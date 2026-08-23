@@ -1,0 +1,23 @@
+*.log
+.DS_Store
+__pycache__/
+
+# Regenerable build outputs (large)
+artifacts/
+sources/
+
+# Generated report JSONs (regenerable, some >10 MB)
+reports/generated/**/*.json
+!reports/generated/u11-repro/reproducibility.json
+
+# Accidental files
+-.0
+-.1
+tab-s9-fe-linux/
+
+# IDE
+.vscode/
+.idea/
+
+# Local-only documents (not for publication)
+.local-only/

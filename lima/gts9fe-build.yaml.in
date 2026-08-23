@@ -1,0 +1,33 @@
+# Plantilla probada en Apple Silicon. setup-lima.sh sustituye la ruta del repo.
+minimumLimaVersion: 2.0.0
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/resolute/release-20260720/ubuntu-26.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+    digest: "sha256:7bcf159e29ad0000bfed9c57875908c39268f5ed1257f4958fa6a9f5f60edd54"
+  - location: "https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+vmType: vz
+mountType: virtiofs
+cpus: 6
+memory: 8GiB
+disk: 35GiB
+param:
+  internal_netplanOptional: "true"
+mounts:
+  - location: "__PROJECT_ROOT__"
+    mountPoint: "__PROJECT_ROOT__"
+    writable: true
+containerd:
+  system: false
+  user: false
+provision:
+  - mode: system
+    script: |
+      #!/bin/sh
+      set -eux
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update
+      apt-get install -y git make bc bison flex build-essential libssl-dev \
+        libelf-dev dwarves device-tree-compiler lz4 cpio rsync python3 \
+        gcc-aarch64-linux-gnu libc6-dev-arm64-cross diffstat clang lld llvm \
+        ccache kmod musl-tools file

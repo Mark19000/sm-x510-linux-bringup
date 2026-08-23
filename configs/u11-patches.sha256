@@ -1,0 +1,10 @@
+4b879525b641ab7220edda8e8047ab9802acff9f9d76016c9ac3314f4eccae8a  0001-arm64-configs-gts9fewifi-enable-linux-early-userspace.patch
+f14eebabbdc4b43b654597b2e7a51e5f96ab1e58771b37af2da4398937e430a8  0002-build-fix-modern-clang.patch
+3d486fc592d64343b13e780f7344e4548cc5b1688dc617d8a1901dbe628c94d9  0003-devfreq-add-missing-return-type.patch
+b57c468e8e2cab3226d1a0833e8c4522c815c146f6a92f30859d689add763603  0004-vendor-drivers-fix-invalid-declarations.patch
+0edfe6b5919be3a0816b5ae9d415e5d3ac2070575bceb62948096e505609df4c  0005-gpu-qos-add-flag-check-return-type.patch
+ca28d992bee42ae11461b47b3e0a75a5ae87b62e5518fab89cf7abd53ecd1de1  0006-devfreq-remove-broken-dfs-id-fallback.patch
+b7ec60361a63d84230f141ea57d596acb4153b4e2aecf62bdbf4b0acd667156a  0008-bringup-disable-crash-tests-and-init-charger-event.patch
+3f7e0d822924e6f8436f1309e73016cd33feacfdf82ac7209d99fed9664794ef  0009-input-novatek-return-valid-irq-status.patch
+17e213da6bfc796b2ca4cbd7cb3986c4c2048914cfb796ba7913fe0b5230e5c3  0010-usb-typec-use-power-port-enum.patch
+35afd5eb9c53419c9604b83f6e390dba81308dd91b4e3059ecca56f46eb75350  0011-build-use-reproducible-kernel-vdso-build-ids.patch

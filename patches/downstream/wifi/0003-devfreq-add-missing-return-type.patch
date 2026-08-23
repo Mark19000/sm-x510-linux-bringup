@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000003 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 12:20:00 +0200
+Subject: [PATCH] ANDROID: devfreq: add missing alt-mode return type
+
+The implementation returns int, but its public declaration relies on the
+removed implicit-int rule.  Match the prototype to the implementation.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ include/soc/samsung/exynos-devfreq.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/soc/samsung/exynos-devfreq.h b/include/soc/samsung/exynos-devfreq.h
+--- a/include/soc/samsung/exynos-devfreq.h
++++ b/include/soc/samsung/exynos-devfreq.h
+@@ -255,6 +255,6 @@ struct exynos_profile_data {
+ };
+ 
+ #if IS_ENABLED(CONFIG_EXYNOS_ALT_DVFS)
+-extern exynos_devfreq_alt_mode_change(unsigned int devfreq_type, int new_mode);
++extern int exynos_devfreq_alt_mode_change(unsigned int devfreq_type, int new_mode);
+ extern void exynos_alt_call_chain(void);
+ #endif
+-- 
+2.50.1

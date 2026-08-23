@@ -1,0 +1,29 @@
+schema=1
+vm=gts9fe-build
+architecture=aarch64
+purpose=frozen-toolchain-evidence-for-fixed6-fixed7
+
+tool=clang path=/usr/bin/clang realpath=/usr/lib/llvm-21/bin/clang sha256=3d91c53a01052091b2d6624ff1008f89748ac45d7cfb2709ad618bf399882eb1
+version=clang Ubuntu clang version 21.1.8 (6ubuntu1)
+tool=ld.lld path=/usr/bin/ld.lld realpath=/usr/lib/llvm-21/bin/lld sha256=007205bb0fb0514ae69f8b55e33a240b2eeb41e3193cb0320bf72b96442b442f
+version=ld.lld Ubuntu LLD 21.1.8 (compatible with GNU linkers)
+tool=llvm-ar path=/usr/bin/llvm-ar realpath=/usr/lib/llvm-21/bin/llvm-ar sha256=a1d4269ef633d4e2621bf26d55f962fc38bcbefedea23c7e684a112e5f45c0f1
+version=llvm-ar Ubuntu LLVM version 21.1.8
+tool=llvm-nm path=/usr/bin/llvm-nm realpath=/usr/lib/llvm-21/bin/llvm-nm sha256=03f15f9348714773e5647af1337da1b03cca9bf744f28adbb76932c574420ab6
+version=llvm-nm llvm-nm, compatible with GNU nm
+tool=llvm-objcopy path=/usr/bin/llvm-objcopy realpath=/usr/lib/llvm-21/bin/llvm-objcopy sha256=dd347b03f80deab8702dcb30ae33932ac63872ed35ea9c1fcd06cb989dc09fc3
+version=llvm-objcopy llvm-objcopy, compatible with GNU objcopy
+tool=llvm-strip path=/usr/bin/llvm-strip realpath=/usr/lib/llvm-21/bin/llvm-objcopy sha256=dd347b03f80deab8702dcb30ae33932ac63872ed35ea9c1fcd06cb989dc09fc3
+version=llvm-strip llvm-strip, compatible with GNU strip
+tool=pahole path=/usr/bin/pahole realpath=/usr/bin/pahole sha256=a3e36155c58b8061305a54b51fe46a7fb85919830607b0a8710df4f63c974e5d
+version=pahole v1.31
+tool=dtc path=/usr/bin/dtc realpath=/usr/bin/dtc sha256=d2b8c61774ecfd6eef1b7f0f9c9a7323ad406ca607d404c22ba6dcac55e04847
+version=dtc Version: DTC 1.7.2
+tool=make path=/usr/bin/make realpath=/usr/bin/make sha256=b12eeb672d64e798b84f297c116651ccbb3ca726a108c74ffe9a60d85547315d
+version=make GNU Make 4.4.1
+tool=tar path=/usr/bin/tar realpath=/usr/bin/tar sha256=0e854852a227a61be4a717674e5b5902188bfa6b92332c7ba22e85edf48f8de9
+version=tar tar (GNU tar) 1.35
+tool=gzip path=/usr/bin/gzip realpath=/usr/bin/gzip sha256=9237464960fa4dc2010365a8921b2b30248576513c67bed6d5bc053e56ccc979
+version=gzip gzip 1.14
+tool=sha256sum path=/usr/bin/sha256sum realpath=/usr/lib/cargo/bin/coreutils/sha256sum sha256=956b53a693650d61b2b4d3f035237de469b28522df27c58f7628d7d731e7f1e1
+version=sha256sum sha256sum (uutils coreutils) 0.8.0

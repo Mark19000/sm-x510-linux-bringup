@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000009 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 13:30:00 +0200
+Subject: [PATCH] ANDROID: input: novatek: return a valid IRQ status on resume failure
+
+The threaded interrupt handler returned SEC_ERROR or a negative errno when a
+resume wait failed.  Neither is a valid irqreturn_t.  The interrupt belongs to
+this device and has been consumed even when its event must be dropped, so
+report IRQ_HANDLED on both failure paths.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ drivers/input/touchscreen/novatek/nt36523_tablet_spi/nt36xxx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/input/touchscreen/novatek/nt36523_tablet_spi/nt36xxx.c b/drivers/input/touchscreen/novatek/nt36523_tablet_spi/nt36xxx.c
+--- a/drivers/input/touchscreen/novatek/nt36523_tablet_spi/nt36xxx.c
++++ b/drivers/input/touchscreen/novatek/nt36523_tablet_spi/nt36xxx.c
+@@ -2765,12 +2765,12 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 		ret = wait_for_completion_interruptible_timeout(&ts->resume_done, msecs_to_jiffies(500));
+ 		if (ret == 0) {
+ 			input_err(true, &ts->client->dev, "%s: LPM: pm resume is not handled\n", __func__);
+-			return SEC_ERROR;
++			return IRQ_HANDLED;
+ 		}
+ 
+ 		if (ret < 0) {
+ 			input_err(true, &ts->client->dev, "%s: LPM: -ERESTARTSYS if interrupted, %d\n", __func__, ret);
+-			return ret;
++			return IRQ_HANDLED;
+ 		}
+ 
+ 		input_info(true, &ts->client->dev, "%s: run LPM interrupt handler, %d\n", __func__, ret);
+-- 
+2.50.1

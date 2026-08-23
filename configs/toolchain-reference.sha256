@@ -1,0 +1,4 @@
+e0d32d2123532860f97123d927b1bb86c4e08e6fd8a48bfc6b5bee0afae9ebd5  sources/toolchain/magisk-v30.7/Magisk-v30.7.apk
+d7440e2cd89899426e809554bf793baef9804ccbe5a52ce34a8b6242725d3c77  sources/toolchain/magisk-v30.7/magiskboot-arm64
+d4683e75f9a12a0a7089871fcc0432d242ccc6d44e7c5fe18f4a0f527151ab66  sources/toolchain/avb-android16.tar.gz
+e5a664a38db623da00f080219bc0ee60a640a9dc4a872803616fae4938ac749b  sources/toolchain/avb-android16/avbtool.py

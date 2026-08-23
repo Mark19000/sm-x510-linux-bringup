@@ -1,0 +1,6 @@
+# Receta congelada para los dos runs limpios fixed8/fixed9.
+# Formato: SHA-256, dos espacios, ruta relativa a la raíz del proyecto.
+e498a801660699da3a449560f663a4fbab90830877242663537737c7da779336  scripts/build-u11-kernel-guest.sh
+3ac5e4426811c36c16f79374b2cbac9691dabfb455238023a3b1c36be3fdbd60  scripts/build-osrc-u11-in-lima.sh
+0ea5fa94ea1cf6c73b949879a1aaee21a8a33824413623b26285ac7619c29cee  configs/gts9fe-linux.fragment
+aa6a2a00fe26fe83ce5c164ae2cc2e227780e8554d716b484d87455aaee841ae  configs/u11-patches.sha256

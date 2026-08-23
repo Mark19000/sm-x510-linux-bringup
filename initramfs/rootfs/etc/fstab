@@ -1,0 +1,5 @@
+proc    /proc           proc    nosuid,nodev,noexec  0 0
+sysfs   /sys            sysfs   nosuid,nodev,noexec  0 0
+devpts  /dev/pts        devpts  nosuid,noexec        0 0
+tmpfs   /run            tmpfs   nosuid,nodev         0 0
+

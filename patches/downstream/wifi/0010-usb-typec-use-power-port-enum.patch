@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000010 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 13:40:00 +0200
+Subject: [PATCH] ANDROID: usb: typec: sm5714: compare the correct port enum
+
+port_type_set receives enum typec_port_type, whose source and sink values are
+TYPEC_PORT_SRC and TYPEC_PORT_SNK.  TYPEC_PORT_DFP and TYPEC_PORT_UFP belong to
+enum typec_port_data and must not be compared here.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ drivers/usb/typec/sm/sm5714/sm5714_typec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/usb/typec/sm/sm5714/sm5714_typec.c b/drivers/usb/typec/sm/sm5714/sm5714_typec.c
+--- a/drivers/usb/typec/sm/sm5714/sm5714_typec.c
++++ b/drivers/usb/typec/sm/sm5714/sm5714_typec.c
+@@ -1348,12 +1348,12 @@ static int sm5714_port_type_set(struct typec_port *port,
+ 		usbpd_data->typec_data_role, port_type);
+ 
+ 	reinit_completion(&usbpd_data->typec_reverse_completion);
+-	if (port_type == TYPEC_PORT_DFP) {
++	if (port_type == TYPEC_PORT_SRC) {
+ 		pr_info("%s : try reversing, from UFP(Sink) to DFP(Source)\n",
+ 			__func__);
+ 		usbpd_data->typec_try_state_change = TRY_ROLE_SWAP_TYPE;
+ 		sm5714_rprd_mode_change(usbpd_data, TYPE_C_ATTACH_DFP);
+-	} else if (port_type == TYPEC_PORT_UFP) {
++	} else if (port_type == TYPEC_PORT_SNK) {
+ 		pr_info("%s : try reversing, from DFP(Source) to UFP(Sink)\n",
+ 			__func__);
+ #if IS_ENABLED(CONFIG_PDIC_NOTIFIER)
+-- 
+2.50.1

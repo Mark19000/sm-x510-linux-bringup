@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000001 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 12:00:00 +0200
+Subject: [PATCH] ANDROID: arm64: gts9fe: enable Linux early userspace
+
+The shipping Android configuration has initrd support but deliberately leaves
+devtmpfs and virtual terminals disabled.  A standalone Linux initramfs needs a
+populated /dev and benefits from a rescue console before Android userspace or
+udev is available.
+
+Enable the minimum facilities used by the project's diagnostic initramfs.  No
+storage write policy or security bypass is changed here.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ arch/arm64/configs/s5e8835-gts9fexx_defconfig | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/configs/s5e8835-gts9fexx_defconfig b/arch/arm64/configs/s5e8835-gts9fexx_defconfig
+--- a/arch/arm64/configs/s5e8835-gts9fexx_defconfig
++++ b/arch/arm64/configs/s5e8835-gts9fexx_defconfig
+@@ -233,3 +233,3 @@
+ # CONFIG_SYSFS_SYSCALL is not set
+-# CONFIG_FHANDLE is not set
++CONFIG_FHANDLE=y
+ CONFIG_POSIX_TIMERS=y
+@@ -1775,3 +1775,4 @@
+ # CONFIG_UEVENT_HELPER is not set
+-# CONFIG_DEVTMPFS is not set
++CONFIG_DEVTMPFS=y
++CONFIG_DEVTMPFS_MOUNT=y
+ CONFIG_STANDALONE=y
+@@ -2969,3 +2970,6 @@
+ CONFIG_TTY=y
+-# CONFIG_VT is not set
++CONFIG_VT=y
++CONFIG_CONSOLE_TRANSLATIONS=y
++CONFIG_VT_CONSOLE=y
++CONFIG_VT_HW_CONSOLE_BINDING=y
+ CONFIG_UNIX98_PTYS=y
+@@ -7681,4 +7685,4 @@
+ CONFIG_TMPFS=y
+-# CONFIG_TMPFS_POSIX_ACL is not set
+-# CONFIG_TMPFS_XATTR is not set
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_TMPFS_XATTR=y
+ # CONFIG_TMPFS_INODE64 is not set
+-- 
+2.50.1

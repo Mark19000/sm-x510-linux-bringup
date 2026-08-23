@@ -1,0 +1,151 @@
+#!/bin/busybox sh
+
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export HOME=/root
+export TERM=linux
+
+echo "[gts9fe-init] iniciando early userspace"
+
+/bin/busybox mount -t proc proc /proc || echo "[gts9fe-init] ERROR: no se pudo montar /proc"
+/bin/busybox mount -t sysfs sysfs /sys || echo "[gts9fe-init] ERROR: no se pudo montar /sys"
+/bin/busybox mount -t devtmpfs devtmpfs /dev 2>/dev/null || \
+    echo "[gts9fe-init] AVISO: devtmpfs no se pudo montar; se intentará mdev"
+/bin/busybox mkdir -p /dev/pts /run /tmp /newroot /sys/kernel/debug
+/bin/busybox mount -t devpts devpts /dev/pts 2>/dev/null || true
+/bin/busybox mount -t tmpfs -o mode=0755,nosuid,nodev tmpfs /run 2>/dev/null || true
+/bin/busybox mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs /tmp 2>/dev/null || true
+/bin/busybox mount -t debugfs debugfs /sys/kernel/debug 2>/dev/null || true
+/bin/busybox hostname gts9fe-rescue
+
+echo "[gts9fe-init] kernel: $(/bin/busybox uname -a)"
+echo "[gts9fe-init] cmdline: $(/bin/busybox cat /proc/cmdline)"
+
+# Populate /dev on kernels where devtmpfs exists but was not mounted automatically.
+if [ -x /sbin/mdev ]; then
+    echo /sbin/mdev > /proc/sys/kernel/hotplug 2>/dev/null || true
+    /sbin/mdev -s 2>/dev/null || true
+fi
+
+# Load modules copied into the image, if any. Failures remain visible in dmesg.
+if [ -d /lib/modules ]; then
+    MODULE_FAILURES=""
+    /sbin/depmod -a 2>/dev/null || true
+    if [ -f /etc/gts9fe-modules ]; then
+        while read -r module rest; do
+            case "$module" in ""|\#*) continue ;; esac
+            echo "[gts9fe-init] cargando módulo $module"
+            if ! /sbin/modprobe "$module"; then
+                echo "[gts9fe-init] ERROR: no se pudo cargar $module"
+                MODULE_FAILURES="$MODULE_FAILURES $module"
+            fi
+        done < /etc/gts9fe-modules
+    fi
+    [ -z "$MODULE_FAILURES" ] || \
+        echo "[gts9fe-init] módulos fallidos:$MODULE_FAILURES"
+fi
+
+setup_usb_acm() {
+    /bin/busybox mkdir -p /sys/kernel/config
+    /bin/busybox mount -t configfs configfs /sys/kernel/config 2>/dev/null || true
+    [ -d /sys/kernel/config/usb_gadget ] || return 1
+    UDC=$(/bin/busybox ls /sys/class/udc 2>/dev/null | /bin/busybox head -n 1)
+    [ -n "$UDC" ] || return 1
+
+    G=/sys/kernel/config/usb_gadget/gts9fe
+    if [ -e "$G" ]; then
+        echo "[gts9fe-init] ERROR: ya existe el gadget parcial $G"
+        return 1
+    fi
+    cleanup_usb_gadget() {
+        [ ! -e "$G/UDC" ] || echo "" > "$G/UDC" 2>/dev/null || true
+        /bin/busybox rm -f "$G/configs/c.1/acm.usb0" 2>/dev/null || true
+        /bin/busybox rmdir "$G/functions/acm.usb0" \
+            "$G/configs/c.1/strings/0x409" "$G/configs/c.1" \
+            "$G/strings/0x409" "$G/strings" "$G" 2>/dev/null || true
+    }
+    usb_step_failed() {
+        echo "[gts9fe-init] ERROR USB ACM: $1"
+        cleanup_usb_gadget
+        return 1
+    }
+
+    /bin/busybox mkdir -p "$G/strings/0x409" "$G/configs/c.1/strings/0x409" || {
+        usb_step_failed "no se pudo crear ConfigFS"
+        return 1
+    }
+    echo 0x1d6b > "$G/idVendor" || { usb_step_failed idVendor; return 1; }
+    echo 0x0104 > "$G/idProduct" || { usb_step_failed idProduct; return 1; }
+    echo gts9fe-linux > "$G/strings/0x409/serialnumber" || {
+        usb_step_failed serialnumber; return 1;
+    }
+    echo "Linux bring-up" > "$G/strings/0x409/manufacturer" || {
+        usb_step_failed manufacturer; return 1;
+    }
+    echo "Tab S9 FE rescue" > "$G/strings/0x409/product" || {
+        usb_step_failed product; return 1;
+    }
+    echo "ACM rescue" > "$G/configs/c.1/strings/0x409/configuration" || {
+        usb_step_failed configuration; return 1;
+    }
+    /bin/busybox mkdir -p "$G/functions/acm.usb0" || {
+        usb_step_failed function; return 1;
+    }
+    /bin/busybox ln -s "$G/functions/acm.usb0" "$G/configs/c.1/acm.usb0" || {
+        usb_step_failed enlace; return 1;
+    }
+    if ! echo "$UDC" > "$G/UDC"; then
+        echo "[gts9fe-init] ERROR: el UDC $UDC rechazó el gadget"
+        cleanup_usb_gadget
+        return 1
+    fi
+    echo "[gts9fe-init] consola USB ACM solicitada en /dev/ttyGS0"
+
+    (
+        while true; do
+            [ -c /dev/ttyGS0 ] && /bin/busybox setsid /bin/busybox sh -c \
+                'exec /bin/busybox sh -i </dev/ttyGS0 >/dev/ttyGS0 2>&1'
+            /bin/busybox sleep 2
+        done
+    ) &
+}
+
+USB_DEBUG_REQUESTED=0
+case " $(/bin/busybox cat /proc/cmdline) " in
+    *" gts9fe.usb_debug=1 "*)
+        USB_DEBUG_REQUESTED=1
+        setup_usb_acm || echo "[gts9fe-init] USB ACM aún no disponible"
+        ;;
+esac
+
+ROOTDEV=""
+DO_SWITCH_ROOT=0
+for arg in $(/bin/busybox cat /proc/cmdline); do
+    case "$arg" in
+        gts9fe.root=*) ROOTDEV=${arg#gts9fe.root=} ;;
+        gts9fe.switch_root=1) DO_SWITCH_ROOT=1 ;;
+    esac
+done
+
+if [ -n "$ROOTDEV" ]; then
+    echo "[gts9fe-init] intentando montar $ROOTDEV en sólo lectura"
+    if /bin/busybox mount -o ro "$ROOTDEV" /newroot; then
+        if [ "$DO_SWITCH_ROOT" = 1 ] && [ "$USB_DEBUG_REQUESTED" = 1 ]; then
+            echo "[gts9fe-init] no se combina switch_root con la shell USB de rescate"
+        elif [ "$DO_SWITCH_ROOT" = 1 ] && [ -x /newroot/sbin/init ]; then
+            exec /sbin/switch_root /newroot /sbin/init
+        elif [ "$DO_SWITCH_ROOT" = 1 ]; then
+            echo "[gts9fe-init] falta /newroot/sbin/init ejecutable; no hago switch_root"
+        else
+            echo "[gts9fe-init] raíz disponible en /newroot; switch_root no solicitado"
+        fi
+        echo "[gts9fe-init] continúo en rescate con /newroot montado en sólo lectura"
+    else
+        echo "[gts9fe-init] no se pudo montar $ROOTDEV; entro en rescate"
+    fi
+fi
+
+echo "[gts9fe-init] dispositivos de bloque:"
+/bin/busybox ls -l /dev/block /dev/sd* /dev/mmcblk* 2>/dev/null || true
+[ -e /dev/console ] || echo "[gts9fe-init] AVISO: /dev/console no existe; la shell puede no ser visible"
+echo "[gts9fe-init] shell de rescate. Usa dmesg, cat /proc/iomem y ls /sys."
+exec /bin/busybox sh -i

@@ -1,0 +1,48 @@
+# Early userspace and device discovery
+CONFIG_BLK_DEV_INITRD=y
+CONFIG_RD_GZIP=y
+CONFIG_RD_LZ4=y
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+CONFIG_FHANDLE=y
+
+# Rescue terminals
+CONFIG_TTY=y
+CONFIG_VT=y
+CONFIG_CONSOLE_TRANSLATIONS=y
+CONFIG_VT_CONSOLE=y
+CONFIG_VT_HW_CONSOLE_BINDING=y
+CONFIG_UNIX98_PTYS=y
+CONFIG_SERIAL_EARLYCON=y
+CONFIG_SERIAL_SAMSUNG=y
+CONFIG_SERIAL_SAMSUNG_CONSOLE=y
+
+# Filesystems useful during bring-up
+CONFIG_PROC_FS=y
+CONFIG_SYSFS=y
+CONFIG_TMPFS=y
+CONFIG_TMPFS_POSIX_ACL=y
+CONFIG_TMPFS_XATTR=y
+CONFIG_CONFIGFS_FS=y
+CONFIG_DEBUG_FS=y
+CONFIG_EXT4_FS=y
+
+# Diagnostics: keep these during bring-up, remove for production
+CONFIG_IKCONFIG=y
+CONFIG_IKCONFIG_PROC=y
+CONFIG_PRINTK_TIME=y
+CONFIG_MAGIC_SYSRQ=y
+CONFIG_DYNAMIC_DEBUG=y
+
+# Reproducibilidad del kernel de bring-up. IKHEADERS empaqueta cabeceras con
+# mtimes de pared dentro de Image. La firma automática genera una clave y un
+# certificado nuevos en cada O=. Ninguno es necesario para M2/M3; los módulos
+# se usan sólo con el kernel construido en la misma ejecución.
+# CONFIG_IKHEADERS is not set
+# CONFIG_MODULE_SIG is not set
+
+# USB gadget rescue console (only used when the controller reaches peripheral mode)
+CONFIG_USB_GADGET=y
+CONFIG_USB_CONFIGFS=y
+CONFIG_USB_CONFIGFS_SERIAL=y
+CONFIG_USB_CONFIGFS_ACM=y

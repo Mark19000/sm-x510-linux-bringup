@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000004 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 12:30:00 +0200
+Subject: [PATCH] ANDROID: samsung: fix invalid declarations in vendor drivers
+
+Give the WLAN bypass variable and RCD cleanup argument their real types.  Also
+read the external idle-IP name before its allocation error path prints it;
+otherwise that path dereferences an uninitialized pointer.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ drivers/gpu/drm/samsung/dpu/cal_qt/rcd_reg.c | 2 +-
+ drivers/misc/samsung/scsc/pmu_cal.c           | 2 +-
+ drivers/soc/samsung/exynos-cpupm.c            | 8 ++++++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/drm/samsung/dpu/cal_qt/rcd_reg.c b/drivers/gpu/drm/samsung/dpu/cal_qt/rcd_reg.c
+--- a/drivers/gpu/drm/samsung/dpu/cal_qt/rcd_reg.c
++++ b/drivers/gpu/drm/samsung/dpu/cal_qt/rcd_reg.c
+@@ -61,7 +61,7 @@ static int rcd_reg_wait_sw_reset_status(u32 id)
+ 	return 0;
+ }
+ 
+-static void rcd_reg_check_cleanup(id)
++static void rcd_reg_check_cleanup(u32 id)
+ {
+ 	if (rcd_read(id, DMA_RCD_IRQ) & DMA_RCD_DEADLOCK_IRQ) {
+ 		rcd_reg_set_sw_reset(id);
+diff --git a/drivers/misc/samsung/scsc/pmu_cal.c b/drivers/misc/samsung/scsc/pmu_cal.c
+--- a/drivers/misc/samsung/scsc/pmu_cal.c
++++ b/drivers/misc/samsung/scsc/pmu_cal.c
+@@ -15,7 +15,7 @@
+  *	};
+  */
+ 
+-extern enable_hwbypass;
++extern bool enable_hwbypass;
+ 
+ static char *pmu_cal_getsfr(int sfr)
+ {
+diff --git a/drivers/soc/samsung/exynos-cpupm.c b/drivers/soc/samsung/exynos-cpupm.c
+--- a/drivers/soc/samsung/exynos-cpupm.c
++++ b/drivers/soc/samsung/exynos-cpupm.c
+@@ -1736,14 +1736,18 @@ static int extern_idle_ip_init(struct device_node *dn)
+ 		struct idle_ip *ip;
+ 		const char *name;
+ 
++		if (of_property_read_string_index(child, "extern-idle-ip", i,
++						  &name)) {
++			spin_unlock_irqrestore(&idle_ip_lock, flags);
++			return -EINVAL;
++		}
++
+ 		ip = kzalloc(sizeof(struct idle_ip), GFP_KERNEL);
+ 		if (!ip) {
+ 			pr_err("Failed to allocate idle_ip [ip=%s].", name);
+ 			spin_unlock_irqrestore(&idle_ip_lock, flags);
+ 			return -ENOMEM;
+ 		}
+ 
+-		of_property_read_string_index(child, "extern-idle-ip", i, &name);
+-
+ 		new_index = list_last_entry(&ip_list,
+ 				struct idle_ip, list)->index + 1;
+-- 
+2.50.1

@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000005 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 12:40:00 +0200
+Subject: [PATCH] ANDROID: gpu: qos: declare flag helper as bool
+
+The helper is used exclusively as a predicate.  Declare its omitted return
+type explicitly instead of relying on C's obsolete implicit-int behaviour.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ drivers/gpu/arm/exynos/backend/gpexbe_qos_internal.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/arm/exynos/backend/gpexbe_qos_internal.h b/drivers/gpu/arm/exynos/backend/gpexbe_qos_internal.h
+--- a/drivers/gpu/arm/exynos/backend/gpexbe_qos_internal.h
++++ b/drivers/gpu/arm/exynos/backend/gpexbe_qos_internal.h
+@@ -18,6 +18,6 @@
+  * http://www.gnu.org/licenses/gpl-2.0.html.
+  */
+ 
+-static inline pmqos_flag_check(mali_pmqos_flags type, mali_pmqos_flags in)
++static inline bool pmqos_flag_check(mali_pmqos_flags type, mali_pmqos_flags in)
+ {
+ 	return (type & in) == in;
+-- 
+2.50.1

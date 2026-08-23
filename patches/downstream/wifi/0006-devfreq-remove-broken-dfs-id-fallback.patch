@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000006 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 13:00:00 +0200
+Subject: [PATCH] ANDROID: devfreq: reject a missing dfs_id safely
+
+The fallback passes an uninitialized string pointer to
+of_property_match_string() and does not store its return value.  All S5E8835
+devfreq domains provide dfs_id, so fail cleanly when that required property is
+absent instead of retaining an unusable and unsafe fallback.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ drivers/devfreq/exynos/exynos-devfreq.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/devfreq/exynos/exynos-devfreq.c b/drivers/devfreq/exynos/exynos-devfreq.c
+--- a/drivers/devfreq/exynos/exynos-devfreq.c
++++ b/drivers/devfreq/exynos/exynos-devfreq.c
+@@ -1826,8 +1826,7 @@ static int exynos_devfreq_parse_dt(struct device_node *np, struct exynos_devfreq
+ 	if (of_property_read_u32(np, "pm_qos_class_max", &data->pm_qos_class_max))
+ 		return -ENODEV;
+ 
+-	if (of_property_read_u32(np, "dfs_id", &data->dfs_id) &&
+-			of_property_match_string(np, "clock-names", buf))
++	if (of_property_read_u32(np, "dfs_id", &data->dfs_id))
+ 		return -ENODEV;
+ 
+ #if IS_ENABLED(CONFIG_DEBUG_SNAPSHOT)
+-- 
+2.50.1

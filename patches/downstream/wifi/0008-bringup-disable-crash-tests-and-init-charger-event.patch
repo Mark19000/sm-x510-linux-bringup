@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000008 Mon Sep 17 00:00:00 2001
+From: Tab S9 FE Linux Project <noreply@example.invalid>
+Date: Sat, 22 Aug 2026 13:20:00 +0200
+Subject: [PATCH] ANDROID: bringup: omit crash injector and initialize charger event
+
+sec_debug_test is a deliberate crash/corruption injection facility, not a
+driver needed by Linux userspace.  It also embeds FPSIMD instructions in a
+kernel built with -mgeneral-regs-only.  Do not include it in the bring-up
+kernel.
+
+Initialize the SM5714 notification value.  The receiving battery callback only
+uses this property as an event, but passing indeterminate data is still invalid
+C and is rejected by modern Clang.
+
+Signed-off-by: Tab S9 FE Linux Project <noreply@example.invalid>
+---
+ drivers/battery/charger/sm5714_charger/sm5714_charger.c | 2 +-
+ drivers/samsung/debug/Makefile                           | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/battery/charger/sm5714_charger/sm5714_charger.c b/drivers/battery/charger/sm5714_charger/sm5714_charger.c
+--- a/drivers/battery/charger/sm5714_charger/sm5714_charger.c
++++ b/drivers/battery/charger/sm5714_charger/sm5714_charger.c
+@@ -1292,7 +1292,7 @@ static inline int _reduce_input_limit_current(struct sm5714_charger_data *charger
+ 
+ static inline void _check_slow_rate_charging(struct sm5714_charger_data *charger)
+ {
+-	union power_supply_propval value;
++	union power_supply_propval value = { 0 };
+ 
+ 	if (charger->input_current <= SLOW_CHARGING_CURRENT_STANDARD &&
+ 			charger->cable_type != SEC_BATTERY_CABLE_NONE) {
+diff --git a/drivers/samsung/debug/Makefile b/drivers/samsung/debug/Makefile
+--- a/drivers/samsung/debug/Makefile
++++ b/drivers/samsung/debug/Makefile
+@@ -7,6 +7,5 @@ sec_debug-y				+= sec_debug_base.o
+ sec_debug-y				+= sec_dump_sink.o
+ obj-$(CONFIG_SEC_DEBUG_BASE)		+= sec_debug_base_early.o
+-obj-$(CONFIG_SEC_DEBUG_BASE)		+= sec_debug_test.o
+ obj-$(CONFIG_SEC_DEBUG_BASE)		+= sec_debug_dprm.o
+ obj-$(CONFIG_SEC_DEBUG_BASE)		+= sec_debug_dprt.o
+ 
+-- 
+2.50.1
