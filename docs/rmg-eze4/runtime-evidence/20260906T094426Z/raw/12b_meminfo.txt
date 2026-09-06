@@ -1,0 +1,58 @@
+HOST_TIMESTAMP_UTC=2026-09-06T09:45:57Z
+COMMAND=adb shell cat /proc/meminfo
+STDOUT_BEGIN
+MemTotal:        7899684 kB
+MemFree:          430344 kB
+MemAvailable:    4335012 kB
+Buffers:            2536 kB
+Cached:          4095344 kB
+SwapCached:       126668 kB
+Active:          3881748 kB
+Inactive:        1474184 kB
+Active(anon):    1238268 kB
+Inactive(anon):   228792 kB
+Active(file):    2643480 kB
+Inactive(file):  1245392 kB
+Unevictable:        4348 kB
+Mlocked:            4348 kB
+RbinTotal:        204800 kB
+RbinAlloced:           0 kB
+RbinPool:              0 kB
+RbinFree:           9060 kB
+RbinCached:       195740 kB
+SwapTotal:       8388604 kB
+SwapFree:        7434724 kB
+Dirty:               312 kB
+Writeback:             0 kB
+AnonPages:       1454412 kB
+Mapped:          1225888 kB
+Shmem:             14736 kB
+KReclaimable:     252324 kB
+Slab:             486124 kB
+SReclaimable:     170100 kB
+SUnreclaim:       316024 kB
+KernelStack:       67120 kB
+ShadowCallStack:   16816 kB
+PageTables:       136628 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:    12236044 kB
+Committed_AS:   251187972 kB
+VmallocTotal:   259653632 kB
+VmallocUsed:      304220 kB
+VmallocChunk:          0 kB
+Percpu:            11296 kB
+AnonHugePages:         0 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+FileHugePages:         0 kB
+FilePmdMapped:         0 kB
+CmaTotal:         339968 kB
+CmaFree:               0 kB
+GpuTotal:              32276 kB
+system:            21184 kB
+system-uncached:  157108 kB
+zram0:            304628 kB
+STDOUT_END
+RETURN_STATUS=0

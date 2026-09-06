@@ -1,0 +1,15 @@
+{
+  "campaign": "SYNTHETIC_PHASE_I_CAMPAIGN",
+  "synthetic": true,
+  "sessions": ["SYN-SESSION-001", "SYN-SESSION-002"],
+  "boots": ["SYN-BOOT-A", "SYN-BOOT-B", "SYN-BOOT-C"],
+  "conditions": ["SYN-COND-NOMINAL", "SYN-COND-ALT", "SYN-COND-UNKNOWN"],
+  "cases": [
+    {"parameter": "SKB_SEND_SIZE", "classification": "COMPATIBLE", "evidence_level": "E3", "raw_refs": ["raw/sha256:synthetic-geom-a", "raw/sha256:synthetic-geom-b"]},
+    {"parameter": "SLIDE_WAIT_NSEC", "classification": "INCOMPATIBLE", "evidence_level": "E3", "raw_refs": ["raw/sha256:synthetic-wait-a"]},
+    {"parameter": "FOPS_ROUTE_FINE_DELAY_TICKS", "classification": "INCONCLUSIVE", "reason": "CROSS_CONDITION_REQUIRED", "evidence_level": "E3"},
+    {"parameter": "P0_FINGERPRINT_MIN_MARGIN", "classification": "INCONCLUSIVE", "reason": "P0_BLOCKED", "table_membership_only": true},
+    {"parameter": "DEFAULT_ATTEMPT_TIMEOUT_SEC", "classification": "INCONCLUSIVE", "reason": "CONTRADICTORY_OBSERVABLE", "boots": ["SYN-BOOT-A", "SYN-BOOT-B"]},
+    {"parameter": "SLIDE_RECLAIM_SENDS", "classification": "INCONCLUSIVE", "reason": "MISSING_PREREQUISITE", "stop_rule": "MISSING_PREREQUISITE"}
+  ]
+}

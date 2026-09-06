@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Compara dos dist U11 independientes y emite evidencia reproducible."""
+"""Compara dos dist independientes y emite evidencia reproducible.
+
+NOTA DE DEUDA TÉCNICA EN NOMBRADO:
+Este script contiene 'u11' en el nombre de fichero por motivos históricos de
+procedencia, pero es herramienta ACTIVA para la validación reproducible de
+árboles EZE4 / U12 (referenciada en EZE4-SOURCE-MIGRATION-ASSESSMENT.md y tests).
+Para EZE4, la identidad canónica del kernel stock es 5.15.189-android13-3-33478785.
+Se expone un alias canónico en `tools/repro_compare.py`.
+"""
 
 from __future__ import annotations
 
@@ -32,7 +40,7 @@ REQUIRED_METADATA = {
     "source_release": "X510XXSBDZB4",
     "source_base": "X510XXU8DYJ4",
     "target_stock": "X510XXUCEZE4",
-    "kernel_release": "5.15.180",
+    "kernel_release": "5.15.189-android13-3-33478785",
     "modules": "282",
     "boot_image_created": "no",
     "avb_signature_created": "no",

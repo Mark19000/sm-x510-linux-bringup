@@ -21,3 +21,11 @@ tab-s9-fe-linux/
 
 # Local-only documents (not for publication)
 .local-only/
+
+# Root-level temporary scratch and extracted OSRC audit workspaces
+/scratch/
+/audit/
+
+# Large raw runtime logcat and candidate logs (>1 MB)
+docs/rmg-eze4/runtime-evidence/**/09*.txt
+docs/rmg-eze4/runtime-evidence/**/analysis/log_*.txt

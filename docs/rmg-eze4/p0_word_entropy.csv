@@ -1,0 +1,9 @@
+WORD_INDEX,IMAGE_OFFSET_WITHIN_PAGE,UNIQUE_VALUES,MAX_COLLISION_GROUP,ZERO_COUNT,REPEATED_VALUE_COUNT,NOTES
+0,0x000,121,3,0,7,Shannon=6.896 bits. Zero=0.0%. Repeated=5.6%. Top: 0xd503201fd503201f(x3); 0xa9bd7bfdd503233f(x2)
+1,0x200,121,4,0,6,Shannon=6.886 bits. Zero=0.0%. Repeated=4.8%. Top: 0xd503201fd503201f(x4); 0xd50323bfa8c17bfd(x2)
+2,0x400,120,4,1,8,Shannon=6.870 bits. Zero=0.8%. Repeated=6.4%. Top: 0xd503201fd503201f(x4); 0x910003fda90157f6(x2)
+3,0x600,118,4,2,12,Shannon=6.838 bits. Zero=1.6%. Repeated=9.6%. Top: 0xd503201fd503201f(x4); 0xf9000bf5a9bd7bfd(x2)
+4,0x800,119,4,0,10,Shannon=6.854 bits. Zero=0.0%. Repeated=8.0%. Top: 0xd503201fd503201f(x4); 0xa9be7bfdd503233f(x2)
+5,0xa00,121,4,0,6,Shannon=6.886 bits. Zero=0.0%. Repeated=4.8%. Top: 0xd503201fd503201f(x4); 0xd65f03c0d50323bf(x2)
+6,0xc00,122,4,0,4,Shannon=6.902 bits. Zero=0.0%. Repeated=3.2%. Top: 0xd503201fd503201f(x4)
+7,0xe00,120,4,0,8,Shannon=6.870 bits. Zero=0.0%. Repeated=6.4%. Top: 0xd503201fd503201f(x4); 0xd4210000d65f03c0(x2)

@@ -1,0 +1,6 @@
+HOST_TIMESTAMP_UTC=2026-09-06T09:45:02Z
+COMMAND=adb shell getprop ro.product.device
+STDOUT_BEGIN
+gts9fewifi
+STDOUT_END
+RETURN_STATUS=0

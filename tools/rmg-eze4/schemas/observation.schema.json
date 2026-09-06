@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rmg-eze4:phase-i:observation",
+  "title": "RMG EZE4 normalized observation",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["SESSION_ID", "BOOT_ID", "CONDITION_ID", "TRIAL_ID", "MEASUREMENT_ID", "GROUP_ID", "PARAMETER", "OBSERVABLE", "TIMESTAMP_HOST", "SOURCE", "RAW_EVIDENCE_REF", "ENVIRONMENT", "EXPECTED_CRITERION", "OBSERVED_VALUE", "RESULT", "CONFIDENCE", "CONFOUNDERS", "SYNTHETIC", "EVIDENCE_LEVEL", "OBSERVABLE_AVAILABLE"],
+  "properties": {
+    "SESSION_ID": {"type": "string", "minLength": 1},
+    "BOOT_ID": {"type": "string", "minLength": 1},
+    "CONDITION_ID": {"type": "string", "minLength": 1},
+    "TRIAL_ID": {"type": "string", "minLength": 1},
+    "MEASUREMENT_ID": {"type": "string", "minLength": 1},
+    "GROUP_ID": {"enum": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10", "G11", "G12"]},
+    "PARAMETER": {"type": "string", "minLength": 1},
+    "OBSERVABLE": {"type": "string", "minLength": 1},
+    "TIMESTAMP_HOST": {"type": "string", "format": "date-time"},
+    "TIMESTAMP_DEVICE_IF_AVAILABLE": {"type": ["string", "null"]},
+    "SOURCE": {"type": "string", "minLength": 1},
+    "RAW_EVIDENCE_REF": {"type": "string", "minLength": 1},
+    "ENVIRONMENT": {"type": "object"},
+    "EXPECTED_CRITERION": {"type": "string", "minLength": 1},
+    "OBSERVED_VALUE": {},
+    "RESULT": {"enum": ["COMPATIBLE", "INCOMPATIBLE", "INCONCLUSIVE", "SAFE_ABORT", "MEASUREMENT_INVALID", "NOT_OBSERVED"]},
+    "CONFIDENCE": {"enum": ["LOW", "MEDIUM", "HIGH", "UNKNOWN"]},
+    "CONFOUNDERS": {"type": "array", "items": {"type": "string"}},
+    "NOTES": {"type": "string"},
+    "SYNTHETIC": {"type": "boolean"},
+    "EVIDENCE_LEVEL": {"enum": ["E0", "E1", "E2", "E3", "E4"]},
+    "OBSERVABLE_AVAILABLE": {"type": "boolean"}
+  }
+}

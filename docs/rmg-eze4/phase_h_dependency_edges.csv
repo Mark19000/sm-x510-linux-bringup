@@ -1,0 +1,21 @@
+UPSTREAM_PARAMETER,DOWNSTREAM_PARAMETER,RELATION,WHY,EVIDENCE,CONFIDENCE
+SKB_SEND_SIZE,SKB_RECLAIM_SENDS,HARD_PREREQUISITE,Reclaim coverage is uninterpretable until each send's allocation/fragment geometry is established,page.c consumers; runtime_parameter_criticality.csv,HIGH
+SKB_SEND_SIZE,SLIDE_RECLAIM_SENDS,HARD_PREREQUISITE,Slide reclaim coverage is uninterpretable until each send's geometry is established,page.c consumers; runtime_parameter_criticality.csv,HIGH
+SLIDE_WAIT_NSEC,SLIDE_REQUEUE_ARM_USEC,HARD_PREREQUISITE,Requeue ordering is interpreted relative to successful waiter-state establishment,slide_app.c; must_validate_parameter_analysis.md,HIGH
+FOPS_ROUTE_COARSE_DELAY_USEC,FOPS_ROUTE_FINE_DELAY_TICKS,HARD_PREREQUISITE,Fine offsets are selected around the configured coarse route delay,slide_app.c route selection,HIGH
+DEFAULT_ATTEMPT_TIMEOUT_SEC,DEFAULT_P0_ATTEMPT_TIMEOUT_SEC,HARD_PREREQUISITE,The P0 timeout is constrained/clamped by the overall attempt timeout,preload.c,HIGH
+SLIDE_KSNITCH_APPENDED_FUTEXES,SLIDE_KSNITCH_REPEAT_MEASUREMENT,SOFT_PREREQUISITE,Candidate population changes workload and noise seen by measurement,page.c; util.c,MEDIUM
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,SLIDE_KSNITCH_AVERAGE,HARD_PREREQUISITE,The profile consumes them jointly and averaging semantics depend on the repeat profile,page.c kernelsnitch_set_profile,HIGH
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,SLIDE_KSNITCH_SCREEN_REPEAT,SOFT_PREREQUISITE,Screening precedes full confirmation and must be assessed against the full profile,page.c comments and fields,MEDIUM
+SLIDE_KSNITCH_SCREEN_REPEAT,SLIDE_KSNITCH_SCREEN_AVERAGE,HARD_PREREQUISITE,Screen repeat and average jointly define screening,page.c fields,HIGH
+P0_FINGERPRINT_MIN_BEST,P0_FINGERPRINT_MIN_MARGIN,HARD_PREREQUISITE,Acceptance applies both score floor and margin to the same best/second result,oracle.c,HIGH
+SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS,SLIDE_WAIT_NSEC,SOFT_PREREQUISITE,Downstream timing cannot be interpreted if setup never establishes the relevant state,consumer sequence; runtime validation layers,MEDIUM
+FOPS_KERNEL_PAGE_SETUP_ATTEMPTS,FOPS_ROUTE_COARSE_DELAY_USEC,SOFT_PREREQUISITE,Route timing cannot be interpreted if fops setup never establishes the relevant state,consumer sequence; runtime validation layers,MEDIUM
+FOPS_ROUTE_FINE_DELAY_TICKS,DEFAULT_EXPLOIT_ATTEMPTS,SOFT_PREREQUISITE,Array entries are selected cyclically by supervisor attempt number and the cap determines coverage,slide_app.c attempt selection; preload.c,MEDIUM
+SKB_RECLAIM_SENDS,SLIDE_RECLAIM_SENDS,SHARED_ENVIRONMENT,Both depend on allocator state but operate in distinct consumer contexts,runtime_parameter_criticality.csv,HIGH
+SLIDE_WAIT_NSEC,FOPS_ROUTE_COARSE_DELAY_USEC,SHARED_ENVIRONMENT,Both are scheduler/load sensitive but no source ordering exists,runtime_validation_layers.md,HIGH
+SLIDE_REQUEUE_ARM_USEC,FOPS_ROUTE_FINE_DELAY_TICKS,SHARED_ENVIRONMENT,Both are timing-sensitive but belong to different route observations,runtime_validation_layers.md,HIGH
+SLIDE_KSNITCH_APPENDED_FUTEXES,SKB_RECLAIM_SENDS,SHARED_ENVIRONMENT,Both consume memory/resources without a direct logical prerequisite,Phase G independent review,MEDIUM
+DEFAULT_EXPLOIT_ATTEMPTS,SKB_SEND_SIZE,INDEPENDENT,Supervisor opportunity count does not define direct allocation geometry,preload.c versus page.c/fops.c,HIGH
+P0_FINGERPRINT_MIN_BEST,SKB_SEND_SIZE,INDEPENDENT,P0 scoring policy and direct socket-buffer geometry have separable observables,oracle.c versus page.c/fops.c,HIGH
+P0_FINGERPRINT_MIN_MARGIN,SLIDE_KSNITCH_AVERAGE,UNKNOWN,Production sequencing may correlate their outcomes but source does not establish parameter causation,p0_loader_knowledge_gap.md; page.c,LOW

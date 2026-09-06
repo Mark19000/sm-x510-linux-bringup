@@ -1,14 +1,16 @@
 # AVB Experiment Plan — SM-X510 U12/EZE4
 
+> **SUPERSEDED — NO EJECUTAR.** Conservado como diseño histórico. La propuesta `vbmeta-only` no es la primera escritura canónica: altera la raíz completa y no prueba una política Samsung segura. El plan vigente condiciona un candidato `boot-only` a unlock y recovery previamente validados. USB/corriente/backlight nunca constituyen por sí solos prueba de ejecución.
+
 Fecha: 2026-08-24
 Modo: diseño de experimento. Este documento **no autoriza flasheo**, no genera imágenes y no sustituye la confirmación de precondiciones físicas.
 Alcance: distinguir de forma reproducible un rechazo de Android Verified Boot de una entrega de control al kernel seguida de crash temprano.
 
 ## 1. Resumen ejecutivo
 
-El vbmeta raíz stock usa `SHA256_RSA4096`, `Rollback Index = 0`, `Flags = 0`, y ancla por hash directo `boot`, `init_boot`, `vendor_boot`, `dtbo`, `recovery`, `bootloader` y particiones firmware críticas (`ldfw`, `tzsw`, entre otras). Encadena además los vbmeta embebidos de `dtbo` (RIL 1), `prism` (RIL 2) y `optics` (RIL 3), todos con la misma clave pública (`sha1 b6924fd4...4029`).
+El vbmeta raíz stock usa `SHA256_RSA4096`, `Rollback Index = 0`, `Flags = 0`, y ancla por hash directo `boot`, `init_boot`, `vendor_boot`, `recovery`, `bootloader` y particiones firmware críticas (`ldfw`, `tzsw`, entre otras). `dtbo` no es un hash directo del root: es una chain partition (RIL 1) cuyo vbmeta embebido contiene el hash de `dtbo`. También encadena `prism` (RIL 2) y `optics` (RIL 3), con la misma clave pública (`sha1 b6924fd4...4029`).
 
-Bajo bootloader LOCKED, cualquier modificación de una partición cubierta por hash invalida la cadena. El kernel propio no debería ejecutarse en ese estado. Bajo UNLOCKED, AOSP permite verificación tolerante u omitida, pero el comportamiento exacto del bootloader Samsung de este modelo —aceptación de vbmeta regenerado, `--flags 1`, advertencias visibles, límites de rollback o comprobaciones Knox adicionales— es todavía **hipótesis**.
+Bajo bootloader LOCKED, cualquier modificación de una partición cubierta invalida la cadena. El kernel propio no debería ejecutarse en ese estado. Bajo UNLOCKED, AOSP permite verificación tolerante u omitida, pero el comportamiento exacto del bootloader Samsung de este modelo —aceptación de vbmeta con `VERIFICATION_DISABLED` (`flags=2`), advertencias visibles, límites de rollback o comprobaciones Knox adicionales— es todavía **hipótesis**.
 
 El protocolo propuesto es incremental:
 
@@ -34,7 +36,7 @@ Cada fase tiene criterios de éxito, fallo y aborto. La recuperación se basa en
 Descriptores relevantes del vbmeta raíz (`avbtool info_image --image artifacts/stock/images/vbmeta.img`):
 
 - Chain partitions: `dtbo → RIL 1`, `prism → RIL 2`, `optics → RIL 3`.
-- Hash descriptors directos que incluyen: `boot` (39,363,360 bytes; digest `3f28d10f...31a420c`), `init_boot` (digest `4f514634...f32efc`), `vendor_boot` (18,334,480 bytes; digest `7c5898f8...050da7`), `dtbo`, `recovery`, `bootloader`, `fld`, `harx`, `keystorage`, `ldfw`, `tzsw`.
+- Hash descriptors directos que incluyen: `boot` (39,363,360 bytes; digest `3f28d10f...31a420c`), `init_boot` (digest `4f514634...f32efc`), `vendor_boot` (18,334,480 bytes; digest `7c5898f8...050da7`), `recovery`, `bootloader`, `fld`, `harx`, `keystorage`, `ldfw`, `tzsw`. `dtbo` aparece sólo mediante CHAIN en el root.
 - Hashtree descriptors dm-verity: `system`, `vendor`, `product`, `odm`, `system_dlkm`, `vendor_dlkm`.
 - Props: `com.android.build.boot.os_version=13`; `com.android.build.system.os_version=16`; security patch `2026-05-05`.
 
@@ -44,7 +46,7 @@ Implicación estructural directa: cambiar el contenido de `boot`, `init_boot`, `
 
 | ID | Hipótesis | Consecuencia si es falsa |
 |---|---|---|
-| H-AVB-1 | El estado UNLOCKED hace que el bootloader Samsung tolere un vbmeta regenerado con `--flags 1`. | La Fase 1 puede terminar en rechazo persistente, advertencia roja o reboot loop. |
+| H-AVB-1 | El estado UNLOCKED hace que el bootloader Samsung tolere un vbmeta alternativo con `VERIFICATION_DISABLED` (`flags=2`). | La Fase 1 puede terminar en rechazo persistente, advertencia roja o reboot loop. |
 | H-AVB-2 | No hay rollback protection efectiva adicional por RIL/RPMB que rechace índices inferiores o iguales tras cambios locales. | Un vbmeta de test podría quedar bloqueado por política Samsung incluso restaurando imágenes stock. |
 | H-AVB-3 | Download Mode permanece siempre accesible mediante combinación física, incluso tras fallo AVB o kernel panic. | El procedimiento de recuperación puede necesitar otra vía (carga de batería, timing distinto, herramienta Samsung). |
 | H-SIG-1 | Las pantallas de advertencia siguen la semántica estándar YELLOW/ORANGE/RED. | La clasificación visual puede ser ambigua y requerir apoyo de USB/consumo/tiempos. |
@@ -108,7 +110,7 @@ Estado requerido: UNLOCKED confirmado + Fase 0 completa.
 
 Contenido lógico de la sonda (definición, **no fabricar en esta tarea**):
 
-- `vbmeta.img` de auditoría con `flags = 1` (verification disabled), o firma de test válida según política confirmada, conservando estructura de chain partitions.
+- Hipótesis de laboratorio: `vbmeta.img` con `VERIFICATION_DISABLED` (`flags=2`), o firma de test válida según política confirmada, conservando la estructura de chain partitions. `flags=1` es exclusivamente `HASHTREE_DISABLED`; `flags=3` combina ambos bits. Ninguna variante está autorizada ni demostrada en Samsung.
 - Todas las demás particiones permanecen stock: `boot`, `init_boot`, `vendor_boot`, `dtbo`, system, vendor, etc.
 
 Interpretación de resultados:

@@ -1,0 +1,6 @@
+HOST_TIMESTAMP_UTC=2026-09-06T09:45:02Z
+COMMAND=adb shell getprop ro.build.version.security_patch
+STDOUT_BEGIN
+2026-05-05
+STDOUT_END
+RETURN_STATUS=0

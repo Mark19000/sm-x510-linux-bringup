@@ -1,7 +1,9 @@
 # First Boot Experiment Plan
 
-Fecha de consolidación: 2026-08-24  
-Alcance: Samsung Galaxy Tab S9 FE SM-X510, variante U12/EZE4  
+> **Errata 2026-09-05:** `--flags 1` significa `HASHTREE_DISABLED`, no disable-verification. `VERIFICATION_DISABLED` es `flags=2`; la aceptación Samsung de flags 2/3 sigue UNKNOWN. Este plan anterior no es autoridad operativa; véase `docs/boot-chain/minimum-first-boot-image-set.md`.
+
+Fecha de consolidación: 2026-08-24
+Alcance: Samsung Galaxy Tab S9 FE SM-X510, variante U12/EZE4
 Modo del documento: preparación de auditoría. No autoriza flasheo ni modifica artefactos existentes.
 
 ## Estado Actual
@@ -94,7 +96,7 @@ Fuente detallada: [`docs/debugging/sec-debug-analysis.md`](../debugging/sec-debu
 |---|---|---|
 | U1 | Estado real de bootloader: OEM unlock activado, UNLOCKED confirmado y política Samsung tras unlock. | Determina si cualquier kernel propio puede recibir control. Es condición previa absoluta. |
 | U2 | Parámetro exacto de consola temprana y estado físico de UART/USB al handoff. | Sin señal temprana, distinguir fallo AVB de fallo pre-driver depende solo de consumo, resets y post-mortem. |
-| U3 | Comportamiento real del bootloader ante imágenes modificadas con `vbmeta --flags 1`. | Define si el experimento mínimo llega a la primera instrucción del kernel. |
+| U3 | Comportamiento real del bootloader ante vbmeta alternativo con `VERIFICATION_DISABLED` (`flags=2`). | Define si el experimento mínimo llega a la primera instrucción del kernel. |
 | U4 | Cierre exacto de dependencias runtime de sec_debug/DSS sobre DTB+overlay EZE4. | Una lista corta puede fallar por dependencia indirecta ausente; una lista amplia aumenta riesgo de panic temprano. |
 | U5 | Necesidad real de pinctrl-samsung-core y otros drivers plataforma para probes de sec_debug/DSS. | Puede provocar probes fallidos silenciosos aunque los `.ko` carguen. |
 | U6 | Tamaño LZ4 real del perfil sec_debug escalonado. | Condiciona empaquetado final de `init_boot` o vendor ramdisk propio. |
@@ -340,7 +342,7 @@ Estos puntos impiden pasar hoy al primer intento físico:
 4. **Auditoría de closures sec_debug/DSS**: incluir dependencias plataforma reales, resolver pinctrl y eliminar supuestos no verificados.
 5. **Medición real de tamaño LZ4** del perfil MINIMAL + sec_debug escalonado, sin generar imagen flasheable todavía.
 6. **Calibrar baseline stock** de consumo, USB y pantalla con método repetible y timestamps.
-7. **Validar política vbmeta tras unlock** en este modelo antes de asumir que `--flags 1` es suficiente o permitido.
+7. **Validar política vbmeta tras unlock** en este modelo antes de asumir que `flags=2/3` es suficiente o permitido; `flags=1` sólo desactiva hashtree.
 8. **Preparar procedimiento seguro de recuperación** desde cualquier resultado: timeout, entrada a Download Mode y restauración stock verificada por hash.
 9. **Documentar plantilla de registro del experimento** con hipótesis, variables, observaciones y conclusión separadas.
 

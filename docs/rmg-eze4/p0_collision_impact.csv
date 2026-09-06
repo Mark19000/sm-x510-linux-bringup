@@ -1,0 +1,5 @@
+SLIDE,FINGERPRINT_STATUS,REACHABILITY_STATUS,CURRENT_RUNTIME_RESULT,SAME_BOOT_RECOVERY,IMPACT_IF_REACHABLE,FINAL_RISK_STATUS
+0x1e4000,FAIL,INSUFFICIENT_EVIDENCE,P0 scan rejects; caller restores; supervisor stops because dirty state remains,NONE,That boot cannot pass the current P0 stage,REACHABILITY_UNKNOWN
+0x1e8000,FAIL,INSUFFICIENT_EVIDENCE,P0 scan rejects; caller restores; supervisor stops because dirty state remains,NONE,That boot cannot pass the current P0 stage,REACHABILITY_UNKNOWN
+0x1ec000,FAIL,INSUFFICIENT_EVIDENCE,P0 scan rejects; caller restores; supervisor stops because dirty state remains,NONE,That boot cannot pass the current P0 stage,REACHABILITY_UNKNOWN
+0x1f0000,BORDERLINE_REJECTED,INSUFFICIENT_EVIDENCE,P0 scan rejects; caller restores; supervisor stops because dirty state remains,NONE,That boot cannot pass the current P0 stage,REACHABILITY_UNKNOWN

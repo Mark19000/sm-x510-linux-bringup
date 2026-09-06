@@ -1,0 +1,15 @@
+RULE_ID,TRIGGER,INPUT_FIELDS,RESULT,PHASE_H_BASIS,MACHINE_CHECKABLE,NOTES
+BASELINE_MISMATCH,Canonical baseline flag is false,BASELINE_MATCH,MEASUREMENT_INVALID,Baseline mismatch,YES,Includes model/kernel/Image mismatch when normalized upstream.
+WRONG_FIRMWARE,Firmware identity differs from campaign baseline,ENVIRONMENT.firmware; campaign baseline,MEASUREMENT_INVALID,Unexpected firmware/kernel,YES,Exact baseline comparison is external input.
+WRONG_SESSION,Record is not linked to declared session,SESSION_ID; SESSION_MATCH,MEASUREMENT_INVALID,Provenance identity,YES,Prevents cross-session leakage.
+MISSING_PREREQUISITE,Hard prerequisite is not validated,dependency state,INCONCLUSIVE,Parameter dependency not validated,YES,Also NOT_ATTRIBUTABLE.
+CONTRADICTORY_OBSERVABLE,Compatible and incompatible attributable votes coexist,criterion votes; identities,INCONCLUSIVE,Inconsistent observables,YES,Never average away.
+INSUFFICIENT_EVIDENCE_LEVEL,Supplied E-level is below Phase H minimum,EVIDENCE_LEVEL; required level,INCONCLUSIVE,Minimum evidence unmet,YES,E2/E3/E4 enforced.
+P0_BLOCKED,P0-dependent/only record lacks resolved P0 ground truth,P0_DEPENDENCY; p0_resolved,INCONCLUSIVE,P0 ambiguity prevents interpretation,YES,Table membership/log absence do not resolve it.
+UNATTRIBUTABLE_RESULT,Attribution checker returns NOT_ATTRIBUTABLE,attribution state,INCONCLUSIVE,Result cannot be attributed,YES,Preserve record with exclusion reason.
+MISSING_RAW_REFERENCE,Raw evidence reference is absent,RAW_EVIDENCE_REF,MEASUREMENT_INVALID,Required observable/provenance unavailable,YES,Manifest linkage also required.
+MISSING_BOOT_ID,Multi-boot claim lacks boot partition,MULTI_BOOT; BOOT_ID,INCONCLUSIVE,Cross-boot evidence cannot merge,YES,Attribution blocked.
+MISSING_OBSERVABLE,Required observable is unavailable,OBSERVABLE_AVAILABLE,INCONCLUSIVE,Required observable unavailable,YES,Result is NOT_OBSERVED at record level.
+UNRESOLVED_GROUP_DEPENDENCY,Group dependency list is nonempty,UNRESOLVED_GROUP_DEPENDENCIES,INCONCLUSIVE,Dependency not validated,YES,Attribution blocked.
+CONDITION_DRIFT,Material environment tuple changes without new CONDITION_ID,condition digest; CONDITION_ID,MEASUREMENT_INVALID,Uncontrolled confounding,PARTIAL,Requires normalized tuple comparison.
+OUT_OF_SCOPE_STATE_CHANGE,Any state change outside declared scope is recorded,scope event,MEASUREMENT_INVALID,State change outside planned scope,PARTIAL,Future provenance input only; no action implemented.

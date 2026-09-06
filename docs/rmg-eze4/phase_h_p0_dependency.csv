@@ -1,0 +1,20 @@
+PARAMETER,P0_DEPENDENCY,WHY,CAN_VALIDATE_BEFORE_P0_CLOSURE,NOTES
+SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS,P0_DEPENDENT,Its production-path outcome is interpreted after the P0/slide discovery chain establishes the relevant state,NO,Setup mechanics may be observed earlier but adequacy for the production path cannot.
+FOPS_KERNEL_PAGE_SETUP_ATTEMPTS,P0_DEPENDENT,Its production-path outcome requires a correctly interpreted discovered state,NO,Do not attribute failure to this cap while P0 ambiguity is active.
+FOPS_ROUTE_COARSE_DELAY_USEC,P0_DEPENDENT,Required route-state timing is downstream of successful discovery and setup,NO,Timing instrumentation can be qualified independently but compatibility cannot.
+FOPS_ROUTE_FINE_DELAY_TICKS,P0_DEPENDENT,The fine sweep is meaningful only for the correctly selected route state,NO,P0 ambiguity confounds whether the intended state was targeted.
+DEFAULT_EXPLOIT_ATTEMPTS,P0_INDEPENDENT,It is a supervisor policy cap over attempts,YES,Adequacy still depends on stage-specific terminal-state distributions.
+DEFAULT_ATTEMPT_TIMEOUT_SEC,P0_INDEPENDENT,It is the overall supervisor duration bound,YES,Measure stage-labelled durations so P0 delays remain separable.
+DEFAULT_P0_ATTEMPT_TIMEOUT_SEC,P0_ONLY,It specifically bounds the pre-P0-ready interval,NO,Loader-label ambiguity and collision behavior are part of the interpreted P0 outcome.
+SLIDE_WAIT_NSEC,P0_DEPENDENT,Waiter-state compatibility belongs to the downstream slide route,NO,Observable identity must be established first.
+SLIDE_REQUEUE_ARM_USEC,P0_DEPENDENT,Requeue ordering belongs to the downstream slide route,NO,Observable identity must be established first.
+SLIDE_KSNITCH_APPENDED_FUTEXES,P0_INDEPENDENT,It governs KernelSnitch candidate resources rather than P0 score acceptance,YES,Validate with explicit discovery observables.
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,P0_INDEPENDENT,It governs KernelSnitch measurement signal/noise,YES,Keep P0 scoring out of the outcome metric.
+SLIDE_KSNITCH_AVERAGE,P0_INDEPENDENT,It governs KernelSnitch measurement averaging,YES,Keep P0 scoring out of the outcome metric.
+SLIDE_KSNITCH_SCREEN_REPEAT,P0_INDEPENDENT,It governs KernelSnitch screening,YES,Keep P0 scoring out of the outcome metric.
+SLIDE_KSNITCH_SCREEN_AVERAGE,P0_INDEPENDENT,It governs KernelSnitch screening averaging,YES,Keep P0 scoring out of the outcome metric.
+SKB_SEND_SIZE,P0_INDEPENDENT,Allocation and fragment geometry can be established at its direct consumers without resolving label semantics,YES,Later end-to-end interpretation still requires P0 closure.
+SKB_RECLAIM_SENDS,P0_INDEPENDENT,Reclaim coverage can be attributed at its direct allocator consumer,YES,Hold geometry and environment constant.
+SLIDE_RECLAIM_SENDS,P0_DEPENDENT,Its adequacy is specific to the slide-stage consumer reached after discovery,NO,Generic reclaim observations are insufficient.
+P0_FINGERPRINT_MIN_BEST,P0_ONLY,It is a direct P0 acceptance threshold,NO,Requires actual score evidence and interpretable label/consumer identity.
+P0_FINGERPRINT_MIN_MARGIN,P0_ONLY,It is a direct P0 ambiguity threshold,NO,Requires actual best and runner-up evidence across relevant states.

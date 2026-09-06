@@ -1,0 +1,11 @@
+DIMENSION,ROLE,LEVELS_OR_VALUE,CAUSAL_REASON,CAPTURE_RULE,DRIFT_EFFECT
+boot_identity,INTENTIONALLY_VARIED,at least 3 distinct verified boots,allocator daemon and scheduler initialization vary by boot,capture before every session and trial boundary,boot change mid-session stops experiment
+condition_class,INTENTIONALLY_VARIED,SETTLED_NOMINAL and ELEVATED_VALID,load thermal and scheduler capacity alter monotonic lifecycle tails,freeze exact thresholds before authorization and capture continuously,crossing threshold invalidates trial
+attempt_ordinal,COVERED_NOT_FORCED,first/cold and safe later retry where naturally available,cached P0 and changed process/memory history alter duration,bind ordinal PID and retained-state disposition,unknown ordinal invalidates trial
+foreground_freezer_state,HELD_CONSTANT,foreground and nonfrozen,freezing advances monotonic time without execution,continuous monitor,any freeze invalidates trial and stops session
+device_uptime,OBSERVED,seconds since boot,early boot daemons and allocator quiet window can alter latency,capture at session and trial boundaries,below 120 seconds fails gate
+thermal_state,CONDITION_COMPONENT,stable approved nominal or elevated stratum,frequency throttling changes duration tails,capture before during after,unplanned transition invalidates trial
+system_load,CONDITION_COMPONENT,stable approved nominal or elevated stratum,runqueue and I/O competition change elapsed duration,capture before during after,unplanned transition invalidates trial
+memory_pressure,OBSERVED_COVARIATE,approved safe range,slow reclaim can inflate lifecycle duration,capture before and after plus passive alerts,out-of-range yields inconclusive or stop on exhaustion
+ADB_attachment,HELD_CONSTANT,connected and monitored,loss can remove evidence and attribution,host monotonic transport monitor,gap beyond approved limit stops session
+scheduler_environment,OBSERVED_COVARIATE,CPU online frequency caps and load,heterogeneous cores and governor affect tails,capture continuously where available,missing monitor makes thermal/load attribution inconclusive

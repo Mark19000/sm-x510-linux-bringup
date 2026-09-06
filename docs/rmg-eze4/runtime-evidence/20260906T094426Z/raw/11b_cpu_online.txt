@@ -1,0 +1,6 @@
+HOST_TIMESTAMP_UTC=2026-09-06T09:45:57Z
+COMMAND=adb shell cat /sys/devices/system/cpu/online
+STDOUT_BEGIN
+0-7
+STDOUT_END
+RETURN_STATUS=0

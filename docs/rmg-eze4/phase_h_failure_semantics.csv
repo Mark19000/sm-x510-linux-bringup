@@ -1,0 +1,20 @@
+NAME,CLASSIFICATION,WRONG_VALUE_CONSEQUENCE,BASIS
+SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS,RELIABILITY_CRITICAL,LOWER_SUCCESS_RATE,Bounds retries of slide controlled-page setup; a positive but inadequate cap can prevent path completion.
+FOPS_KERNEL_PAGE_SETUP_ATTEMPTS,RELIABILITY_CRITICAL,LOWER_SUCCESS_RATE,Bounds retries of fops controlled-page setup; a positive but inadequate cap can prevent path completion.
+FOPS_ROUTE_COARSE_DELAY_USEC,CORRECTNESS_CRITICAL,WRONG_STATE,Selects coarse placement within a required ordering window.
+FOPS_ROUTE_FINE_DELAY_TICKS,CORRECTNESS_CRITICAL,WRONG_STATE,Selects the fine sweep around the required ordering window.
+DEFAULT_EXPLOIT_ATTEMPTS,POLICY_ONLY,LOWER_SUCCESS_RATE,Supervisor retry cap; it does not define a successful child result but limits opportunities.
+DEFAULT_ATTEMPT_TIMEOUT_SEC,POLICY_ONLY,TIMEOUT,Supervisor terminates an attempt at expiry.
+DEFAULT_P0_ATTEMPT_TIMEOUT_SEC,POLICY_ONLY,TIMEOUT,Supervisor terminates a pre-P0 attempt at expiry.
+SLIDE_WAIT_NSEC,CORRECTNESS_CRITICAL,WRONG_STATE,Wait duration participates in establishing the required waiter state and can cause path failure.
+SLIDE_REQUEUE_ARM_USEC,CORRECTNESS_CRITICAL,WRONG_STATE,Delay participates in required requeue ordering and can cause path failure.
+SLIDE_KSNITCH_APPENDED_FUTEXES,RELIABILITY_CRITICAL,RESOURCE_EXHAUSTION,Candidate population must be large enough for discovery but consumes environment-defined resources.
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,RELIABILITY_CRITICAL,FALSE_CLASSIFICATION,Measurement count controls discovery signal stability.
+SLIDE_KSNITCH_AVERAGE,RELIABILITY_CRITICAL,FALSE_CLASSIFICATION,Averaging controls discovery noise and threshold separation.
+SLIDE_KSNITCH_SCREEN_REPEAT,RELIABILITY_CRITICAL,FALSE_CLASSIFICATION,Screening repeat count controls early candidate retention and rejection.
+SLIDE_KSNITCH_SCREEN_AVERAGE,RELIABILITY_CRITICAL,FALSE_CLASSIFICATION,Screening average controls early candidate separation.
+SKB_SEND_SIZE,CORRECTNESS_CRITICAL,WRONG_STATE,Determines allocation and fragment geometry used by multiple consumers.
+SKB_RECLAIM_SENDS,RELIABILITY_CRITICAL,LOWER_SUCCESS_RATE,Controls reclaim coverage under allocator state.
+SLIDE_RECLAIM_SENDS,RELIABILITY_CRITICAL,LOWER_SUCCESS_RATE,Controls slide-stage reclaim coverage under allocator state.
+P0_FINGERPRINT_MIN_BEST,CORRECTNESS_CRITICAL,FALSE_CLASSIFICATION,Acceptance floor protects against accepting weak matches and can also safely reject true matches.
+P0_FINGERPRINT_MIN_MARGIN,CORRECTNESS_CRITICAL,FALSE_CLASSIFICATION,Winner separation protects against ambiguous identification and can also safely reject true matches.

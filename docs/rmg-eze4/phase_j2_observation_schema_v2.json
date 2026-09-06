@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tab-s9-fe-linux.org/schemas/phase_j2_observation_schema_v2.json",
+  "title": "PhaseJ2ObservationRecordV2_2_1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_grammar_version",
+    "candidate_identity",
+    "experiment_id",
+    "session_id",
+    "boot_id",
+    "trial_id",
+    "attempt_ordinal",
+    "pid",
+    "artifact_identity",
+    "condition_vector",
+    "timing_metrics",
+    "confounder_observations",
+    "state_transitions",
+    "observables",
+    "classification"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "2.2.1" },
+    "event_grammar_version": { "type": "string", "const": "2.1.1" },
+    "candidate_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_parameter", "candidate_value"],
+      "properties": {
+        "candidate_parameter": { "type": "string", "const": "DEFAULT_ATTEMPT_TIMEOUT_SEC" },
+        "candidate_value": { "type": "integer", "const": 2200 }
+      }
+    },
+    "experiment_id": { "type": "string", "pattern": "^EXP-[A-F0-9]{8}$" },
+    "session_id": { "type": "string", "pattern": "^SES-[A-F0-9]{8}$" },
+    "boot_id": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "trial_id": { "type": "string", "pattern": "^TRL-[0-9]{4}$" },
+    "attempt_ordinal": { "type": "integer", "minimum": 1 },
+    "pid": { "type": "integer", "minimum": 1 },
+    "artifact_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_defined",
+        "device_model",
+        "device_name",
+        "incremental_version",
+        "build_fingerprint",
+        "stock_image_sha256",
+        "kernel_identity",
+        "run_package_identity",
+        "raw_evidence_identity"
+      ],
+      "properties": {
+        "schema_defined": { "type": "boolean", "const": true },
+        "device_model": { "type": "string", "const": "SM-X510" },
+        "device_name": { "type": "string", "const": "gts9fewifi" },
+        "incremental_version": { "type": "string", "const": "X510XXUCEZE4" },
+        "build_fingerprint": {
+          "type": "string",
+          "const": "samsung/gts9fewifieea/gts9fewifi:16/BP4A.251205.006/X510XXUCEZE4:user/release-keys"
+        },
+        "stock_image_sha256": {
+          "type": "string",
+          "const": "ca56baf428a3f334d90f5d366f02e6cb36cf70fec23a2055b4f80c29cbe6ede9"
+        },
+        "kernel_identity": {
+          "type": "string",
+          "const": "5.15.189-android13-3-33478785"
+        },
+        "run_package_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["binding_status", "run_package_sha256"],
+          "properties": {
+            "binding_status": { "type": "string", "enum": ["UNBOUND_PENDING_J3", "BOUND_FROZEN"] },
+            "run_package_sha256": { "type": "string", "pattern": "^([a-f0-9]{64}|UNBOUND_PENDING_J3)$" }
+          }
+        },
+        "raw_evidence_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["binding_status", "raw_session_manifest_sha256"],
+          "properties": {
+            "binding_status": { "type": "string", "enum": ["UNBOUND_PENDING_SESSION_CLOSE", "BOUND_CLOSED"] },
+            "raw_session_manifest_sha256": { "type": "string", "pattern": "^([a-f0-9]{64}|UNBOUND_PENDING_SESSION_CLOSE)$" }
+          }
+        }
+      }
+    },
+    "condition_vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition_class",
+        "threshold_profile_id",
+        "detector_version",
+        "freezer_state",
+        "thermal_state",
+        "load_class",
+        "memory_pressure_class",
+        "collector_health",
+        "raw_telemetry"
+      ],
+      "properties": {
+        "condition_class": { "type": "string", "enum": ["SETTLED_NOMINAL", "ELEVATED_VALID"] },
+        "threshold_profile_id": { "type": "string", "enum": ["TEMPLATE_UNBOUND", "J3_PROFILE_S9FE_CALIBRATED"] },
+        "detector_version": { "type": "string", "minLength": 1 },
+        "freezer_state": { "type": "string", "enum": ["THAWED", "FROZEN", "TRANSITIONING", "UNKNOWN"] },
+        "thermal_state": { "type": "string", "enum": ["NOMINAL", "FAIR", "SERIOUS", "CRITICAL", "UNKNOWN"] },
+        "load_class": { "type": "string", "enum": ["IDLE_NOMINAL", "MODERATE_VALID", "OVERLOADED_INVALID", "UNKNOWN"] },
+        "memory_pressure_class": { "type": "string", "enum": ["NONE", "LOW", "MEDIUM", "CRITICAL", "UNKNOWN"] },
+        "collector_health": { "type": "string", "enum": ["HEALTHY", "DEGRADED", "FAILED", "DROPPED_EVENTS"] },
+        "raw_telemetry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["cpu_temp_celsius", "load_avg_1m", "mem_available_mb"],
+          "properties": {
+            "cpu_temp_celsius": { "type": "number" },
+            "load_avg_1m": { "type": "number" },
+            "mem_available_mb": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "timing_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clock_source",
+        "post_fork_monotonic_ns",
+        "slide_ready_monotonic_ns",
+        "terminal_monotonic_ns",
+        "p0_duration_seconds",
+        "candidate_elapsed_duration_ns",
+        "candidate_elapsed_duration_seconds",
+        "canonical_headroom_seconds",
+        "supervisor_integer_elapsed_sec"
+      ],
+      "properties": {
+        "clock_source": { "type": "string", "const": "CLOCK_MONOTONIC" },
+        "post_fork_monotonic_ns": { "type": "integer", "minimum": 0 },
+        "slide_ready_monotonic_ns": { "type": ["integer", "null"], "minimum": 0 },
+        "terminal_monotonic_ns": { "type": "integer", "minimum": 0 },
+        "p0_duration_seconds": { "type": ["number", "null"], "minimum": 0 },
+        "candidate_elapsed_duration_ns": { "type": "integer", "minimum": 0 },
+        "candidate_elapsed_duration_seconds": { "type": "number", "minimum": 0 },
+        "canonical_headroom_seconds": { "type": "number" },
+        "supervisor_integer_elapsed_sec": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "confounder_observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["c1_p0_delay", "c2_cgroup_freezer", "c3_thermal_throttling"],
+      "properties": {
+        "c1_p0_delay": {
+          "type": "object",
+          "required": ["classification", "slide_ready_detected", "p0_duration_sec"],
+          "properties": {
+            "classification": { "type": "string", "enum": ["C1_CLEAR", "C1_PRESENT", "C1_UNKNOWN"] },
+            "slide_ready_detected": { "type": "boolean" },
+            "p0_duration_sec": { "type": ["number", "null"], "minimum": 0 }
+          }
+        },
+        "c2_cgroup_freezer": {
+          "type": "object",
+          "required": ["classification", "freeze_event_count", "monitor_coverage_pct", "max_monitor_gap_ms"],
+          "properties": {
+            "classification": { "type": "string", "enum": ["C2_ABSENT", "C2_PRESENT", "C2_UNKNOWN"] },
+            "freeze_event_count": { "type": "integer", "minimum": 0 },
+            "monitor_coverage_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "max_monitor_gap_ms": { "type": "number", "minimum": 0 }
+          }
+        },
+        "c3_thermal_throttling": {
+          "type": "object",
+          "required": ["classification", "excursion_count", "monitor_coverage_pct", "max_monitor_gap_ms"],
+          "properties": {
+            "classification": { "type": "string", "enum": ["C3_ABSENT", "C3_PRESENT", "C3_UNKNOWN"] },
+            "excursion_count": { "type": "integer", "minimum": 0 },
+            "monitor_coverage_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+            "max_monitor_gap_ms": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "state_transitions": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "event_type",
+          "device_monotonic_ns",
+          "boot_id",
+          "session_id",
+          "trial_id",
+          "attempt_ordinal",
+          "pid",
+          "producer",
+          "payload"
+        ],
+        "properties": {
+          "sequence": { "type": "integer", "minimum": 0 },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "TRIAL_INIT",
+              "ATTEMPT_SPAWN",
+              "P0_ENTER",
+              "P0_EXIT_SLIDE_READY",
+              "OVERALL_SLIDE_ENTER",
+              "HEARTBEAT_PROGRESS",
+              "TERMINAL_COMPLETION",
+              "WATCHDOG_EXPIRY",
+              "PROCESS_SIGNAL",
+              "PROCESS_REAP",
+              "CONFOUNDER_SAMPLE"
+            ]
+          },
+          "device_monotonic_ns": { "type": "integer", "minimum": 0 },
+          "boot_id": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "session_id": { "type": "string", "pattern": "^SES-[A-F0-9]{8}$" },
+          "trial_id": { "type": "string", "pattern": "^TRL-[0-9]{4}$" },
+          "attempt_ordinal": { "type": "integer", "minimum": 1 },
+          "pid": { "type": "integer", "minimum": 1 },
+          "producer": {
+            "type": "string",
+            "enum": ["SUPERVISOR", "TARGET_CHILD", "CONFOUNDER_MONITOR", "SYSTEM_LOG"]
+          },
+          "payload": { "type": "object" }
+        }
+      }
+    },
+    "observables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "observable_id",
+          "observable_version",
+          "status",
+          "timestamp_ns",
+          "sequence",
+          "source_refs",
+          "interpretation"
+        ],
+        "properties": {
+          "observable_id": { "type": "string" },
+          "observable_version": { "type": "string" },
+          "status": { "type": "string", "enum": ["OBSERVED", "ABSENT", "INDETERMINATE"] },
+          "timestamp_ns": { "type": "integer", "minimum": 0 },
+          "sequence": { "type": "integer", "minimum": 0 },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "sha256", "producer", "artifact_type", "selector"],
+              "properties": {
+                "path": { "type": "string" },
+                "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+                "producer": { "type": "string" },
+                "artifact_type": { "type": "string", "enum": ["TEXT_LOG", "BINARY_TRACE", "EVENT_PIPE"] },
+                "selector": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["selector_type", "start", "end"],
+                  "properties": {
+                    "selector_type": { "type": "string", "enum": ["LINE_RANGE", "BYTE_RANGE", "EVENT_SEQUENCE_RANGE"] },
+                    "start": { "type": "integer", "minimum": 0 },
+                    "end": { "type": "integer", "minimum": 0 }
+                  }
+                }
+              }
+            }
+          },
+          "interpretation": { "type": "string" }
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trial_terminal_class", "trial_validity", "trial_evidence_vote"],
+      "properties": {
+        "trial_terminal_class": {
+          "type": "string",
+          "enum": [
+            "QUALIFYING_COMPLETION",
+            "EXPECTED_P0_TIMEOUT",
+            "SUPERVISOR_OVERALL_TIMEOUT",
+            "CHILD_EXPLICIT_FAILURE",
+            "CHILD_SIGNAL_FAILURE",
+            "WRONG_STATE_TERMINATION",
+            "EXTERNAL_INTERRUPTION",
+            "MEASUREMENT_FAILURE"
+          ]
+        },
+        "trial_validity": { "type": "string", "enum": ["VALID", "INVALID", "INCONCLUSIVE"] },
+        "trial_evidence_vote": { "type": "string", "enum": ["COMPATIBLE_VOTE", "INCOMPATIBLE_VOTE", "NO_VOTE"] }
+      }
+    }
+  }
+}

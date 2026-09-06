@@ -1,0 +1,19 @@
+ID,CATEGORY,TEST,DEPENDENCY,REQUIRED_ARTIFACT,EXPECTED_RESULT,FAILURE_ACTION,HARD
+G01,documents,Specification completeness,All J2.1-R1 docs and schemas present,docs/rmg-eze4/,All files present and hash-verified,STOP; restore offline,YES
+G02,device_identity,Read-only model and SoC check,adb shell getprop,Hardware property dump,ro.product.model==SM-X510 && ro.product.device==gts9fewifi && ro.board.platform==s5e8835,STOP wrong device,YES
+G03,firmware_identity,Read-only build fingerprint and incremental,adb shell getprop,Build properties,ro.build.version.incremental==X510XXUCEZE4 && ro.build.fingerprint==samsung/gts9fewifieea/gts9fewifi:16/BP4A.251205.006/X510XXUCEZE4:user/release-keys,STOP,YES
+G04,kernel_identity,Read-only kernel release check,uname -r or /proc/version,Kernel version string,uname -r==5.15.189-android13-3-33478785,STOP,YES
+G05,stock_image,Verify canonical stock Image digest,sha256sum Image.stock,Image.stock,sha256sum(Image.stock)==ca56baf428a3f334d90f5d366f02e6cb36cf70fec23a2055b4f80c29cbe6ede9,STOP,YES
+G06,run_package,Verify approved run-package manifest,sha256sum -c run_package.sha256,run_package_manifest,Exact match to independently approved J3 freeze manifest,STOP,YES
+G07,target_configuration,Inspect candidate parameter and value,Configuration inspector,Config header,candidate_parameter==DEFAULT_ATTEMPT_TIMEOUT_SEC and candidate_value==2200,STOP,YES
+G08,boot_identity,Derive and verify cryptographic boot ID,boot_id derivation tool,/proc/sys/kernel/random/boot_id,Derived SHA-256 boot ID non-empty and unmutated from fresh reboot,STOP,YES
+G09,clock_health,Capture resolution and bracketing calibration tuples,Clock calibration tool,clock_calibration.jsonl,Monotonic nondecreasing step >=0 and supervisor sanity delta <=1.1s,STOP,YES
+G10,storage_readiness,Calculate capture size and verify free space,df -h,Storage telemetry,Free space >= worst-case capture plus 2x safety reserve,STOP,YES
+G11,event_grammar,Verify active event grammar version,Schema validator,phase_j2_event_grammar.json,Active event grammar version == 2.1.1,STOP,YES
+G12,observation_schema,Validate observation schema v2.2.1,Schema validator,phase_j2_observation_schema_v2.json,Schema compilation and self-test PASS (schema_version==2.2.1),STOP,YES
+G13,c1_detector_ready,Verify C1 pre-slide interface listener,Supervisor state machine,C1 detector interface,Interface functional and capable of capturing P0_ENTER and P0_EXIT,STOP,YES
+G14,c2_detector_ready,Verify C2 cgroup freezer monitor,Freezer watcher poller,/sys/fs/cgroup/.../cgroup.events,Poller running with sampling interval <=200ms and active heartbeat,STOP,YES
+G15,c3_detector_ready,Verify C3 thermal zone monitor,Thermal poller,/sys/class/thermal/thermal_zone*,Poller running with sampling interval <=1000ms and trip points mapped,STOP,YES
+G16,condition_baseline,Verify declared condition class stability,Environment collector,Condition telemetry,Uptime >=120s and background state stable within approved bounds,WAIT or STOP,YES
+G17,isolation_check,Verify protected parameters isolation,Parameter integrity checker,Source build headers,Hashes of protected parameters match frozen constants,STOP,YES
+G18,independent_review,Independent reviewer sign-off,Sign-off record,approval.sig,Formal approval references exact run package and commit hashes,STOP,YES

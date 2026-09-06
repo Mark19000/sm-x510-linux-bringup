@@ -62,7 +62,43 @@ Fecha de corte: 23 de agosto de 2026.
 - preflight U11 e initramfs separados del pipeline U3, siempre con puerta
   física `NO-GO`.
 
-## Pendiente de datos físicos
+## Actualización canónica 2026-09-05 — EZE4 y Evidencia Física de Desbloqueo
+
+El bloque U11 inferior se conserva como historia, pero ya no describe el estado activo. Samsung OSRC EZE4 (`5.15.189`) es la base canónica del pipeline:
+- `kernelrelease` stock exacto: `5.15.189-android13-3-33478785`
+- `vermagic` stock exacto: `5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64`
+- Compatibilidad ABI: 100.00% (281/281 módulos propietarios stock verificados, 15,123/15,123 símbolos CRC exactos, 0 discrepancias).
+- Suite de pruebas de regresión: 98/98 pruebas aprobadas en host (incorporadas guardas anti-self-confirmation de identidad física 5.15.189-android13-3-33478785 y alias repro_compare).
+- Proyecto Root-My-Galaxy EZE4: Fase J2.1-R1 Non-Semantic Remediation COMPLETADA; stack de validación J2 congelado (68/68 pruebas passing); J3 en HOLD; L3 en NO-GO; exploit real no demostrado.
+
+### Estado Físico y Evidencia de Diagnóstico (Actualizado por `IMG_2113.HEIC` y `IMG_2114.HEIC`)
+
+Se obtuvieron capturas fotográficas directas de la pantalla de advertencia previa (`IMG_2113.HEIC`) y de la pantalla estándar de Odin Mode (`IMG_2114.HEIC`, transcripción pública con identificadores únicos redactados en [`docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md`](file:///Users/markpi/tab-s9-fe-linux/docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md)):
+- **Pantalla de advertencia previa (Warning Screen)**: **CONFIRMED** (fotografiada físicamente en `IMG_2113.HEIC`).
+- **Ruta a Device Unlock Mode**: **CONFIRMED** (anunciada explícitamente en el microcódigo del cargador en la localización en chino: `长按音量增加键：设备解锁模式`, omitida en inglés).
+- **Pantalla normal de Odin Mode**: **CONFIRMED** (alcanzada mediante pulsación corta de Vol Up desde la pantalla de advertencia, fotografiada en `IMG_2114.HEIC`).
+- **CURRENT BINARY**: `Samsung Official` (**CONFIRMED** en UI de bootloader).
+- **KG STATE**: `Completed (00)` (**CONFIRMED** en UI de bootloader).
+- **Secure Download**: `Enabled` (**CONFIRMED** en UI de bootloader).
+- **Sales code / CID / AID**: `EUX//` (**CONFIRMED** en UI de bootloader).
+- **WARRANTY VOID**: `0 (0x0000)` (**CONFIRMED** en UI de bootloader).
+- **RP SWREV (Bootloader)**: `B:12` (**CONFIRMED** en UI de bootloader; confirma físicamente nivel de rollback 12).
+- **HW REV**: `4` (**CONFIRMED** en UI de bootloader; coincide con DTBO `r04`).
+- **DDR SIZE**: `8G` (**CONFIRMED** en UI de bootloader).
+- **BUILD VERSION**: `X510XXUCEZE4` (**CONFIRMED** en UI de bootloader).
+- **Campos no mostrados en Odin Mode**: `OEM LOCK`, `FRP LOCK`, `SYSTEM STATUS` (**`NOT DISPLAYED`**; no inferir estados desde la ausencia).
+- **Secuencia segura de reinicio/cancelación**: `Volume Down Key + Side key for more than 7 secs` (**CONFIRMED** en UI).
+- **Capacidad práctica de desbloqueo del propietario**: **STRONGLY_SUPPORTED** (anunciada en UI de SBOOT/LOKE en hardware Exynos EUX libre).
+- **Pantalla de Device Unlock Mode (2B)**: **NOT YET CAPTURED / NOT YET OBSERVED**.
+- **Desbloqueo exitoso completado**: **NOT YET TESTED / LOCKED** (el dispositivo físico continúa estrictamente `ro.boot.flash.locked=1`, `ro.boot.vbmeta.device_state=locked`, `ro.boot.verifiedbootstate=green`, `ro.boot.warranty_bit=0`).
+- **Estado de decisión del propietario**: **`READY_FOR_OWNER_UNLOCK_DECISION`** (se cuenta con evidencia física directa suficiente para evaluar borrado de fábrica y consecuencias en eFuse Knox).
+- **Estado para primer flasheo custom**: **`NOT_READY_FOR_FIRST_CUSTOM_FLASH`** (la recuperación está sólo parcialmente validada y AVB multi-partición no está probado).
+- **Recuperación**: **PARTIALLY VALIDATED** (acceso a Download Mode, diagnóstico visual y enumeración USB `04e8:685d` confirmados; herramientas host en macOS, handshake LOKE, lectura PIT y restauración completa pendientes).
+- **Significado de `[Reboot Device - D2]`**: estrictamente **UNKNOWN** (la hipótesis comunitaria de bloqueo de pantalla queda como conjetura no demostrada).
+- **Banderas AVB 2.0**: se distingue formalmente `flags=1` (`HASHTREE_DISABLED`) de `flags=2` (`VERIFICATION_DISABLED`).
+- **Documentos de Referencia Canónica**: [`docs/boot-chain/unlock-evidence-matrix.md`](file:///Users/markpi/tab-s9-fe-linux/docs/boot-chain/unlock-evidence-matrix.md), [`docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md`](file:///Users/markpi/tab-s9-fe-linux/docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md), [`docs/hardware/evidence/2026-09-05-download-warning-device-unlock-mode.md`](file:///Users/markpi/tab-s9-fe-linux/docs/hardware/evidence/2026-09-05-download-warning-device-unlock-mode.md).
+
+## Pendiente de datos físicos (histórico U11; superseded)
 
 - recibir la respuesta a la solicitud oficial Samsung OSRC del código exacto
   `SM-X510` / `X510XXUCEZE4`; U11 es la mejor referencia actual, no EZE4;

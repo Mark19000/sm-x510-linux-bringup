@@ -1,0 +1,14 @@
+ID,SCOPE,TRIGGER,IMMEDIATE_ACTION,EVIDENCE_DISPOSITION,RESUME_RULE
+S01,TRIAL,unexpected state transition or unknown event,abort collection envelope safely and do not interpret outcome,INCONCLUSIVE; preserve raw,new trial only after session-level review
+S02,TRIAL,missing required observable or partial terminal capture,do not infer outcome,INCONCLUSIVE unless provenance/identity corrupt then INVALID,replacement allowed within invalid caps after review
+S03,TRIAL,HIGH confounder detected,quarantine trial and stop current session when C2 or uncontained C3,per confounder contract,no same-session silent recovery
+S04,SESSION,persistent ADB/collector loss or logging failure,stop launching trials and close/hash available raw,affected trial INCONCLUSIVE or INVALID,brand-new session after root cause and gate rerun
+S05,SESSION,resource exhaustion memory pressure or storage reserve breach,stop launching and preserve evidence,affected trial INCONCLUSIVE; incident recorded,independent safety review required
+S06,SESSION,dirty writer or unsafe-retry signal,do not retry; end session,trial classified by prior evidence; disposition retained,no continuation on that boot without separately authorized recovery
+S07,SESSION,repeated malformed evidence two consecutive or three total,stop session,malformed trials INVALID,repair offline and rerun all gates
+S08,EXPERIMENT,wrong device firmware kernel artifact parameter or session identity,stop all collection and quarantine campaign,INVALID_EXPERIMENT,no resume; new experiment ID after review
+S09,EXPERIMENT,unexpected reboot or boot ID changes mid-session,stop all collection and preserve boundary,INVALID affected session; experiment review required,new authorized boot/session only if campaign integrity retained
+S10,EXPERIMENT,device instability new kernel/system behavior or safety anomaly,stop all collection; follow human recovery plan,no compatibility interpretation,independent safety and scope review
+S11,EXPERIMENT,clock backward step corruption or >1.1s authoritative disagreement,stop all collection,INVALID_EXPERIMENT if source-wide; otherwise invalid trial pending review,new experiment if clock source not trustworthy
+S12,EXPERIMENT,invalid limits exceeded (>1 per boot or >2 total),stop campaign,INVALID_EXPERIMENT,no replacement/continuation under same experiment
+S13,EXPERIMENT,unrelated parameter/configuration changes or concurrent experiment,stop all collection,INVALID_EXPERIMENT,new reviewed experiment only

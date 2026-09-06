@@ -1,0 +1,20 @@
+NAME,MINIMUM_VALIDATED_COMPATIBLE,MINIMUM_VALIDATED_INCOMPATIBLE,WHY
+SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS,E3,E3,A distribution of setup outcomes is required in either direction.
+FOPS_KERNEL_PAGE_SETUP_ATTEMPTS,E3,E3,A distribution of setup outcomes is required in either direction.
+FOPS_ROUTE_COARSE_DELAY_USEC,E4,E3,Compatibility must survive condition variation; repeated systematic window misses can falsify sooner.
+FOPS_ROUTE_FINE_DELAY_TICKS,E4,E3,Compatibility of a sweep must survive condition variation; repeated uncovered windows can falsify sooner.
+DEFAULT_EXPLOIT_ATTEMPTS,E4,E4,A retry cap is a policy adequacy claim over cross-condition terminal distributions.
+DEFAULT_ATTEMPT_TIMEOUT_SEC,E4,E3,Compatibility needs duration tails across conditions; repeated premature expiry can falsify.
+DEFAULT_P0_ATTEMPT_TIMEOUT_SEC,E4,E3,Compatibility needs pre-P0 duration tails across boots; repeated premature expiry can falsify.
+SLIDE_WAIT_NSEC,E4,E3,Compatibility is scheduler/load sensitive; repeated wrong ordering can falsify.
+SLIDE_REQUEUE_ARM_USEC,E4,E3,Compatibility is scheduler/load sensitive; repeated wrong ordering can falsify.
+SLIDE_KSNITCH_APPENDED_FUTEXES,E4,E3,Resource/candidate adequacy must hold across relevant memory conditions.
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,E4,E3,Signal/noise compatibility requires repeated and cross-condition distributions.
+SLIDE_KSNITCH_AVERAGE,E4,E3,Signal/noise compatibility requires repeated and cross-condition distributions.
+SLIDE_KSNITCH_SCREEN_REPEAT,E4,E3,Screening compatibility requires repeated and cross-condition candidate outcomes.
+SLIDE_KSNITCH_SCREEN_AVERAGE,E4,E3,Screening compatibility requires repeated and cross-condition candidate outcomes.
+SKB_SEND_SIZE,E3,E2,Repeated direct-consumer geometry supports compatibility; one unambiguous incompatible geometry can falsify.
+SKB_RECLAIM_SENDS,E4,E3,Coverage adequacy is allocator-state sensitive.
+SLIDE_RECLAIM_SENDS,E4,E3,Coverage adequacy is allocator-state sensitive.
+P0_FINGERPRINT_MIN_BEST,E4,E3,Compatibility must cover score variation across boots/conditions; repeated true-state rejection or weak false acceptance can falsify.
+P0_FINGERPRINT_MIN_MARGIN,E4,E3,Compatibility must cover separation variation and collision states; repeated ambiguous acceptance or true-state rejection can falsify.

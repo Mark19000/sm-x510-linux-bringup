@@ -1,0 +1,1 @@
+ls: /data/local/tmp/cve-2026-43499-root: No such file or directory

@@ -1,0 +1,21 @@
+REQUIREMENT,STATUS,EVIDENCE,BLOCKING,REQUIRED_ACTION
+Validation question,COMPLETE_AND_BOUND,phase_j2_validation_question.md,NO,None
+Experimental unit,COMPLETE_AND_BOUND,phase_j2_experimental_unit.md,NO,None
+State model,COMPLETE_AND_BOUND,phase_j2_state_model.md,NO,None
+Event grammar,COMPLETE_AND_BOUND,phase_j2_event_grammar.json,NO,Grammar v2.1.1 frozen
+Observation schema,COMPLETE_AND_BOUND,phase_j2_observation_schema_v2.json,NO,Schema v2.2.1 frozen
+Runtime identity contract,COMPLETE_AND_BOUND,phase_j2_runtime_identity_contract.md,NO,Exact EZE4 physical identity bound and frozen
+Clock model,COMPLETE_AND_BOUND,phase_j2_clock_model.md,NO,Device CLOCK_MONOTONIC and post-fork epoch frozen
+Result taxonomy,COMPLETE_AND_BOUND,phase_j2_1_taxonomy.md,NO,4-layer taxonomy frozen
+Decision table,COMPLETE_AND_BOUND,phase_j2_decision_table.csv,NO,Canonical E4 decision table frozen
+E4 contract,COMPLETE_AND_BOUND,phase_j2_e4_contract.md,NO,3x2x2 partition and invalid caps frozen
+GO gates,COMPLETE_AND_BOUND,phase_j2_go_gates.csv,YES_AT_EXECUTION,Every hard gate must pass at execution
+STOP rules,COMPLETE_AND_BOUND,phase_j2_stop_rules.csv,NO,None
+Raw evidence contract,COMPLETE_AND_BOUND,phase_j2_raw_evidence_contract.md,NO,Deterministic manifest closure defined
+Condition vector template,COMPLETE_AS_TEMPLATE,phase_j2_confounders.csv,NO,Dimensions defined; numerical thresholds unbound
+C1 detector contract,COMPLETE_AS_TEMPLATE,phase_j2_confounders.csv,NO,Interface defined; physical transport bound in J3
+C2 freezer monitor,COMPLETE_AS_TEMPLATE,phase_j2_confounders.csv,NO,200ms poller spec defined; binary bound in J3
+C3 thermal monitor,COMPLETE_AS_TEMPLATE,phase_j2_confounders.csv,NO,1000ms poller spec defined; binary bound in J3
+Run-package manifest,BLOCKED_PENDING_J3_BINDING,run_package.sha256,YES,Bind concrete binaries configs and schemas in J3
+Condition numerical thresholds,BLOCKED_PENDING_J3_BINDING,threshold_profile.json,YES,Device calibration and freeze in J3
+Real L3 authorization,NOT_GRANTED,Design/contract scope only,YES,Explicit human authorization required prior to L3 review

@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "grammar_version": "2.1.1",
+  "grammar_description": "Authoritative lifecycle and telemetry event grammar for Root-My-Galaxy EZE4 J2.1-R1 evaluation.",
+  "required_event_envelope": [
+    "sequence",
+    "event_type",
+    "device_monotonic_ns",
+    "boot_id",
+    "session_id",
+    "trial_id",
+    "attempt_ordinal",
+    "pid",
+    "producer",
+    "payload"
+  ],
+  "events": {
+    "TRIAL_INIT": {
+      "producer": "SUPERVISOR",
+      "description": "Supervisor initializes trial and locks condition envelope.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["experiment_id", "session_id", "condition_class"],
+        "properties": {
+          "experiment_id": { "type": "string" },
+          "session_id": { "type": "string" },
+          "condition_class": { "type": "string", "enum": ["SETTLED_NOMINAL", "ELEVATED_VALID"] }
+        }
+      }
+    },
+    "ATTEMPT_SPAWN": {
+      "producer": "SUPERVISOR",
+      "description": "Supervisor forks and execs child attempt, capturing post-fork monotonic start epoch.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["assigned_pid", "executable_path"],
+        "properties": {
+          "assigned_pid": { "type": "integer", "minimum": 1 },
+          "executable_path": { "type": "string" }
+        }
+      }
+    },
+    "P0_ENTER": {
+      "producer": "TARGET_CHILD",
+      "description": "Child enters pre-slide preparation stage governed by 1200s pre-slide watchdog.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "P0_EXIT_SLIDE_READY": {
+      "producer": "TARGET_CHILD",
+      "description": "Child signals readiness to enter candidate overall slide.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["p0_duration_ns", "handshake_status"],
+        "properties": {
+          "p0_duration_ns": { "type": "integer", "minimum": 0 },
+          "handshake_status": { "type": "string" }
+        }
+      }
+    },
+    "OVERALL_SLIDE_ENTER": {
+      "producer": "SUPERVISOR",
+      "description": "Supervisor switches active threshold to 2200s from original post-fork epoch (no timer reset).",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate_watchdog_seconds", "watchdog_epoch_start_monotonic_ns"],
+        "properties": {
+          "candidate_watchdog_seconds": { "type": "integer", "const": 2200 },
+          "watchdog_epoch_start_monotonic_ns": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "HEARTBEAT_PROGRESS": {
+      "producer": "TARGET_CHILD",
+      "description": "Periodic progress marker emitted during candidate slide.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["progress_phase", "iteration_count"],
+        "properties": {
+          "progress_phase": { "type": "string" },
+          "iteration_count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "TERMINAL_COMPLETION": {
+      "producer": "TARGET_CHILD",
+      "description": "Child exits cleanly with exit status 0.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["exit_code", "total_monotonic_ns"],
+        "properties": {
+          "exit_code": { "type": "integer", "const": 0 },
+          "total_monotonic_ns": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "WATCHDOG_EXPIRY": {
+      "producer": "SUPERVISOR",
+      "description": "Supervisor overall watchdog fires at >=2200s from post-fork.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_pid", "elapsed_seconds"],
+        "properties": {
+          "target_pid": { "type": "integer", "minimum": 1 },
+          "elapsed_seconds": { "type": "integer", "minimum": 2200 }
+        }
+      }
+    },
+    "PROCESS_SIGNAL": {
+      "producer": "SUPERVISOR",
+      "description": "Child caught signal or terminated via SIGKILL by supervisor.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_pid", "signal_number", "signal_name"],
+        "properties": {
+          "target_pid": { "type": "integer", "minimum": 1 },
+          "signal_number": { "type": "integer" },
+          "signal_name": { "type": "string" }
+        }
+      }
+    },
+    "PROCESS_REAP": {
+      "producer": "SUPERVISOR",
+      "description": "Supervisor reaps child via waitpid.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reaped_pid", "exit_status"],
+        "properties": {
+          "reaped_pid": { "type": "integer", "minimum": 1 },
+          "exit_status": { "type": "integer" }
+        }
+      }
+    },
+    "CONFOUNDER_SAMPLE": {
+      "producer": "CONFOUNDER_MONITOR",
+      "description": "Continuous telemetry sample emitted by background detector.",
+      "payload_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["confounder_type", "metric_name", "metric_value"],
+        "properties": {
+          "confounder_type": { "type": "string", "enum": ["C2_FREEZER", "C3_THERMAL", "LOAD", "MEMORY"] },
+          "metric_name": { "type": "string" },
+          "metric_value": { "type": "number" }
+        }
+      }
+    }
+  }
+}

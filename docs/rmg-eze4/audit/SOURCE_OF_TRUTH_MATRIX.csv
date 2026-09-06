@@ -1,0 +1,17 @@
+concept,authoritative_source,secondary_source,notes
+struct member offset,BTF/DWARF from EZE4 rebuild (eze4_struct_layout.csv),stock_rtmutex_binary_verification.md disassembly for PI fields,Rebuild-derived layouts validated against stock binary where possible
+stock symbol/function offset,Image.stock direct disassembly (eze4_symbol_map.csv),rebuild vmlinux for initial localization,EZE4_STOCK_IMAGE_OFFSET column is authoritative; EZE4_REBUILT_VMLINUX_ADDRESS is guide only
+allocation bucket size,source code CONFIG + slab allocator semantics,eze4_target_readiness_v2.csv,sizeof(struct) != allocator bucket; MM_STRUCT_SZ=0x400 vs sizeof=0x3e0
+payload synthetic layout,payload source code (target.h),eze4_target_readiness_v2.csv PAYLOAD_SYNTHETIC_LAYOUT rows,Independent of firmware binary; owned by payload author
+P0 fingerprint table,Image.stock + generate_p0_fingerprint.py,eze4_p0_fingerprint_table.csv / p0_fingerprint_EZE4.generated.h,Generated deterministically from raw Image bytes
+P0 oracle algorithm,ZG3 source oracle.c + target.h,p0_oracle_algorithm.md,Algorithm parameters (step/probe/thresholds) from source
+P0 collision analysis,Image.stock fingerprint table + scoring algorithm,p0_collision_analysis.md / p0_similarity_matrix.csv,Deterministic static analysis; reachability is OPEN
+KASLR/loader physical placement,UNKNOWN — no retained bootloader source/binary,kaslr_selection_analysis.md (documents the gap),Samsung sboot not available for analysis
+runtime deployment state,physical device observation (Phase G raw evidence),CODEX_PHASE_G_INDEPENDENT_REVIEW.md,Raw ADB captures under runtime-evidence/
+firmware identity,Phase G raw evidence files 01-06,CANONICAL_STATUS.md / validator.py / schema v2.2.1,Six identity dimensions all const-bound in schema
+stock vulnerability presence,Image.stock disassembly,stock_rtmutex_binary_verification.md,Binary-level verification of remove_waiter(); no runtime exploit test
+E4 verdict semantics,aggregator.py + phase_j2_e4_contract.md,validator.py + test_phase_j2_1_r1_replay.py,Active code is authoritative; contract doc must match
+J2 experiment semantics,phase_j2_observation_schema_v2.json (v2.2.1),PHASE_J2_1_R1_1.md,Schema is structural authority; phase report is narrative
+parameter accounting,eze4_target_readiness_v2.csv,CANONICAL_STATUS.md (derived summary),180 rows are primary; summary totals are derived
+historical rationale,phase reports (PHASE1-J2.1-R1.1),superseded by CANONICAL_STATUS.md where errata disagree,Phase reports are historical context not active authority
+confounder detector contracts,phase_j2_confounders.csv + j1_timeout_confounders.md,validator.py confounder logic,Feasibility on stock Android is UNVERIFIED

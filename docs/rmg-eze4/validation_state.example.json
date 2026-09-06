@@ -1,0 +1,249 @@
+{
+  "schema_version": "PHASE_I_EXAMPLE_1",
+  "synthetic": true,
+  "campaign_id": "SYNTHETIC_PHASE_I_CAMPAIGN",
+  "p0_state": {
+    "loader_mapping": "OPEN",
+    "collision_reachability": "UNKNOWN",
+    "same_boot_recovery": "NONE"
+  },
+  "parameters": [
+    {
+      "parameter": "SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E3",
+      "dependencies": [
+        "P0_GROUND_TRUTH"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [
+        "P0_GROUND_TRUTH"
+      ],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "FOPS_KERNEL_PAGE_SETUP_ATTEMPTS",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E3",
+      "dependencies": [
+        "P0_GROUND_TRUTH"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [
+        "P0_GROUND_TRUTH"
+      ],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "FOPS_ROUTE_COARSE_DELAY_USEC",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "FOPS_KERNEL_PAGE_SETUP_ATTEMPTS"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "FOPS_ROUTE_FINE_DELAY_TICKS",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "FOPS_ROUTE_COARSE_DELAY_USEC"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "DEFAULT_EXPLOIT_ATTEMPTS",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "DEFAULT_ATTEMPT_TIMEOUT_SEC",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "DEFAULT_P0_ATTEMPT_TIMEOUT_SEC",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "P0_GROUND_TRUTH",
+        "DEFAULT_ATTEMPT_TIMEOUT_SEC"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [
+        "P0_GROUND_TRUTH"
+      ],
+      "p0_dependency": "P0_ONLY",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "SLIDE_WAIT_NSEC",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "SLIDE_REQUEUE_ARM_USEC",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SLIDE_WAIT_NSEC"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "SLIDE_KSNITCH_APPENDED_FUTEXES",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "SLIDE_KSNITCH_REPEAT_MEASUREMENT",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SLIDE_KSNITCH_APPENDED_FUTEXES"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "SLIDE_KSNITCH_AVERAGE",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SLIDE_KSNITCH_REPEAT_MEASUREMENT"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "SLIDE_KSNITCH_SCREEN_REPEAT",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SLIDE_KSNITCH_REPEAT_MEASUREMENT"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "SLIDE_KSNITCH_SCREEN_AVERAGE",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SLIDE_KSNITCH_SCREEN_REPEAT"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "SKB_SEND_SIZE",
+      "current_validation_state": "COMPATIBLE",
+      "minimum_evidence_level": "E3",
+      "dependencies": [],
+      "collected_evidence_refs": [
+        "raw/sha256:synthetic-geom-a",
+        "raw/sha256:synthetic-geom-b"
+      ],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "COMPATIBLE"
+    },
+    {
+      "parameter": "SKB_RECLAIM_SENDS",
+      "current_validation_state": "NOT_OBSERVED",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SKB_SEND_SIZE"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [],
+      "p0_dependency": "P0_INDEPENDENT",
+      "final_status": "NOT_OBSERVED"
+    },
+    {
+      "parameter": "SLIDE_RECLAIM_SENDS",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "SKB_SEND_SIZE",
+        "P0_GROUND_TRUTH"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [
+        "P0_GROUND_TRUTH"
+      ],
+      "p0_dependency": "P0_DEPENDENT",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "P0_FINGERPRINT_MIN_BEST",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "P0_GROUND_TRUTH"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [
+        "P0_GROUND_TRUTH"
+      ],
+      "p0_dependency": "P0_ONLY",
+      "final_status": "INCONCLUSIVE"
+    },
+    {
+      "parameter": "P0_FINGERPRINT_MIN_MARGIN",
+      "current_validation_state": "INCONCLUSIVE",
+      "minimum_evidence_level": "E4",
+      "dependencies": [
+        "P0_GROUND_TRUTH"
+      ],
+      "collected_evidence_refs": [],
+      "open_blockers": [
+        "P0_GROUND_TRUTH"
+      ],
+      "p0_dependency": "P0_ONLY",
+      "final_status": "INCONCLUSIVE"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+SCENARIO,TRIAL_TERMINAL_CLASS,CONFOUNDER_STATE,TRIAL_VALIDITY,TRIAL_EVIDENCE_VOTE,CAMPAIGN_EFFECT,REASON
+all valid trials finish by 2195s with complete E4 coverage,QUALIFYING_COMPLETION,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,COMPATIBLE_VOTE,COMPATIBLE,E4 contract satisfied with conservative 5s headroom
+high variance completions all <=2195s,QUALIFYING_COMPLETION,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,COMPATIBLE_VOTE,COMPATIBLE,variance alone is not failure if within headroom
+completion between 2195s and 2200s,QUALIFYING_COMPLETION,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,NO_VOTE,INCONCLUSIVE,positive execution but required policy headroom absent
+one attributable overall timeout,SUPERVISOR_OVERALL_TIMEOUT,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,INCOMPATIBLE_VOTE,INCONCLUSIVE,E4 rule requires >=3 same condition across >=2 boots
+three attributable overall timeouts same condition across >=2 boots,SUPERVISOR_OVERALL_TIMEOUT,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,INCOMPATIBLE_VOTE,INCOMPATIBLE,canonical E4 repeated-attributable falsification rule met
+two timeouts on one boot zero on others,SUPERVISOR_OVERALL_TIMEOUT,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,INCOMPATIBLE_VOTE,INCONCLUSIVE,fails multi-boot requirement
+cross-condition timeouts one settled one elevated,SUPERVISOR_OVERALL_TIMEOUT,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,INCOMPATIBLE_VOTE,INCONCLUSIVE,fails same-condition requirement
+timeout with C1 unseparated P0 delay present,SUPERVISOR_OVERALL_TIMEOUT,C1_PRESENT,INVALID,NO_VOTE,INCONCLUSIVE,P0 delay contaminated candidate duration attribution
+timeout with C2 cgroup freezer event present,SUPERVISOR_OVERALL_TIMEOUT,C2_PRESENT,INVALID,NO_VOTE,INCONCLUSIVE,freezer stole execution time and destroyed attribution
+timeout with C3 thermal throttling excursion present,SUPERVISOR_OVERALL_TIMEOUT,C3_PRESENT,INVALID,NO_VOTE,INCONCLUSIVE,thermal stall stole execution time and destroyed attribution
+confounder detector coverage gap C1 unknown,ANY,C1_UNKNOWN,INCONCLUSIVE,NO_VOTE,INCONCLUSIVE,unproven P0 separation cannot vote
+confounder detector coverage gap C2 unknown,ANY,C2_UNKNOWN,INCONCLUSIVE,NO_VOTE,INCONCLUSIVE,unproven freezer absence cannot vote
+confounder detector coverage gap C3 unknown,ANY,C3_UNKNOWN,INCONCLUSIVE,NO_VOTE,INCONCLUSIVE,unproven thermal absence cannot vote
+expected pre-P0 1200s watchdog timeout,EXPECTED_P0_TIMEOUT,C1_CLEAR,VALID,NO_VOTE,INCONCLUSIVE,separate parameter and outside candidate slide scope
+child explicit failure exit nonzero intact telemetry,CHILD_EXPLICIT_FAILURE,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,NO_VOTE,INCONCLUSIVE,process failure does not invalidate measurement hygiene
+child crash via signal intact telemetry,CHILD_SIGNAL_FAILURE,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,NO_VOTE,INCONCLUSIVE,signal fault does not invalidate measurement hygiene
+clock disagreement >1.1s or backward step,MEASUREMENT_FAILURE,ANY,INVALID,NO_VOTE,INVALID_EXPERIMENT,clock contract violated
+two invalid trials on same boot,MEASUREMENT_FAILURE,ANY,INVALID,NO_VOTE,INVALID_EXPERIMENT,exceeds maximum 1 invalid trial per boot cap
+three invalid trials across campaign,MEASUREMENT_FAILURE,ANY,INVALID,NO_VOTE,INVALID_EXPERIMENT,exceeds maximum 2 invalid trials total cap
+boot ID changes mid-trial,WRONG_STATE_TERMINATION,ANY,INVALID,NO_VOTE,INVALID_EXPERIMENT,boot attribution broken
+missing raw evidence file or hash mismatch,MEASUREMENT_FAILURE,ANY,INVALID,NO_VOTE,INVALID_EXPERIMENT,raw evidence chain of custody broken
+unexpected state machine transition,WRONG_STATE_TERMINATION,ANY,INVALID,NO_VOTE,INVALID_EXPERIMENT,state model no longer explains evidence
+transport loss causing missing observables,EXTERNAL_INTERRUPTION,ANY,INVALID,NO_VOTE,INCONCLUSIVE,host disconnect may hide required observables
+insufficient valid trials to meet E4,QUALIFYING_COMPLETION,C1_CLEAR and C2_ABSENT and C3_ABSENT,VALID,COMPATIBLE_VOTE,INCONCLUSIVE,E4 partition coverage incomplete

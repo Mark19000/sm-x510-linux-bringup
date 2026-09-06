@@ -1,0 +1,15 @@
+{
+  "label": "SYNTHETIC",
+  "cases": [
+    {"id": "A_CLEAR_COMPATIBLE", "kind": "clearly compatible evidence", "compatibility": true, "incompatibility": false, "expected": "COMPATIBLE"},
+    {"id": "B_CLEAR_INCOMPATIBLE", "kind": "clearly incompatible evidence", "compatibility": false, "incompatibility": true, "expected": "INCOMPATIBLE"},
+    {"id": "C_INSUFFICIENT", "kind": "insufficient evidence", "evidence_level": "E1", "expected": "INCONCLUSIVE"},
+    {"id": "D_CONTRADICTORY", "kind": "contradictory measurements", "two_opposed_records": true, "expected": "INCONCLUSIVE"},
+    {"id": "E_MISSING_OBSERVABLE", "kind": "missing observables", "observable_available": false, "expected": "INCONCLUSIVE"},
+    {"id": "F_CROSS_BOOT_DISAGREEMENT", "kind": "cross-boot disagreement", "two_opposed_boots": true, "expected": "INCONCLUSIVE"},
+    {"id": "G_CROSS_CONDITION_DISAGREEMENT", "kind": "cross-condition disagreement", "two_opposed_conditions": true, "expected": "INCONCLUSIVE"},
+    {"id": "H_OUTLIER", "kind": "outlier measurements", "outlier_unresolved": true, "expected": "INCONCLUSIVE"},
+    {"id": "I_MALFORMED", "kind": "malformed evidence", "omit": "RAW_EVIDENCE_REF", "expected": "INVALID_MEASUREMENT"},
+    {"id": "J_WRONG_FIRMWARE_SESSION", "kind": "wrong firmware/session", "baseline_match": false, "session_match": false, "expected": "INVALID_MEASUREMENT"}
+  ]
+}

@@ -1,0 +1,74 @@
+file_path,authority_class,notes
+docs/rmg-eze4/CANONICAL_STATUS.md,ACTIVE_CANONICAL,Top-level summary — derived from primary evidence
+docs/rmg-eze4/STATUS.md,ACTIVE_SUPPORTING,Extended status narrative
+docs/rmg-eze4/eze4_target_readiness_v2.csv,ACTIVE_CANONICAL,Primary 180-parameter inventory (v2 supersedes v1)
+docs/rmg-eze4/eze4_target_readiness.csv,HISTORICAL_SUPERSEDED,Superseded by v2
+docs/rmg-eze4/eze4_struct_layout.csv,ACTIVE_CANONICAL,Primary struct layout evidence from BTF/DWARF
+docs/rmg-eze4/eze4_symbol_map.csv,ACTIVE_CANONICAL,Primary symbol/offset mapping from Image.stock
+docs/rmg-eze4/stock_rtmutex_binary_verification.md,ACTIVE_CANONICAL,Primary stock vulnerability verification
+docs/rmg-eze4/rtmutex_patch_status.md,ACTIVE_SUPPORTING,Patch status context
+docs/rmg-eze4/p0_fingerprint_EZE4.generated.h,GENERATED_ARTIFACT,Generated from Image.stock via generate_p0_fingerprint.py
+docs/rmg-eze4/eze4_p0_fingerprint_table.csv,GENERATED_ARTIFACT,CSV form of P0 table
+docs/rmg-eze4/p0_oracle_algorithm.md,ACTIVE_SUPPORTING,P0 algorithm documentation
+docs/rmg-eze4/p0_collision_analysis.md,ACTIVE_CANONICAL,P0 collision root-cause analysis
+docs/rmg-eze4/p0_similarity_matrix.csv,GENERATED_ARTIFACT,Collision comparison matrix
+docs/rmg-eze4/p0_discrimination_report.csv,GENERATED_ARTIFACT,P0 discrimination analysis
+docs/rmg-eze4/kaslr_selection_analysis.md,ACTIVE_CANONICAL,KASLR/loader uncertainty analysis
+docs/rmg-eze4/p0_loader_knowledge_gap.md,ACTIVE_SUPPORTING,Loader knowledge gap documentation
+docs/rmg-eze4/pi_orientation_matrix.csv,ACTIVE_SUPPORTING,PI orientation analysis
+docs/rmg-eze4/fpsimd_static_analysis.md,ACTIVE_SUPPORTING,FPSIMD route static analysis
+docs/rmg-eze4/runtime_parameter_criticality.csv,ACTIVE_CANONICAL,L3 parameter criticality classification
+docs/rmg-eze4/runtime_validation_inventory.csv,ACTIVE_SUPPORTING,Runtime validation state tracking
+docs/rmg-eze4/runtime_validation_layers.md,ACTIVE_SUPPORTING,Evidence layer model
+docs/rmg-eze4/must_validate_parameter_analysis.md,ACTIVE_SUPPORTING,Must-validate parameter rationale
+docs/rmg-eze4/phase_j2_observation_schema_v2.json,ACTIVE_CANONICAL,Schema v2.2.1 — structural authority for observations
+docs/rmg-eze4/phase_j2_observation_schema.json,HISTORICAL_SUPERSEDED,Superseded by v2
+docs/rmg-eze4/phase_j2_event_grammar.json,ACTIVE_CANONICAL,Event grammar v2.1.1
+docs/rmg-eze4/phase_j2_e4_contract.md,ACTIVE_CANONICAL,E4 decision contract
+docs/rmg-eze4/phase_j2_decision_table.csv,ACTIVE_CANONICAL,Decision table
+docs/rmg-eze4/phase_j2_go_gates.csv,ACTIVE_CANONICAL,GO gate requirements
+docs/rmg-eze4/phase_j2_stop_rules.csv,ACTIVE_CANONICAL,STOP rules
+docs/rmg-eze4/phase_j2_validation_question.md,ACTIVE_CANONICAL,Primary validation question
+docs/rmg-eze4/phase_j2_experimental_unit.md,ACTIVE_CANONICAL,Experimental unit definition
+docs/rmg-eze4/phase_j2_state_model.md,ACTIVE_CANONICAL,State model
+docs/rmg-eze4/phase_j2_clock_model.md,ACTIVE_CANONICAL,Clock model
+docs/rmg-eze4/phase_j2_raw_evidence_contract.md,ACTIVE_CANONICAL,Raw evidence contract
+docs/rmg-eze4/phase_j2_runtime_identity_contract.md,ACTIVE_CANONICAL,Runtime identity contract
+docs/rmg-eze4/phase_j2_preexecution_matrix.csv,ACTIVE_CANONICAL,Pre-execution checklist
+docs/rmg-eze4/phase_j2_attribution.md,ACTIVE_SUPPORTING,Attribution rules
+docs/rmg-eze4/phase_j2_confounders.csv,ACTIVE_CANONICAL,Confounder specifications
+docs/rmg-eze4/phase_j2_observables.csv,ACTIVE_SUPPORTING,Observable specifications
+docs/rmg-eze4/phase_j2_condition_dimensions.csv,ACTIVE_SUPPORTING,Condition dimensions
+docs/rmg-eze4/phase_j2_schema_migration.md,HISTORICAL_SUPERSEDED,Documents v1 to v2 migration
+docs/rmg-eze4/PHASE_J2_1_R1_1.md,ACTIVE_CANONICAL,Latest phase report — R1.1 identity binding patch
+docs/rmg-eze4/PHASE_J2_1_R1.md,ACTIVE_SUPPORTING,R1 phase report
+docs/rmg-eze4/PHASE_J2.md,HISTORICAL_SUPERSEDED,Superseded by R1/R1.1 corrections
+docs/rmg-eze4/PHASE_J1_OFFLINE_REVIEW.md,ACTIVE_SUPPORTING,J1 offline review
+docs/rmg-eze4/PHASE_J0.md,ACTIVE_SUPPORTING,J0 candidate selection
+docs/rmg-eze4/PHASE_I.md,ACTIVE_SUPPORTING,Phase I measurement pipeline design
+docs/rmg-eze4/PHASE_H.md,ACTIVE_SUPPORTING,Phase H validation domains
+docs/rmg-eze4/PHASE_G.md,ACTIVE_CANONICAL,Phase G runtime observation report
+docs/rmg-eze4/CODEX_PHASE_G_INDEPENDENT_REVIEW.md,ACTIVE_SUPPORTING,G2 independent review
+docs/rmg-eze4/PHASE_F.md,ACTIVE_SUPPORTING,Phase F reconciliation
+docs/rmg-eze4/PHASE_E.md,ACTIVE_SUPPORTING,Phase E static closure
+docs/rmg-eze4/PHASE_E_ERRATA.md,ACTIVE_SUPPORTING,Phase E errata
+docs/rmg-eze4/PHASE3B.md,HISTORICAL_SUPERSEDED,Phase 3B — P0 analysis (historical)
+docs/rmg-eze4/PHASE3A.md,HISTORICAL_SUPERSEDED,Phase 3A — symbol mapping (historical)
+docs/rmg-eze4/PHASE3A_ERRATA.md,HISTORICAL_SUPERSEDED,Phase 3A errata
+docs/rmg-eze4/PHASE2C.md,HISTORICAL_SUPERSEDED,Phase 2C — vulnerability analysis (historical)
+docs/rmg-eze4/PHASE2B.md,HISTORICAL_SUPERSEDED,Phase 2B — kernel config (historical)
+docs/rmg-eze4/PHASE2B_ERRATA2.md,HISTORICAL_SUPERSEDED,Phase 2B errata 2
+docs/rmg-eze4/PHASE2A_ERRATA.md,HISTORICAL_SUPERSEDED,Phase 2A errata
+docs/rmg-eze4/PHASE1.md,HISTORICAL_SUPERSEDED,Phase 1 — initial analysis (historical)
+docs/rmg-eze4/runtime-evidence/20260906T094426Z/raw/*,RAW_EVIDENCE,46 raw ADB capture files
+docs/rmg-eze4/runtime-evidence/20260906T094426Z/evidence_sha256.txt,RAW_EVIDENCE,Hash manifest for raw files
+docs/rmg-eze4/runtime-evidence/20260906T094426Z/session_manifest.txt,RAW_EVIDENCE,Session metadata
+tools/rmg-eze4/generate_p0_fingerprint.py,ACTIVE_CANONICAL,P0 table generator/verifier
+tools/rmg-eze4/analysis/validator.py,ACTIVE_CANONICAL,Observation record validator
+tools/rmg-eze4/analysis/aggregator.py,ACTIVE_CANONICAL,E4 campaign aggregator
+tools/rmg-eze4/analysis/check_consistency.py,ACTIVE_CANONICAL,Cross-artifact consistency checker
+tools/rmg-eze4/analysis/engine.py,LEGACY_RETAINED,Legacy Phase-I single-record classifier (retained strictly for Phase I backward compatibility)
+tools/rmg-eze4/schemas/observation.schema.json,LEGACY_RETAINED,Legacy Phase-I observation schema file
+tools/rmg-eze4/tests/*,TEST_ONLY,Test suite (68 tests)
+tools/u11_repro_compare.py,ACTIVE_CANONICAL,Build reproducibility comparison tool (retains historical naming debt)
+tools/repro_compare.py,ACTIVE_CANONICAL,Canonical wrapper alias for tools/u11_repro_compare.py

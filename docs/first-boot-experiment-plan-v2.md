@@ -1,5 +1,7 @@
 # First Boot Experiment Plan v2
 
+> **SUPERSEDED — HISTÓRICO, NO OPERATIVO, NO AUTORIZA FLASH.** Este plan usa U11, observabilidad ambigua y una recuperación no validada. La autoridad EZE4 actual es `docs/boot-chain/first-custom-kernel-experiment.md`; USB, consumo, backlight o un reboot distinto no prueban por sí solos ejecución del kernel.
+
 **Fecha:** 2026-08-24
 **Proyecto:** Samsung Galaxy Tab S9 FE Linux Bring-Up
 **Dispositivo:** SM-X510 Wi-Fi, U12/EZE4, Android 16, SoC S5E8835 (Exynos 1380)
@@ -44,7 +46,7 @@
 
 | # | Incógnita | Impacto en experimento |
 |---|-----------|----------------------|
-| U1 | ¿El bootloader Samsung respeta flags=1 bajo UNLOCKED? | Determina si podemos usar vbmeta propio o necesitamos otra ruta |
+| U1 | ¿El bootloader Samsung respeta `VERIFICATION_DISABLED` (`flags=2`) bajo UNLOCKED? | `flags=1` sólo desactiva hashtree; la política Samsung sigue desconocida |
 | U2 | ¿El unlock borra datos? ¿Activa Knox irreversible? | Decisión del propietario antes de cualquier flash |
 | U3 | ¿El bootloader añade parámetros al cmdline final en runtime? | Podría activar earlycon automáticamente o añadir restricciones |
 | U4 | hw_rev físico real (¿r00, r01 o r04?) | Determina qué overlay aplica el bootloader |
@@ -85,7 +87,7 @@ El experimento mínimo NO es "flashear un kernel custom". Es una **secuencia de 
 **Precondición:** dispositivo desbloqueado (decisión del propietario documentada).
 
 **Acciones:**
-1. Regenerar vbmeta.img con flags=1 (disable verification) usando avbtool local.
+1. Hipótesis aún no autorizada: vbmeta con `VERIFICATION_DISABLED` (`flags=2`). `flags=1` significa `HASHTREE_DISABLED`; no usar los nombres indistintamente.
 2. Flashear SOLO vbmeta.img. NO tocar boot/init_boot/vendor_boot/dtbo.
 3. Observar arranque.
 
@@ -93,7 +95,7 @@ El experimento mínimo NO es "flashear un kernel custom". Es una **secuencia de 
 
 | Resultado | Interpretación | Siguiente paso |
 |-----------|---------------|---------------|
-| Boot normal Android | Bootloader respeta flags=1 bajo UNLOCKED → podemos proceder con kernel propio | Avanzar a Fase 2 |
+| Boot normal Android | Bootloader tolera la política concreta ensayada; no generalizar a otros flags o imágenes | Revalidar antes de Fase 2 |
 | Warning naranja + boot lento pero funciona | Comportamiento estándar AOSP unlocked | Avanzar a Fase 2 |
 | Warning rojo / reboot loop / modo download | Samsung rechaza vbmeta modificado incluso unlocked → bloqueante mayor | STOP, investigar alternativa |
 | Brick / no responde a Download Mode | Escenario peor | Procedimiento recuperación oficial |
@@ -144,7 +146,7 @@ El experimento mínimo NO es "flashear un kernel custom". Es una **secuencia de 
 | Fase | boot.img | init_boot.img | vendor_boot.img | dtbo.img | vbmeta.img |
 |------|----------|--------------|----------------|----------|-----------|
 | 0 | Stock | Stock | Stock | Stock | Stock |
-| 1 | Stock | Stock | Stock | Stock | **Modificado** (flags=1) |
+| 1 | Stock | Stock | Stock | Stock | **Hipotético** (`flags=2`; no autorizado) |
 | 2 | **U11 kernel** | Stock | Stock | Stock | Modificado |
 | 3 | **U11 kernel** | **MINIMAL ramdisk** | Stock | Stock | Modificado |
 | 4 | **U11 kernel** | **SEC_DEBUG ramdisk** | Stock | Stock | Modificado |
@@ -177,7 +179,7 @@ Riesgo conocido: sus 281 módulos DLKM son incompatibles con kernel U11 (F11). P
 
 ```
 Fase 1 (vbmeta-only):
-├── Boot normal/warning amarillo → bootloader tolera flags=1 → CONTINUAR
+├── Boot normal/warning amarillo → tolera la política concreta ensayada → REVISAR antes de continuar
 ├── Warning rojo/reboot → Samsung bloquea → ESCALAR (investigar alternativas)
 └── Brick → RECUPERAR via firmware oficial → RE-EVALUAR proyecto
 

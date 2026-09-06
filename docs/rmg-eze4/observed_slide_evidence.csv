@@ -1,0 +1,3 @@
+SOURCE,BUILD,SLIDE,CONTEXT,DIRECT_OR_INFERRED,CONFIDENCE,NOTES
+ZG3 Git commit b7a854e9f8cf36808ccccc0975ad7d3880ed923a,X510XXSEEZG3,0x140000,Commit message reports root on attempt 1/8 and KASLR slide,DIRECT,MEDIUM,Direct as a recorded operator result; no raw log or address-domain correlation retained
+docs/rmg-eze4/PHASE3A.md:109,X510XXSEEZG3,0x140000,Phase report repeats commit b7a854e result,INFERRED,MEDIUM,Secondary restatement of the same single observation; not an independent sample

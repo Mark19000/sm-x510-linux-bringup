@@ -1,0 +1,23 @@
+CHANGED_PARAMETER,ZG3_VALUE,EZE4_VALUE,DEPENDENT_NAME,DEPENDENCY_TYPE,EXPECTED_DERIVED_VALUE,CURRENT_VALUE,STATUS
+P0_FINGERPRINT_HEADER,"targets/gts9fewifi-X510XXSEEZG3/p0_fingerprint.h","targets/gts9fewifi-X510XXUCEZE4/p0_fingerprint.h",oracle.c include,preprocessor include,EZE4 fingerprint header,no EZE4 target source,NOT_PRESENT
+P0_FINGERPRINT_HEADER,"targets/gts9fewifi-X510XXSEEZG3/p0_fingerprint.h","targets/gts9fewifi-X510XXUCEZE4/p0_fingerprint.h",pipe.c include,preprocessor include,EZE4 fingerprint header,no EZE4 target source,NOT_PRESENT
+KMALLOC_CACHES_OFF,0x01b04c70,0x01b04bb0,KMALLOC_CACHES,address expression,0xffffffc009b04bb0,0xffffffc009b04bb0,CONSISTENT
+KMALLOC_CACHES,0xffffffc009b04c70,0xffffffc009b04bb0,KMALLOC(type index),macro arithmetic,base 0xffffffc009b04bb0 plus cache-table index,current readiness expression uses EZE4 base,CONSISTENT
+KMALLOC_CACHES,0xffffffc009b04c70,0xffffffc009b04bb0,pipe.c controlled-mm cache lookup,data_addr consumer,0xffffffc009b04bb0 plus runtime slide/alias,current readiness value 0xffffffc009b04bb0,CONSISTENT
+ANON_PIPE_BUF_OPS_OFF,0x01912de0,0x01912d20,ANON_PIPE_BUF_OPS,address expression,0xffffffc009912d20,0xffffffc009912d20,CONSISTENT
+ANON_PIPE_BUF_OPS,0xffffffc009912de0,0xffffffc009912d20,pipe.c pipe_ops(),text_addr consumer,0xffffffc009912d20 plus runtime slide,current readiness value 0xffffffc009912d20,CONSISTENT
+ASHMEM_FOPS_OFF,0x01ab3c08,0x01ab3b48,ASHMEM_FOPS,address expression,0xffffffc009ab3b48,0xffffffc009ab3b48,CONSISTENT
+ASHMEM_FOPS,0xffffffc009ab3c08,0xffffffc009ab3b48,main.c alias verification,text_addr consumer,0xffffffc009ab3b48 plus runtime slide,current readiness value 0xffffffc009ab3b48,CONSISTENT
+ASHMEM_FOPS,0xffffffc009ab3c08,0xffffffc009ab3b48,fops.c original-fops checks,canon_addr/data_addr consumer,0xffffffc009ab3b48 in selected address domain,current readiness value 0xffffffc009ab3b48,CONSISTENT
+ASHMEM_FOPS_OFF,0x01ab3c08,0x01ab3b48,slide_app.c virtual-base checks,offset subtraction/bounds,0x01ab3b48,current readiness value 0x01ab3b48,CONSISTENT
+SLIDE_NFULNL_LOGGER_NAME_OFF,0x017fdc14,0x017fdb3c,SLIDE_NFULNL_LOGGER_NAME_IMAGE,address expression,0xffffffc0097fdb3c,0xffffffc0097fdb3c,CONSISTENT
+SLIDE_NFULNL_LOGGER_NAME_IMAGE,0xffffffc0097fdc14,0xffffffc0097fdb3c,SLIDE_NFULNL_LOGGER_NAME,P0 data-alias expression,P0_DATA_ALIAS_CONST(0xffffffc0097fdb3c),current readiness value 0xffffffc0097fdb3c,CONSISTENT
+SLIDE_NFULNL_LOGGER_NAME_IMAGE,0xffffffc0097fdc14,0xffffffc0097fdb3c,slide_app.c payload-slot selection,p0_alias_image_offset consumer,image offset derived from 0xffffffc0097fdb3c,current readiness value 0xffffffc0097fdb3c,CONSISTENT
+SLIDE_NFULNL_LOGGER_NAME_IMAGE,0xffffffc0097fdc14,0xffffffc0097fdb3c,util.c diagnostic output,address log consumer,0xffffffc0097fdb3c in selected address domain,current readiness value 0xffffffc0097fdb3c,CONSISTENT
+KMALLOC_CACHES,0xffffffc009b04c70,0xffffffc009b04bb0,KMALLOC_CACHES_OFF,reverse dependency audit,0x01b04bb0,0x01b04bb0,CONSISTENT
+ANON_PIPE_BUF_OPS,0xffffffc009912de0,0xffffffc009912d20,ANON_PIPE_BUF_OPS_OFF,reverse dependency audit,0x01912d20,0x01912d20,CONSISTENT
+ASHMEM_FOPS,0xffffffc009ab3c08,0xffffffc009ab3b48,ASHMEM_FOPS_OFF,reverse dependency audit,0x01ab3b48,0x01ab3b48,CONSISTENT
+SLIDE_NFULNL_LOGGER_NAME_IMAGE,0xffffffc0097fdc14,0xffffffc0097fdb3c,SLIDE_NFULNL_LOGGER_NAME_OFF,reverse dependency audit,0x017fdb3c,0x017fdb3c,CONSISTENT
+p0_fingerprints,125-row ZG3 table,125-row EZE4 table,oracle.c p0_fingerprint_score,array-element consumer,EZE4 QWORD values,generated header matches EZE4 CSV 1000/1000,CONSISTENT
+p0_fingerprints,125-row ZG3 table,125-row EZE4 table,oracle.c scan loop,array-size consumer,125 entries,125 entries,CONSISTENT
+p0_fingerprints,125-row ZG3 table,125-row EZE4 table,oracle.c best_slide selection,slide-field consumer,0x000000..0x1f0000 step 0x4000,0x000000..0x1f0000 step 0x4000,CONSISTENT

@@ -1,0 +1,6 @@
+HOST_TIMESTAMP_UTC=2026-09-06T09:45:02Z
+COMMAND=adb shell getprop ro.build.fingerprint
+STDOUT_BEGIN
+samsung/gts9fewifieea/gts9fewifi:16/BP4A.251205.006/X510XXUCEZE4:user/release-keys
+STDOUT_END
+RETURN_STATUS=0

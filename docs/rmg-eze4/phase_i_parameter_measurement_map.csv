@@ -1,0 +1,20 @@
+PARAMETER,GROUP_ID,PRIMARY_OBSERVABLE,SUPPORTING_OBSERVABLES,ENVIRONMENT_FIELDS,MIN_EVIDENCE_LEVEL,REPETITIONS_REQUIRED,CROSS_BOOT_REQUIRED,CROSS_CONDITION_REQUIRED,P0_DEPENDENCY,COMPATIBILITY_RULE_ID,INCOMPATIBILITY_RULE_ID,INCONCLUSIVE_RULE_ID
+SLIDE_KERNEL_PAGE_SETUP_ATTEMPTS,G1,attempts used and setup terminal state,cap exhaustion; prerequisite state,boot; CPU; load; memory/allocator,E3,UNKNOWN,NO,NO,P0_DEPENDENT,C-G1-SETUP,I-G1-CAP,X-G1-ATTR
+FOPS_KERNEL_PAGE_SETUP_ATTEMPTS,G2,attempts used and setup terminal state,cap exhaustion; route state,boot; CPU; load; memory/allocator,E3,UNKNOWN,NO,NO,P0_DEPENDENT,C-G2-SETUP,I-G2-CAP,X-G2-ATTR
+FOPS_ROUTE_COARSE_DELAY_USEC,G4,state-labelled coarse timing,window boundary; setup state,boot; CPU; scheduler/load; timebase,E4,UNKNOWN,NO,YES,P0_DEPENDENT,C-G4-COARSE,I-G4-COARSE,X-G4-TRACE
+FOPS_ROUTE_FINE_DELAY_TICKS,G4,per-offset state-window coverage,coarse baseline; attempt coverage,boot; CPU; scheduler/load; counter,E4,UNKNOWN,NO,YES,P0_DEPENDENT,C-G4-FINE,I-G4-FINE,X-G4-COVERAGE
+DEFAULT_EXPLOIT_ATTEMPTS,G12,attempt-indexed terminal distribution,cap exhaustion; dirty state; policy target,boot; condition; CPU/load/memory; P0,E4,UNKNOWN,YES,YES,P0_INDEPENDENT,C-G12-POLICY,I-G12-CAP,X-G12-TARGET
+DEFAULT_ATTEMPT_TIMEOUT_SEC,G11,overall stage-labelled duration,expiry reason; terminal transition,boot; condition; CPU/load,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G11-OVERALL,I-G11-OVERALL,X-G11-LABEL
+DEFAULT_P0_ATTEMPT_TIMEOUT_SEC,G11,pre-P0 stage-labelled duration,expiry reason; P0-ready transition,boot; condition; CPU/load; P0,E4,UNKNOWN,YES,YES,P0_ONLY,C-G11-P0,I-G11-P0,X-G11-P0BLOCK
+SLIDE_WAIT_NSEC,G3,waiter-state versus expiry ordering,setup state; timing uncertainty,boot; CPU; affinity; scheduler/load; timebase,E4,UNKNOWN,NO,YES,P0_DEPENDENT,C-G3-WAIT,I-G3-WAIT,X-G3-WAITOBS
+SLIDE_REQUEUE_ARM_USEC,G3,requeue-arm ordered transitions,waiter state; dependent state,boot; CPU; affinity; scheduler/load; timebase,E4,UNKNOWN,NO,YES,P0_DEPENDENT,C-G3-REQUEUE,I-G3-REQUEUE,X-G3-PREREQ
+SLIDE_KSNITCH_APPENDED_FUTEXES,G7,candidate coverage and resource state,allocation failures; profile cost,boot; memory/resource; CPU/load,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G7-COVERAGE,I-G7-RESOURCE,X-G7-ACCOUNT
+SLIDE_KSNITCH_REPEAT_MEASUREMENT,G5,component score variance,averaged separation; candidate labels,boot; CPU/load; memory; candidate mix,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G5-REPEAT,I-G5-REPEAT,X-G5-GROUND
+SLIDE_KSNITCH_AVERAGE,G5,averaged class separation,component scores; candidate labels,boot; CPU/load; memory; candidate mix,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G5-AVERAGE,I-G5-AVERAGE,X-G5-COMPONENT
+SLIDE_KSNITCH_SCREEN_REPEAT,G6,screen-stage confusion state,component scores; full confirmation,boot; CPU/load; memory; candidate mix,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G6-REPEAT,I-G6-REPEAT,X-G6-GROUND
+SLIDE_KSNITCH_SCREEN_AVERAGE,G6,screen averaged separation,component scores; retained labels,boot; CPU/load; memory; candidate mix,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G6-AVERAGE,I-G6-AVERAGE,X-G6-COMPONENT
+SKB_SEND_SIZE,G8,direct allocation and fragment geometry,exact send result; allocator/socket state,boot; memory/allocator; CPU/load; socket,E3,UNKNOWN,NO,NO,P0_INDEPENDENT,C-G8-GEOMETRY,I-G8-GEOMETRY,X-G8-CONSUMER
+SKB_RECLAIM_SENDS,G9,general-consumer reclaim coverage,per-send state; resources,boot; memory/allocator; CPU/load; consumer,E4,UNKNOWN,NO,YES,P0_INDEPENDENT,C-G9-SKB,I-G9-SKB,X-G9-GEOMETRY
+SLIDE_RECLAIM_SENDS,G9,slide-consumer reclaim coverage,per-send state; resources,boot; memory/allocator; CPU/load; consumer; P0,E4,UNKNOWN,NO,YES,P0_DEPENDENT,C-G9-SLIDE,I-G9-SLIDE,X-G9-P0
+P0_FINGERPRINT_MIN_BEST,G10,ground-truth best score,second score; read integrity; row,boot; condition; read integrity; loader mapping,E4,UNKNOWN,YES,YES,P0_ONLY,C-G10-BEST,I-G10-BEST,X-G10-P0
+P0_FINGERPRINT_MIN_MARGIN,G10,ground-truth best-minus-second,raw best and second; collision state,boot; condition; read integrity; loader mapping,E4,UNKNOWN,YES,YES,P0_ONLY,C-G10-MARGIN,I-G10-MARGIN,X-G10-P0

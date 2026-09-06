@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rmg-eze4:phase-j2:timeout-trial",
+  "deprecated": true,
+  "description": "DEPRECATED: Superseded by phase_j2_observation_schema_v2.json (Schema v2.2.1). Retained strictly for archival reproducibility of Phase J2 early design records. Do NOT use for active J2.1-R1 evaluations.",
+  "title": "DEPRECATED - Phase J2 DEFAULT_ATTEMPT_TIMEOUT_SEC trial record (v1, superseded by v2.2.1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "experiment_id", "session_id", "boot_id", "trial_id",
+    "firmware_identity", "kernel_identity", "artifact_identity",
+    "candidate_parameter", "candidate_value", "condition_vector",
+    "start_timestamp", "end_timestamp", "duration", "clock_source",
+    "state_transition_summary", "observable_results", "confounder_flags",
+    "trial_validity", "trial_outcome", "raw_evidence_refs", "notes",
+    "phase_i_projection"
+  ],
+  "properties": {
+    "experiment_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "boot_id": {"type": "string", "minLength": 1},
+    "trial_id": {"type": "string", "minLength": 1},
+    "firmware_identity": {
+      "type": "object",
+      "required": ["model", "device", "fingerprint", "incremental"],
+      "properties": {
+        "model": {"const": "SM-X510"},
+        "device": {"const": "gts9fewifi"},
+        "fingerprint": {"type": "string", "minLength": 1},
+        "incremental": {"const": "X510XXUCEZE4"}
+      }
+    },
+    "kernel_identity": {"type": "string", "minLength": 1},
+    "artifact_identity": {"type": "object", "additionalProperties": {"type": "string"}},
+    "candidate_parameter": {"const": "DEFAULT_ATTEMPT_TIMEOUT_SEC"},
+    "candidate_value": {"const": 2200},
+    "condition_vector": {
+      "type": "object",
+      "required": ["condition_id", "condition_class", "attempt_ordinal", "uptime_sec", "foreground", "freezer_state", "thermal_class", "load_class", "memory_pressure_class", "adb_state"],
+      "properties": {
+        "condition_id": {"type": "string", "minLength": 1},
+        "condition_class": {"enum": ["SETTLED_NOMINAL", "ELEVATED_VALID"]},
+        "attempt_ordinal": {"type": "integer", "minimum": 1},
+        "uptime_sec": {"type": "number", "minimum": 120},
+        "foreground": {"const": true},
+        "freezer_state": {"const": "NOT_FROZEN"},
+        "thermal_class": {"type": "string"},
+        "load_class": {"type": "string"},
+        "memory_pressure_class": {"type": "string"},
+        "adb_state": {"type": "string"}
+      }
+    },
+    "start_timestamp": {"type": "object", "required": ["device_monotonic_ns", "host_utc"], "properties": {"device_monotonic_ns": {"type": "integer", "minimum": 0}, "host_utc": {"type": "string", "format": "date-time"}}},
+    "end_timestamp": {"type": "object", "required": ["device_monotonic_ns", "host_utc"], "properties": {"device_monotonic_ns": {"type": "integer", "minimum": 0}, "host_utc": {"type": "string", "format": "date-time"}}},
+    "duration": {"type": "object", "required": ["nanoseconds", "seconds", "headroom_seconds"], "properties": {"nanoseconds": {"type": "integer", "minimum": 0}, "seconds": {"type": "number", "minimum": 0}, "headroom_seconds": {"type": "number"}}},
+    "clock_source": {"const": "DEVICE_CLOCK_MONOTONIC"},
+    "state_transition_summary": {"type": "array", "items": {"type": "object"}},
+    "observable_results": {"type": "array", "items": {"type": "object"}},
+    "confounder_flags": {"type": "array", "items": {"enum": ["C1_UNSEPARATED_P0", "C2_CGROUP_FREEZER", "C3_THERMAL_DRIFT", "CLOCK_CORRUPTION", "EXTERNAL_INTERRUPTION", "CHILD_DEADLOCK", "TRANSPORT_LOSS"]}},
+    "trial_validity": {"enum": ["VALID", "INVALID", "INCONCLUSIVE"]},
+    "trial_outcome": {"enum": ["COMPATIBLE_VOTE", "INCOMPATIBLE_VOTE", "NO_VOTE", "QUALIFYING_COMPLETION", "EXPECTED_P0_TIMEOUT", "SUPERVISOR_OVERALL_TIMEOUT", "CHILD_EXPLICIT_FAILURE", "CHILD_SIGNAL_FAILURE", "WRONG_STATE_TERMINATION", "EXTERNAL_INTERRUPTION", "MEASUREMENT_FAILURE"]},
+    "raw_evidence_refs": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}},
+    "notes": {"type": "string"},
+    "phase_i_projection": {"type": "object"}
+  }
+}

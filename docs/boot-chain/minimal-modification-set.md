@@ -1,16 +1,18 @@
 # Minimal Modification Set — SM-X510 U12/EZE4
 
-Fecha: 2026-08-24  
-Alcance: primer experimento con kernel propio, sin flashear ni generar imágenes ejecutables.  
+> **SUPERSEDED — NO USAR COMO PLAN OPERATIVO.** Conservado como auditoría histórica U11. Contiene conclusiones invalidadas sobre el mínimo, `dtbo` y flags AVB. La autoridad actual es `docs/boot-chain/minimum-first-boot-image-set.md`; el veredicto vigente es `CANNOT_YET_BE_DETERMINED`.
+
+Fecha: 2026-08-24
+Alcance: primer experimento con kernel propio, sin flashear ni generar imágenes ejecutables.
 Estado: auditoría estática de imágenes stock y artefactos U11 ya presentes en el repositorio.
 
 ## Resumen Ejecutivo
 
-- **HECHO:** `boot`, `init_boot`, `vendor_boot` y `dtbo` están cubiertos por hash descriptors firmados en el vbmeta raíz. Cada imagen también contiene un vbmeta embebido firmado. Cambiar el payload de cualquiera invalida su hash; bajo bootloader LOCKED no puede asumirse ejecución del kernel modificado.
+- **ERRATA:** el root protege `boot`, `init_boot` y `vendor_boot` mediante HASH directo; `dtbo` mediante CHAIN a su vbmeta hijo, cuyo HASH cubre `dtbo`. Cada imagen inspeccionada contiene además vbmeta embebido.
 - **HECHO:** `boot.img` aporta el kernel; `init_boot.img` aporta sólo ramdisk GKI; `vendor_boot.img` aporta vendor ramdisk, DTB base comprimido Samsung y bootconfig; `dtbo.img` aporta tres overlays.
 - **HECHO:** El kernel U11 construido es `5.15.180` y los inventarios stock EZE4 corresponden a `5.15.189-android13-3`. Con `MODVERSIONS=y` y vermagic distinto, los 281 módulos del vendor ramdisk stock deben tratarse como incompatibles hasta demostrar lo contrario.
 - **HECHO:** Los tres overlays U11 disponibles son byte-idénticos a los overlays extraídos de `dtbo.img` EZE4. Por tanto, `dtbo.img` stock es candidato válido para permanecer sin cambios en el experimento mínimo, sujeto a la política del bootloader desbloqueado.
-- **Conclusión operativa:** el conjunto estructural mínimo es `boot.img + init_boot.img + vbmeta.img`. En la práctica, si el kernel U11 sigue dependiendo de módulos tempranos críticos que hoy son modulares, se necesita además un mecanismo para evitar el consumo literal del vendor ramdisk stock: modificar/reemplazar `init_boot`/`vendor_boot` según el diseño final del initramfs o construir esos drivers como built-in. La opción built-in es la menos invasiva respecto a particiones, pero es una hipótesis pendiente de validación.
+- **ERRATA:** esa conclusión operativa queda retirada. Tras unlock, `boot-only` es el candidato mecánicamente mínimo para un marcador EZE4, pero la aceptación Samsung del hash roto es **UNKNOWN**; no hay conjunto probado.
 
 ## Evidencia Encontrada
 
@@ -121,17 +123,17 @@ Sí, como decisión técnica de contenido. Los tres artefactos comparados son id
 
 No modificar `dtbo` reduce variables y preserva el comportamiento de selección stock.
 
-#### ¿Siempre hay que regenerar `vbmeta.img`? ¿Basta `flags=1`?
+#### ¿Siempre hay que regenerar `vbmeta.img`? ¿Basta un flag?
 
-Si cambia cualquier imagen anclada por el vbmeta raíz, hay que producir un vbmeta nuevo coherente. Eso no implica necesariamente “regenerarlo con firma válida OEM”, porque esa clave privada no está disponible. En un dispositivo UNLOCKED, las opciones teóricas son firmar con clave propia enrolada/aceptada o usar un vbmeta con verificación deshabilitada (`flags=1`), siempre que el bootloader Samsung respete esa política.
+Si cambia cualquier imagen anclada por el vbmeta raíz, su descriptor deja de coincidir. La clave OEM no está disponible. En un dispositivo UNLOCKED, una hipótesis es usar `VERIFICATION_DISABLED` (`flags=2`), siempre que el bootloader Samsung respete esa política. `flags=1` es `HASHTREE_DISABLED`, no desactiva hashes/firmas; `flags=3` combina ambos bits.
 
-`flags=1` no es automáticamente suficiente:
+Ningún valor es automáticamente suficiente:
 
 - **HECHO:** el vbmeta stock tiene flags 0 y firma OEM.
-- **HIPÓTESIS:** el bootloader desbloqueado acepta un vbmeta alternativo con flags 1.
+- **HIPÓTESIS:** el bootloader desbloqueado acepta un vbmeta alternativo con `flags=2` o `flags=3`.
 - **HIPÓTESIS:** Samsung no añade comprobaciones adicionales que hagan fallar esa configuración.
 
-El experimento AVB debe probar primero la ruta menos ambigua y definir recuperación antes de tocar hardware. Bajo LOCKED no debe asumirse que `flags=1` permita boot.
+El experimento AVB debe definir primero una ruta de recuperación validada. Bajo LOCKED no debe asumirse que ningún flag permita boot.
 
 ## Riesgos
 
@@ -140,7 +142,7 @@ El experimento AVB debe probar primero la ruta menos ambigua y definir recuperac
 | Mezclar kernel U11 con 281 módulos stock U12 | Alto | Tratar como NO-GO; usar initramfs U11 coherente o drivers tempranos built-in |
 | Creer que cambiar sólo boot/vbmeta basta | Crítico si se usa ramdisk stock Android | Definir explícitamente quién provee `/init` y qué módulos se cargan |
 | Modificar DTBO sin necesidad | Medio | Mantener stock porque los overlays son idénticos |
-| Asumir `flags=1` universalmente válido | Alto | Probarlo sólo dentro del plan AVB con recuperación definida |
+| Asumir `flags=2/3` universalmente válido | Alto | Mantenerlo como hipótesis Samsung hasta validar recovery y obtener autorización futura |
 | Ocultar fallos de módulo por loader tolerante | Medio-Alto | Registrar cada resultado de carga; no interpretar llegada a shell como compatibilidad total |
 | Confundir rechazo AVB con crash temprano de kernel | Alto | Usar matriz de señales: warning persistente, Download Mode, enumeración USB y consumo |
 
@@ -148,7 +150,7 @@ El experimento AVB debe probar primero la ruta menos ambigua y definir recuperac
 
 1. Un kernel U11 con chipid, clock S5E8835, MCT v3, pinctrl y PMU básico built-in puede alcanzar `/init` sin procesar módulos stock U12.
 2. El ramdisk GKI stock puede convivir con ese kernel sólo si no impone dependencias incompatibles antes del `/init` experimental.
-3. El bootloader UNLOCKED acepta `boot` + `init_boot` modificados con vbmeta propio/flags 1 mientras `vendor_boot` y `dtbo` siguen stock.
+3. Hipótesis histórica corregida: el bootloader UNLOCKED acepta imágenes modificadas con `VERIFICATION_DISABLED` (`flags=2`) mientras `vendor_boot` y `dtbo` siguen stock. La aceptación Samsung permanece **UNKNOWN** y el conjunto ya no es el candidato mínimo canónico.
 4. La selección DTBO stock funciona sin cambio de imagen porque el contenido overlay es equivalente byte a byte.
 5. Samsung no exige una cadena Knox/RPMB adicional incompatible con este esquema.
 
