@@ -69,7 +69,7 @@ El bloque U11 inferior se conserva como historia, pero ya no describe el estado 
 - `vermagic` stock exacto: `5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64`
 - Compatibilidad ABI: 100.00% (281/281 módulos propietarios stock verificados, 15,123/15,123 símbolos CRC exactos, 0 discrepancias).
 - Suite de pruebas de regresión: 98/98 pruebas aprobadas en host (incorporadas guardas anti-self-confirmation de identidad física 5.15.189-android13-3-33478785 y alias repro_compare).
-- Proyecto Root-My-Galaxy EZE4: Fase J2.1-R1 Non-Semantic Remediation COMPLETADA; stack de validación J2 congelado (68/68 pruebas passing); J3 en HOLD; L3 en NO-GO; exploit real no demostrado.
+- Proyecto Root-My-Galaxy EZE4: Fase J2.1-R1 Non-Semantic Remediation COMPLETADA; stack de validación J2 congelado (71/71 pruebas passing); caps canónicas de ensayos inválidos ($\le 1/\text{boot}$, $\le 2\,\text{total}$); confounders canónicos ($C_1 = \text{unseparated P0 contamination}$, $C_2 = \text{Android freezer / suspension}$, $C_3 = \text{thermal throttling / core migration}$); J2 checkpoint hygiene: COMPLETE; overall repository working tree: DIRTY BY DESIGN; J3 en HOLD; L3 en NO-GO; exploit real no demostrado.
 
 ### Estado Físico y Evidencia de Diagnóstico (Actualizado por `IMG_2113.HEIC` y `IMG_2114.HEIC`)
 

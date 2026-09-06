@@ -69,6 +69,6 @@ tools/rmg-eze4/analysis/aggregator.py,ACTIVE_CANONICAL,E4 campaign aggregator
 tools/rmg-eze4/analysis/check_consistency.py,ACTIVE_CANONICAL,Cross-artifact consistency checker
 tools/rmg-eze4/analysis/engine.py,LEGACY_RETAINED,Legacy Phase-I single-record classifier (retained strictly for Phase I backward compatibility)
 tools/rmg-eze4/schemas/observation.schema.json,LEGACY_RETAINED,Legacy Phase-I observation schema file
-tools/rmg-eze4/tests/*,TEST_ONLY,Test suite (68 tests)
+tools/rmg-eze4/tests/*,TEST_ONLY,Test suite (71 tests)
 tools/u11_repro_compare.py,ACTIVE_CANONICAL,Build reproducibility comparison tool (retains historical naming debt)
 tools/repro_compare.py,ACTIVE_CANONICAL,Canonical wrapper alias for tools/u11_repro_compare.py

@@ -35,12 +35,21 @@
 | **evidence vote** | COMPATIBLE_VOTE, INCOMPATIBLE_VOTE, or NO_VOTE — the trial's contribution to verdict | validity, terminal class |
 | **campaign verdict** | Final E4 aggregation: COMPATIBLE, INCOMPATIBLE, INCONCLUSIVE, INVALID_EXPERIMENT | trial vote |
 | **qualifying trial** | VALID trial with an evidence vote (not NO_VOTE) | invalid trial |
+| **invalid trial caps** | Maximum $\le 1$ invalid trial per boot, maximum $\le 2$ invalid trials total across campaign | "per cell" caps |
 | **confounder present** | Detector positively identifies interfering condition (freezer, thermal, etc.) | confounder unknown |
 | **confounder unknown** | Detector cannot determine confounder state (e.g., no access to sysfs) | confounder absent |
 | **condition class** | SETTLED_NOMINAL or ELEVATED_VALID — the environmental partition for the trial | confounder |
 | **run package** | Frozen set of binaries/scripts deployed for execution | raw evidence |
 | **raw evidence manifest** | SHA256-hashed inventory of all observation output files from a session | run package |
 | **boot** | One distinct device boot cycle identified by cryptographic boot_id | session |
+
+## Confounders (C1, C2, C3)
+
+| Confounder | Canonical Name | Canonical Definition | Canonical Attribution Distinction |
+|---|---|---|---|
+| **C1** | `UNSEPARATED_P0_DELAY` | **unseparated P0 contamination** | P0 consuming time != C1 contamination. C1 means that the state or elapsed contribution of P0 cannot be separated or attributed correctly from the post-fork candidate lifecycle. Verified `P0_EXIT_SLIDE_READY` prior to 1200s establishes separation. |
+| **C2** | `ANDROID_CGROUP_FREEZER` | **Android freezer / suspension** | Android cgroup freezer or kernel suspend halts user process execution while monotonic clock advances, artificially inflating elapsed duration. |
+| **C3** | `THERMAL_THROTTLING_CORE_MIGRATION` | **thermal throttling / core migration** | Thermal governor clamps CPU frequency below valid baseline or migrates workload across core types, inflating duration tails. |
 
 ## Parameter Classification
 
@@ -62,3 +71,8 @@
 - Do NOT say "validated" for a parameter that has only environmental evidence
 - Do NOT say "absent" when you mean "not observed" or "access denied"
 - Do NOT say "not applicable" for parameters that are merely "legacy inactive"
+- Do NOT define C1 as "ambient interference"; C1 is strictly **unseparated P0 contamination** (`P0 consuming time != C1 contamination`)
+- Do NOT define C2 as simply "freezer desync"; C2 is strictly **Android freezer / suspension**
+- Do NOT define C3 as simply "thermal throttle"; C3 is strictly **thermal throttling / core migration**
+- Do NOT state invalid trial caps as "per cell"; invalid caps are strictly **$\le 1$ per boot** and **$\le 2$ total**
+- Do NOT declare repository hygiene "fully restored" while unrelated untracked work intentionally remains in the working tree (`J2 checkpoint hygiene: COMPLETE`; `overall repository working tree: DIRTY BY DESIGN`)
