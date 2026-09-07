@@ -1,156 +1,156 @@
-# Plan de observación de hardware y preparación del primer arranque
+# Hardware Observation Plan and First Boot Preparation
 
-Fecha: 2026-08-24
-Artefacto auditado: `artifacts/u11/x510xxsbdzb4-u11-clang21-20260823/kernel.config`
-Fase: preparatoria, **no flasheo**
+Date: 2026-08-24
+Audited artifact: `artifacts/u11/x510xxsbdzb4-u11-clang21-20260823/kernel.config`
+Phase: preparatory, **no flashing**
 
-## 1. Auditoría del kernel `.config`
+## 1. Kernel `.config` Audit
 
-### Opciones críticas
+### Critical Options
 
-| Config | Valor U11 | Clasificación | Impacto en M2 (primer printk) / M3 (`/init`) |
+| Config | U11 Value | Classification | Impact on M2 (first printk) / M3 (`/init`) |
 |---|---|---|---|
-| `CONFIG_PSTORE` | `y` | ya activo | Necesario para persistir logs tras panic/reboot; sin efecto sobre llegar a `/init`. |
-| `CONFIG_PSTORE_RAM` | `y` | ya activo | Permite ramoops si hay región reservada + cmdline correcto; clave para capturar fallos tardíos aunque no haya consola. |
-| `CONFIG_USB_GADGET` | `y` | ya activo | Requisito para consola USB; no afecta a M2/M3 directamente. |
-| `CONFIG_USB_CONFIGFS` | `y` | ya activo | Interfaz necesaria para crear gadget serial desde initramfs. |
-| `CONFIG_USB_CONFIGFS_SERIAL` | `y` | ya activo | Función serial genérica disponible; ACM también está activo. |
-| `CONFIG_SERIAL_SAMSUNG` | `y` (+ console) | ya activo | Driver UART Samsung; imprescindible para consola física si existe. |
-| `CONFIG_SERIAL_EARLYCON` | `y` | ya activo | Mensajes antes que la consola normal; máxima prioridad M2. |
-| `CONFIG_EARLY_PRINTK` | ausente (normal en arm64 moderno; se usa earlycon) | no necesario | No bloquea nada; `earlycon=` es el mecanismo correcto. |
-| DRM core | `CONFIG_DRM=y`, DeCON/DSI/DPU/Samsung = `y/m` | ya activo | No relevante para M2/M3; útil después de tener shell/logs. |
-| DRM panel específico | `DRM_PANEL_MCD_COMMON=m`; resto genérico off | parcialmente activo | Riesgo post-M3: si el panel real no matchea, pantalla negra pero sistema vivo. No prioridad inicial. |
-| `CONFIG_USB_DWC3_EXYNOS` | `=y` y también `=m` (contradicción Kconfig aparente) | revisar | El módulo debe estar presente en initramfs usb-console; si sólo estuviera built-in, mejor. Verificar con `modules.builtin`. |
-| Ramoops región reservada | no visible en config | necesario activar (DT/cmdline) | Sin dirección/tamaño reservados, pstore RAM no guarda nada. Acción offline antes de flashear. |
+| `CONFIG_PSTORE` | `y` | already active | Required to persist logs after panic/reboot; no effect on reaching `/init`. |
+| `CONFIG_PSTORE_RAM` | `y` | already active | Enables ramoops if reserved region + correct cmdline present; key to capturing late failures even without console. |
+| `CONFIG_USB_GADGET` | `y` | already active | Prerequisite for USB console; does not affect M2/M3 directly. |
+| `CONFIG_USB_CONFIGFS` | `y` | already active | Interface needed to create serial gadget from initramfs. |
+| `CONFIG_USB_CONFIGFS_SERIAL` | `y` | already active | Generic serial function available; ACM is also active. |
+| `CONFIG_SERIAL_SAMSUNG` | `y` (+ console) | already active | Samsung UART driver; essential for physical console if it exists. |
+| `CONFIG_SERIAL_EARLYCON` | `y` | already active | Messages before standard console; top M2 priority. |
+| `CONFIG_EARLY_PRINTK` | absent (typical on modern arm64; earlycon is used) | not needed | Blocks nothing; `earlycon=` is the proper mechanism. |
+| DRM core | `CONFIG_DRM=y`, DeCON/DSI/DPU/Samsung = `y/m` | already active | Not relevant to M2/M3; useful once shell/logs are available. |
+| DRM specific panel | `DRM_PANEL_MCD_COMMON=m`; rest generic off | partially active | Post-M3 risk: if physical panel does not match, black screen but live system. Not initial priority. |
+| `CONFIG_USB_DWC3_EXYNOS` | `=y` and also `=m` (apparent Kconfig contradiction) | review | Module must be present in usb-console initramfs; built-in preferred. Verify with `modules.builtin`. |
+| Ramoops reserved region | not visible in config | required to activate (DT/cmdline) | Without reserved address/size, pstore RAM stores nothing. Offline action before flashing. |
 
-### Resumen
+### Summary
 
-- **Ya activo:** pstore completo, ramoops base, gadget/configfs/serial/ACM, serial Samsung + earlycon, DRM core Samsung.
-- **Necesario activar/preparar:** reserva de memoria ramoops en DT + parámetros cmdline; verificación explícita de módulo/built-in DWC3-Exynos.
-- **No necesario:** `CONFIG_EARLY_PRINTK` clásico (obsoleto en arm64).
+- **Already active:** full pstore, base ramoops, gadget/configfs/serial/ACM, Samsung serial + earlycon, Samsung DRM core.
+- **Required to activate/prepare:** ramoops memory reservation in DT + cmdline parameters; explicit verification of DWC3-Exynos module/built-in status.
+- **Not needed:** classic `CONFIG_EARLY_PRINTK` (obsolete on arm64).
 
-## 2. Tres perfiles de initramfs
+## 2. Three Initramfs Profiles
 
-Todos comparten BusyBox 1.36.1 ARM64 estático, `/init` actual y empaquetado reproducible gzip/lz4. Se documentan como diseño; no se construyen todavía.
+All share static BusyBox 1.36.1 ARM64, current `/init`, and reproducible gzip/lz4 packaging. Documented as designs; not yet built.
 
 ### A) minimal
 
-Objetivo: máxima probabilidad de ejecutar `/init`.
+Objective: Maximum probability of executing `/init`.
 
-Contenido:
-- BusyBox estático + `/init` + `/etc/passwd`, `/etc/group`.
-- Cero módulos (`MODULES_MODE=none`).
-- Sin USB gadget, sin carga de drivers.
-- Cmdline recomendado:
+Content:
+- Static BusyBox + `/init` + `/etc/passwd`, `/etc/group`.
+- Zero modules (`MODULES_MODE=none`).
+- No USB gadget, no driver loading.
+- Recommended cmdline:
   - `earlycon=exynos4210,mmio32,0x13800000`
   - `console=ttySAC0,115200n8`
   - `printk.devkmsg=on`
   - `panic_print=0x1f`
   - `panic_timeout=30`
 
-Interpretación: si este perfil no llega a `/init`, el problema está antes (AVB/bootloader) o en el canal de observabilidad, no en drivers.
+Interpretation: If this profile fails to reach `/init`, the problem lies earlier (AVB/bootloader) or in the observability channel, not in drivers.
 
 ### B) debug
 
-Objetivo: maximizar evidencia ante cualquier fallo.
+Objective: Maximize evidence upon any failure.
 
-Añade respecto a A:
-- printk máximo vía cmdline: `loglevel=8 ignore_loglevel`.
-- `pstore`/`ramoops` con región reservada definida en DT o `ramoops.mem_address=... ramoops.mem_size=... ramoops.record_size=... ramoops.console_size=...`.
-- `crashkernel` NO se activa (innecesario para primer contacto y añade riesgo).
-- `softlockup_panic=1 hardlockup_panic=1 nmi_watchdog=1` opcional si queremos convertir hangs en registros pstore.
-- `panic_timeout=0` (sin reinicio automático durante experimentos con operador presente).
+Adds relative to A:
+- Maximum printk via cmdline: `loglevel=8 ignore_loglevel`.
+- `pstore`/`ramoops` with reserved region defined in DT or `ramoops.mem_address=... ramoops.mem_size=... ramoops.record_size=... ramoops.console_size=...`.
+- `crashkernel` NOT enabled (unnecessary for initial contact and adds risk).
+- `softlockup_panic=1 hardlockup_panic=1 nmi_watchdog=1` optional if converting hangs to pstore records is desired.
+- `panic_timeout=0` (no automatic reboot during attended operator trials).
 
-Uso previsto: segunda pasada, cuando ya sabemos que el kernel arranca y queremos capturar dónde muere.
+Intended use: Second pass, once kernel boot is confirmed and capturing crash point is needed.
 
 ### C) usb-console
 
-Objetivo: shell por USB serial si el kernel alcanza el punto donde DWC3 + configfs funcionan.
+Objective: Shell over USB serial if kernel reaches point where DWC3 + configfs function.
 
-Añade respecto a A:
-- Módulos U11 cerrados por modprobe: `dwc3-exynos-usb` + `phy-exynos-usbdrd-super` (lista existente `configs/initramfs-modules-usb.conf`).
-- Activación de gadget ACM (ya implementada en `/init` bajo `gts9fe.usb_debug=1`).
-- Cmdline: `gts9fe.usb_debug=1` + los mismos de minimal.
+Adds relative to A:
+- U11 modules loaded via modprobe: `dwc3-exynos-usb` + `phy-exynos-usbdrd-super` (existing list in `configs/initramfs-modules-usb.conf`).
+- ACM gadget activation (already implemented in `/init` under `gts9fe.usb_debug=1`).
+- Cmdline: `gts9fe.usb_debug=1` + same parameters as minimal.
 
-Criterio de éxito: el host ve un nuevo puerto `/dev/ttyUSB*` o `/dev/ttyACM*`. Si aparece pero no hay shell, el problema es post-DWC3 pero pre-userspace-visible.
+Success criterion: Host detects new `/dev/ttyUSB*` or `/dev/ttyACM*` port. If present without shell, issue is post-DWC3 but pre-userspace-visible.
 
-## 3. Evidencias buscadas e interpretación
+## 3. Target Evidence and Interpretation
 
-| Resultado observable | Significado | Decisión siguiente |
+| Observable Result | Meaning | Next Decision |
 |---|---|---|
-| Cero bytes UART + host USB no ve nada nuevo | Fallo antes del kernel (AVB, bootloader, imagen inválida). Kernel posiblemente nunca ejecutó una instrucción. | Volver a AVB/firma/formato boot/init_boot. No tocar drivers ni rootfs. |
-| Cero bytes UART + host USB sí enumera gadget serial | Kernel llegó lejos; sólo falta canal UART físico. | Continuar M3/M4 por USB. UART pasa a ser problema de hardware/pines, no de boot. |
-| Bytes parciales UART y hang | Fallo temprano en timer/PSCI/GIC/memoria. | Comparar DTBO elegido, revisar earlycon y PSCI; considerar JTAG. |
-| Log UART completo hasta panic "no init found" | Kernel OK; initramfs inválido o corrupto. | Revisar formato cpio, compresión, tamaño y metadata boot v4. |
-| Shell USB funciona | M3 superado. | Pasar a UFS/rootfs read-only, luego pantalla (post-M3), no antes. |
-| Pantalla negra pero USB/UART vivo | DRM/panel aún no matchea. | Es resultado esperable; no cuenta como fallo de boot. |
-| Reinicio en loop sin log | Panic temprano con reboot automático o watchdog firmware. | Repetir con perfil debug y `panic_timeout=0`. |
-| Nada en absoluto, incluso USB host no detecta | Probable rechazo bootloader o hardware distinto al esperado. | Auditar AVB/vbmeta y overlay r00/r01/r04 efectivo. |
+| Zero UART bytes + host USB sees nothing new | Pre-kernel failure (AVB, bootloader, invalid image). Kernel likely never executed an instruction. | Return to AVB/signing/boot/init_boot format. Do not touch drivers or rootfs. |
+| Zero UART bytes + host USB enumerates serial gadget | Kernel progressed far; only physical UART channel missing. | Continue M3/M4 via USB. UART becomes hardware/pinout issue, not boot blocker. |
+| Partial UART bytes and hang | Early timer/PSCI/GIC/memory failure. | Compare selected DTBO, review earlycon and PSCI; consider JTAG. |
+| Full UART log up to panic "no init found" | Kernel OK; initramfs invalid or corrupt. | Review cpio format, compression, size, and boot v4 metadata. |
+| USB shell functional | M3 achieved. | Proceed to read-only UFS/rootfs, then screen (post-M3), not before. |
+| Black screen but USB/UART live | DRM/panel not yet matched. | Expected outcome; does not constitute boot failure. |
+| Reboot loop without log | Early panic with automatic reboot or firmware watchdog. | Repeat with debug profile and `panic_timeout=0`. |
+| Complete silence, even host USB detects nothing | Probable bootloader rejection or unexpected hardware discrepancy. | Audit AVB/vbmeta and effective r00/r01/r04 overlay. |
 
-## 4. Interpretación de consumo por USB
+## 4. USB Current Draw Interpretation
 
-El puerto USB-C del host nos da tres señales independientes, todas baratas y sin abrir la tablet:
+Host USB-C port provides three independent signals without opening tablet:
 
-1. **Corriente consumida** (medible con un medidor USB inline):
-   - < ~20 mA constante: probablemente no ha arrancado nada real; puede estar esperando negociación o en modo download/recovery silencioso.
-   - Salto brusco a >100 mA sostenido: señal de actividad CPU real (kernel ejecutando algo), aunque no haya enumeración.
-   - Consumo oscilante estable (~100–300 mA): patrón típico de kernel vivo con scheduler activo.
-2. **Enumeración USB**:
-   - Aparece dispositivo Samsung (VID 0x04e8) → bootloader habló por USB (modo download u Odin-like).
-   - Aparece dispositivo Linux Gadget (VID 0x1d6b, producto "Tab S9 FE rescue") → kernel llegó a DWC3 + userspace init. Prueba directa de M3.
-   - No aparece nada → o bootloader no entró en modo transferencia, o kernel no llegó a USB.
-3. **Tipo de puerto/negociación**:
-   - Si el host reporta "dispositivo desconocido" o error de descriptor → hubo intento de hablar USB, fallo parcial.
-   - Si no hay ninguna transacción eléctrica → problema previo a USB, posiblemente pre-kernel.
+1. **Current drawn** (measurable with inline USB meter):
+   - < ~20 mA constant: Likely nothing real started; may be awaiting negotiation or in silent download/recovery mode.
+   - Sudden step to >100 mA sustained: Signal of real CPU activity (kernel executing code), even without enumeration.
+   - Stable fluctuating current (~100–300 mA): Typical pattern of live kernel with active scheduler.
+2. **USB enumeration**:
+   - Samsung device appears (VID 0x04e8) → Bootloader communicating over USB (download mode or Odin-like).
+   - Linux Gadget device appears (VID 0x1d6b, product "Tab S9 FE rescue") → Kernel reached DWC3 + userspace init. Direct M3 proof.
+   - Nothing appears → Either bootloader did not enter transfer mode, or kernel did not reach USB.
+3. **Port type / negotiation**:
+   - If host reports "unknown device" or descriptor error → USB communication attempt occurred, partial failure.
+   - If zero electrical transaction → Issue prior to USB, likely pre-kernel.
 
-Regla: el consumo USB es indicio estadístico, nunca prueba determinista. Sólo la enumeración con VID/PID correctos o un log son prueba fuerte.
+Rule: USB current draw is a statistical indicator, never deterministic proof. Only enumeration with correct VID/PID or a log constitutes strong proof.
 
-## 5. Cadena USB-C: qué depende de quién
+## 5. USB-C Chain: Dependency Hierarchy
 
-Sin desmontar la tablet, la cadena USB-C tiene tres capas:
+Without disassembling tablet, USB-C chain consists of three layers:
 
-| Capa | Responsable | Observable desde el host |
+| Layer | Responsible | Observable From Host |
 |---|---|---|
-| Física / CC / orientación | PMIC + controlador tipo-C + bootloader Samsung | Negociación de corriente, presencia de VBUS, detección de cable/orientación |
-| Bootloader / modo download | SBOOT/LK2 Samsung | Enumeración VID 0x04e8 en Odin/Heimdall, respuesta a protocolo propio |
-| Kernel Linux (DWC3 + gadget) | Kernel U11 + initramfs + módulos | Enumeración VID 0x1d6b con gadget serial/ACM, aparición de `/dev/tty*` en host |
+| Physical / CC / orientation | PMIC + Type-C controller + Samsung bootloader | Current negotiation, VBUS presence, cable detection/orientation |
+| Bootloader / download mode | Samsung SBOOT/LK2 | VID 0x04e8 enumeration in Odin/Heimdall, response to proprietary protocol |
+| Linux Kernel (DWC3 + gadget) | U11 kernel + initramfs + modules | VID 0x1d6b enumeration with serial/ACM gadget, appearance of `/dev/tty*` on host |
 
-Conclusiones prácticas:
+Practical conclusions:
 
-- Si el dispositivo entra en modo download y el host lo ve como Samsung, **el bootloader y la capa física USB-C funcionan**, independientemente de nuestro kernel. Esto se puede probar hoy sin riesgo, sin flashear.
-- Si el kernel no llega a gadget, no sabemos si el fallo es USB-C físico, bootloader, o kernel; necesitamos otra evidencia (UART, pstore) para discriminar.
-- La función serial depende completamente del kernel; su aparición es prueba de M3, no del bootloader.
+- If device enters download mode and host detects it as Samsung, **bootloader and physical USB-C layer are functional**, independent of our kernel. This can be tested today safely without flashing.
+- If kernel fails to reach gadget, whether failure is physical USB-C, bootloader, or kernel remains unknown; secondary evidence (UART, pstore) is required to discriminate.
+- Serial function depends entirely on kernel; its appearance proves M3, not bootloader functionality.
 
-## 6. Árbol de decisión tras el primer intento
+## 6. Decision Tree Following First Attempt
 
 ```text
-Primer intento (perfil minimal)
-├── Host ve gadget Samsung en modo download?
-│   ├── Sí → bootloader OK, capa física OK. Flashear candidato y observar.
-│   └── No → resolver entrada a modo download primero. STOP.
+First attempt (minimal profile)
+├── Does host detect Samsung gadget in download mode?
+│   ├── Yes → bootloader OK, physical layer OK. Flash candidate and observe.
+│   └── No → resolve download mode entry first. STOP.
 │
-├── Tras flasheo, host ve gadget Linux (0x1d6b)?
-│   ├── Sí → kernel llegó a /init. Ir a pruebas UFS/read-only.
-│   └── No → seguir.
+├── After flashing, does host detect Linux gadget (0x1d6b)?
+│   ├── Yes → kernel reached /init. Proceed to UFS/read-only tests.
+│   └── No → proceed.
 │
-├── Hay bytes UART?
-│   ├── Sí, log completo hasta panic initramfs → arreglar formato/init_boot.
-│   ├── Sí, hang parcial → revisar PSCI/timer/earlycon.
-│   └── No bytes → continuar.
+├── Are UART bytes observed?
+│   ├── Yes, full log up to initramfs panic → fix format/init_boot.
+│   ├── Yes, partial hang → review PSCI/timer/earlycon.
+│   └── No bytes → continue.
 │
-├── Consumo USB salta a patrón activo (>100 mA sostenido)?
-│   ├── Sí → kernel probablemente vivo, problema sólo de observabilidad.
-│   │        → repetir con usb-console.
-│   └── No, consumo plano bajo → probablemente pre-kernel. Volver a AVB/firma.
+├── Does USB current draw jump to active pattern (>100 mA sustained)?
+│   ├── Yes → kernel likely alive, issue solely observability.
+│   │        → repeat with usb-console.
+│   └── No, low flat current → likely pre-kernel. Return to AVB/signing.
 │
-└── Nada de lo anterior → repetir con perfil debug + pstore.
-    Extraer pstore tras recovery/ADB si Android stock vuelve a arrancar.
+└── None of the above → repeat with debug profile + pstore.
+    Extract pstore via recovery/ADB if stock Android boots again.
 ```
 
-## 7. Reglas fijas para esta fase
+## 7. Fixed Rules for This Phase
 
-- Un único cambio entre intentos.
-Ficha de intento obligatoria antes de tocar hardware (ver `docs/12-preflight-primera-prueba.md`).
-- Timeout y condición de aborto escritos antes del intento.
-- Ningún cambio simultáneo de kernel + DTBO + vbmeta + rootfs.
-- El veredicto sigue siendo **NO-GO para flasheo**; esta fase sólo prepara instrumentos.
+- Single variable changed between trials.
+Trial sheet mandatory prior to touching hardware (see `docs/12-preflight-primera-prueba.md`).
+- Timeout and abort conditions written prior to trial.
+- No simultaneous modification of kernel + DTBO + vbmeta + rootfs.
+- The verdict remains **NO-GO for flashing**; this phase only prepares instrumentation.

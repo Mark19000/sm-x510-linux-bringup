@@ -1,0 +1,11 @@
+primitive_id,name,depends_on,reference_status,eze4_status,feasibility,reliability,evidence,blocker,next_test
+P00,target identity and ordinary app-domain entry precondition,,WORKING_REFERENCE,STRONGLY_SUPPORTED_EZE4,PLAUSIBLE,UNMEASURED,"runtime identity and ordinary shell/app environment captured; no exploit deployment",identity-bound payload still absent,identity-bound build validation
+P01,vulnerable proxy-lock reachability,P00,DEMONSTRATED_REFERENCE,STRONGLY_SUPPORTED_EZE4,VULNERABLE_CODE_PROVEN_TRIGGER_UNPROVEN,UNMEASURED,stock source and binary retain vulnerable cleanup,controlled EZE4 effect absent,non-escalating trigger-effect probe after C2/C3
+P02,controlled stale waiter/task relationship,P01,DEMONSTRATED_REFERENCE,UNTESTED_EZE4,UNPROVEN,UNKNOWN,53/53 layouts match but no runtime effect,first unproven primitive,design isolated non-escalating probe
+P03,controlled page reclaim,P02,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,UNKNOWN,UNKNOWN,static allocator/layout evidence only,P02 unresolved,none before P02
+P04,P0 and KASLR selection,P03,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,STATIC_ALGORITHM_SUPPORTED,CONDITIONAL_UNKNOWN,EZE4 fingerprint regenerated; collision set known,P03 and placement reachability unknown,none before P03
+P05,FOPS page and data alias,P03|P04,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,UNKNOWN,UNKNOWN,rederived EZE4 symbols,P03/P04 unresolved,none before dependencies
+P06,constrained indirect-call stage,P05,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,UNKNOWN,UNKNOWN,layout and mitigation configuration only,P05 unresolved,none before P05
+P07,pipe-backed kernel read/write,P06,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,UNKNOWN,UNKNOWN,structural offsets only,P06 unresolved,none before P06
+P08,root workqueue helper action,P07,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,UNKNOWN,UNKNOWN,static workqueue/symbol mapping,P07 plus KDP/RKP runtime behavior,none before P07
+P09,durable root result,P08,DEMONSTRATED_REFERENCE,BLOCKED_BY_DEPENDENCY,UNKNOWN,UNKNOWN,reference criterion only,P08 and helper deployment,none before P08

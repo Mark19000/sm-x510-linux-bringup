@@ -1,3 +1,8 @@
+# HISTORICAL / SUPERSEDED — DO NOT USE FOR CURRENT J2 DECISIONS
+
+This static-analysis snapshot predates the canonical J2 closure. Use
+`CANONICAL_STATUS.md` and `J2_FINAL_STATUS.md` for current J2 decisions.
+
 # EZE4 static-analysis consolidation status
 
 Audit scope: every Phase 1–3 report and erratum, all CSVs and generated headers in this directory, and the retained ZG3 production target under `.local-only/vendor/Root-My-Galaxy-Payloads-ZG3/`. All conclusions below are static. No payload or target binary was executed.

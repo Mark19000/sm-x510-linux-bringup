@@ -1,125 +1,122 @@
-# 13. Staging OSRC para SM-X510 / Android 16 / U11
+# 13. OSRC Staging for SM-X510 / Android 16 / U11
 
-Este flujo prepara el código OSRC `X510XXSBDZB4` de la unidad `SM-X510`
-(Android 16, bootloader U11) sin mezclarlo con la fuente Wi-Fi U3 que se conserva en
-`sources/wifi-kernel`. No modifica el firmware extraído ni publica imágenes
-en `artifacts/` salvo un registro nuevo por ejecución.
+This workflow prepares the `X510XXSBDZB4` OSRC source code for the `SM-X510`
+unit (Android 16, bootloader U11) without mixing it with the U3 Wi-Fi source kept in
+`sources/wifi-kernel`. It does not modify extracted firmware or publish images
+to `artifacts/` except for a new record per execution.
 
-## Qué se conoce del release
+## What is Known About the Release
 
-La entrega OSRC observada está compuesta por:
+The observed OSRC delivery consists of:
 
-- un wrapper base con `Kernel.tar.gz`, `Platform.tar.gz` y `README`;
-- un overlay regional `X510XXSBDZB4`, con raíz
-  `SM-X510_EUR_16_XX_X510XXSBDZB4/Kernel` y su `README`;
-- el README indica usar primero la base `X510XXU8DYJ4` y después aplicar el
+- a base wrapper containing `Kernel.tar.gz`, `Platform.tar.gz`, and `README`;
+- an `X510XXSBDZB4` regional overlay, rooted at
+  `SM-X510_EUR_16_XX_X510XXSBDZB4/Kernel` and its `README`;
+- the README directs applying the `X510XXU8DYJ4` base first, then applying the
   overlay.
 
-El árbol base declara kernel 5.15.180, `s5e8835-gts9fewifixx_defconfig`,
-`clang-r450784d`, `PLATFORM_VERSION=13` y `TARGET_SOC=s5e8835`. Estos datos se
-registran como evidencia y no sustituyen la validación del commit, config,
-DTS y scripts del paquete que se reciba.
+The base tree declares kernel 5.15.180, `s5e8835-gts9fewifixx_defconfig`,
+`clang-r450784d`, `PLATFORM_VERSION=13`, and `TARGET_SOC=s5e8835`. These data are
+recorded as evidence and do not replace validating the commit, config, DTS,
+and scripts in the received package.
 
-## Staging seguro
+## Safe Staging
 
-La entrada se copia sin abrir al disco ext4 de la VM Lima. La extracción del
-ZIP, de `Kernel.tar.gz`, `Platform.tar.gz` y de los ZIP anidados ocurre
-únicamente bajo `$HOME/osrc-u11-work/<run-id>` dentro del guest. El árbol
-Platform se conserva separado y se inventaría para análisis; nunca se usa como
-entrada de la compilación del kernel.
-Los archivos comprimidos que formen parte del código ya extraído (por ejemplo,
-fixtures de tests) se conservan como archivos normales y no se abren de forma
-recursiva.
+Input is copied unopened to the ext4 disk of the Lima VM. Extraction of
+the ZIP, `Kernel.tar.gz`, `Platform.tar.gz`, and nested ZIPs occurs
+strictly under `$HOME/osrc-u11-work/<run-id>` inside the guest. The Platform
+tree is kept separate and inventoried for analysis; it is never used as input
+for the kernel build.
+Compressed archives that are part of already-extracted code (such as test
+fixtures) are kept as regular files and are not unpacked recursively.
 
-Primero prepara o arranca la VM y después ejecuta sólo la inspección:
+First prepare or start the VM, then run inspection only:
 
 ```sh
 ./scripts/setup-lima.sh
-OSRC_RELEASE=/ruta/SM-X510.zip \
+OSRC_RELEASE=/path/to/SM-X510.zip \
   ./scripts/build-osrc-u11-in-lima.sh
 ```
 
-También se puede entregar un directorio ya descargado. No uses un archivo
-`.part`; el wrapper lo rechaza por nombre antes de copiarlo. No apuntes a
-`sources/wifi-kernel`, a `artifacts/kernel/wifi` ni a otra salida existente.
-La extracción valida traversal, tipos especiales, hardlinks y symlinks: sólo
-se permiten symlinks relativos que permanezcan dentro del árbol.
+A pre-downloaded directory can also be provided. Do not use a `.part` file;
+the wrapper rejects it by name before copying. Do not point to
+`sources/wifi-kernel`, `artifacts/kernel/wifi`, or any other existing output.
+Extraction validates traversal, special types, hardlinks, and symlinks: only
+relative symlinks remaining within the tree are permitted.
 
-El inventario registra `Kernel.tar.gz`, el overlay, raíces que contienen
-`Makefile`/`build_kernel.sh`, defconfigs, configs, referencias de commit y
-rutas de toolchain. Los ficheros pequeños de evidencia se copian a
-`artifacts/u11/<run-id>/`; los fuentes, objetos, tarballs y salidas permanecen
-en ext4. Un run-id repetido se rechaza para no sobrescribir un registro previo.
+The inventory records `Kernel.tar.gz`, the overlay, roots containing
+`Makefile`/`build_kernel.sh`, defconfigs, configs, commit references, and
+toolchain paths. Small evidence files are copied to `artifacts/u11/<run-id>/`;
+sources, objects, tarballs, and outputs remain on ext4. A repeated run-id
+is rejected to avoid overwriting a previous record.
 
-## Compilación fija
+## Fixed Build
 
-La inspección no ejecuta scripts entregados por terceros. Cuando encuentra el
-README con los marcadores exactos `X510XXSBDZB4` y `X510XXU8DYJ4`, el wrapper
-copia la base a `u11-composite/Kernel` dentro del guest y aplica allí sólo el
-árbol `.../X510XXSBDZB4/Kernel`. Los modos originales se restauran después de
-aplicar el overlay. Los dos árboles originales quedan separados y el composite
-exacto tampoco se usa como árbol de trabajo: el modo build crea una copia
-privada en `build-source/Kernel`, porque algunos Makefiles Samsung generan
-ficheros dentro del source incluso usando `O=`. El build nunca usa la base U8
-sola. El `overlay-manifest.txt` contiene el SHA-256 de cada fichero aplicado.
+Inspection does not execute scripts supplied by third parties. When it finds
+the README with the exact `X510XXSBDZB4` and `X510XXU8DYJ4` markers, the wrapper
+copies the base to `u11-composite/Kernel` inside the guest and applies only the
+`.../X510XXSBDZB4/Kernel` tree there. Original permissions are restored after
+applying the overlay. The two original trees remain separate, and the exact
+composite is not used as a working tree either: build mode creates a private
+copy in `build-source/Kernel`, because some Samsung Makefiles generate files
+inside the source tree even when using `O=`. The build never uses the U8 base
+alone. The `overlay-manifest.txt` contains the SHA-256 of each applied file.
 
-Cuando el layout y el composite hayan sido revisados, ejecuta el perfil fijado
-del repositorio:
+Once layout and composite have been reviewed, run the repository's pinned
+profile:
 
 ```sh
 ./scripts/build-osrc-u11-in-lima.sh \
-  --release /ruta/SM-X510.zip \
-  --build --jobs 6 --run-id x510-u11-prueba-01
+  --release /path/to/SM-X510.zip \
+  --build --jobs 6 --run-id x510-u11-trial-01
 ```
 
-No se acepta un comando de shell aportado mediante variables de entorno. El
-perfil exige kernel 5.15.180, el defconfig de X510, los nueve parches con sus
-SHA-256, el DTB base, exactamente los tres DTBO conocidos y 282 módulos. Fija
-usuario, host, fecha, semilla Kconfig y rutas de depuración. También rechaza
-una `Image` o un `.ko` que conserve la ruta física del run.
+A shell command supplied via environment variables is not accepted. The
+profile requires kernel 5.15.180, the X510 defconfig, the nine patches with
+their SHA-256s, the base DTB, exactly the three known DTBOs, and 282 modules.
+It fixes user, host, date, Kconfig seed, and debug paths. It also rejects an
+`Image` or `.ko` that retains the physical path of the run.
 
-`CONFIG_IKHEADERS` y la firma automática de módulos se desactivan en este
-perfil de bring-up: introducían respectivamente mtimes y una clave nueva. Los
-paths de `__FILE__` se normalizan mediante `KCPPFLAGS`; BTF del kernel y de los
-módulos se mantiene. Estas decisiones no pretenden reproducir el binario
-firmado de Samsung.
+`CONFIG_IKHEADERS` and automatic module signing are disabled in this bring-up
+profile: they introduced mtimes and a new key, respectively. `__FILE__` paths
+are normalized via `KCPPFLAGS`; kernel and module BTF is preserved. These
+decisions do not attempt to reproduce Samsung's signed binary.
 
-El `O=out-u11` es hijo directo de la copia privada del source. Así Kbuild usa
-`srctree=..` y Clang recibe nombres de fuente relativos; un microbuild de EMS
-confirmó cero apariciones del run físico. Con un `O=` hermano, ThinLTO conservaba
-la ruta absoluta aunque hubiera prefix-map.
+`O=out-u11` is a direct child of the private source copy. Thus Kbuild uses
+`srctree=..` and Clang receives relative source names; an EMS microbuild
+confirmed zero occurrences of the physical run path. With a sibling `O=`,
+ThinLTO retained the absolute path even with prefix-map.
 
-Si el release trae más de una raíz de kernel, falta el README/overlay exacto o
-se reutiliza un run-id, el modo `--build` se detiene. No infiere un overlay
-arbitrario, no compila la base U8 sola y no sobreescribe el checkout U3.
+If the release provides more than one kernel root, lacks the exact README/overlay,
+or reuses a run-id, `--build` mode halts. It does not infer an arbitrary overlay,
+does not build the U8 base alone, and does not overwrite the U3 checkout.
 
-## Evidencia y fallos
+## Evidence and Failures
 
-Cada ejecución conserva:
+Each execution retains:
 
-- `release-layout.json`: layout, configs, toolchain y referencias de commit;
-- `archive-manifest.json`: tarballs/ZIP procesados y los que quedaron sólo
-  inventariados;
-- `overlay-manifest.txt` y `composite-layout.json`: composición U11 y hashes;
-- `build-metadata.txt`: raíz elegida, defconfigs, scripts y estado Git;
-- `u11-build.log`, `guest-console.log` y `STATUS`.
+- `release-layout.json`: layout, configs, toolchain, and commit references;
+- `archive-manifest.json`: processed tarballs/ZIPs and those kept only inventoried;
+- `overlay-manifest.txt` and `composite-layout.json`: U11 composition and hashes;
+- `build-metadata.txt`: selected root, defconfigs, scripts, and Git state;
+- `u11-build.log`, `guest-console.log`, and `STATUS`.
 
-Un fallo no limpia ni reutiliza otra ejecución. Revisa el log y el estado del
-run en ext4 antes de repetir con un nuevo `--run-id`. Este flujo no autoriza
-firmar, instalar ni escribir una imagen en la tableta.
+A failure neither cleans up nor reuses another run. Review the log and run status
+on ext4 before retrying with a new `--run-id`. This workflow does not authorize
+signing, installing, or flashing an image to the tablet.
 
-Los intentos `fixed1` a `fixed4` se conservan como pruebas negativas. Encontraron
-una incompatibilidad posicional de GNU tar, rutas absolutas en ThinLTO,
-un falso negativo del detector causado por SIGPIPE y, finalmente, demostraron
-que las rutas estaban en `.rodata`/`__FILE__` y no en BTF. Cada directorio
-contiene un `FAILURE.md`; ninguno es candidato físico.
+Attempts `fixed1` through `fixed4` are preserved as negative tests. They found
+a positional incompatibility in GNU tar, absolute paths in ThinLTO, a detector
+false negative caused by SIGPIPE, and finally demonstrated that paths resided in
+`.rodata`/`__FILE__` and not in BTF. Each directory contains a `FAILURE.md`;
+none is a physical candidate.
 
-## Resultado comprobado
+## Verified Result
 
-El composite exacto se verificó contra una reconstrucción independiente: cero
-diferencias de contenido, modo o symlink. Después se creó un árbol privado,
-se aplicaron los nueve parches Wi-Fi y se compiló con Clang 21 ARM64. El build
-completo produjo kernel 5.15.180, `Image`, DTB base, los DTBO r00/r01/r04 y 282
-módulos, con salida 0. Los hashes, logs y pruebas negativas por parche están en
-`artifacts/u11/x510xxsbdzb4-u11-clang21-20260823`; el análisis se explica en
-`docs/14-resultados-u11-u3-eze4.md`.
+The exact composite was verified against an independent reconstruction: zero
+differences in content, mode, or symlink. A private tree was then created,
+the nine Wi-Fi patches applied, and compilation performed with Clang 21 ARM64.
+The full build produced kernel 5.15.180, `Image`, base DTB, DTBOs r00/r01/r04,
+and 282 modules, exiting with status 0. Hashes, logs, and per-patch negative
+tests are in `artifacts/u11/x510xxsbdzb4-u11-clang21-20260823`; analysis is
+explained in `docs/14-resultados-u11-u3-eze4.md`.

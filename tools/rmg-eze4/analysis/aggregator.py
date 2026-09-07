@@ -12,6 +12,11 @@ Implements the exact canonical J2 E4 decision contract:
 from collections import Counter, defaultdict
 from typing import Dict, List, Mapping, Tuple
 
+try:  # Support both direct script-path imports and package imports.
+    from .validator import validate_observation_record
+except ImportError:  # pragma: no cover - exercised by the direct test runner
+    from validator import validate_observation_record
+
 
 COMPATIBLE = "COMPATIBLE"
 INCOMPATIBLE = "INCOMPATIBLE"
@@ -23,6 +28,32 @@ def aggregate_campaign(records: List[Mapping]) -> Dict:
     """Aggregate normalized observations into a final campaign verdict."""
     if not records:
         return {"verdict": INCONCLUSIVE, "reasons": ["NO_RECORDS"]}
+
+    # The aggregator is the canonical J2 entry point, so it must not rely on
+    # callers remembering to run the schema/semantic validator first.
+    seen_trial_keys = set()
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            return {
+                "verdict": INVALID_EXPERIMENT,
+                "reasons": [f"RECORD_{index}_NOT_AN_OBJECT"],
+            }
+        valid, errors = validate_observation_record(record)
+        if not valid:
+            return {
+                "verdict": INVALID_EXPERIMENT,
+                "reasons": [f"RECORD_{index}_INVALID_{error}" for error in errors],
+            }
+        trial_key = (
+            record.get("experiment_id"), record.get("session_id"),
+            record.get("boot_id"), record.get("trial_id"),
+        )
+        if trial_key in seen_trial_keys:
+            return {
+                "verdict": INVALID_EXPERIMENT,
+                "reasons": [f"DUPLICATE_TRIAL_RECORD_AT_INDEX_{index}"],
+            }
+        seen_trial_keys.add(trial_key)
 
     # Track boots, conditions, and invalid counts
     boot_invalid_counts = Counter()

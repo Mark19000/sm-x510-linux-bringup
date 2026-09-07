@@ -1,97 +1,72 @@
-# 0. Seguridad, modelos y regla de no perder Android
+# 0. Safety, Models, and the Rule of Not Losing Android
 
-## Antes de empezar
+## Before Starting
 
-Desbloquear el bootloader de una Samsung normalmente borra todos los datos y
-puede activar de forma irreversible el estado Knox Warranty Bit. La posibilidad
-de desbloqueo depende de la región, el operador y la versión del dispositivo.
-Este proyecto no intenta saltarse esas restricciones.
+Unlocking the bootloader on a Samsung device typically wipes all data and can permanently and irreversibly trip the Knox Warranty Bit status. Bootloader unlocking availability depends on region, carrier, and device version. This project does not attempt to bypass these restrictions.
 
-No desbloquees ni flashees todavía. Primero completa el análisis sin escritura:
+Do not unlock or flash yet. First, complete the read-only analysis:
 
 ```sh
 ./scripts/collect-device.sh
 ./scripts/extract-stock.sh AP_DE_TU_VERSION.tar.md5
 ```
 
-El segundo comando opera sobre una copia local del firmware. El primero usa ADB
-para leer información; algunas lecturas estarán bloqueadas en un Android de
-producción y eso es normal.
+The second command operates on a local copy of the firmware. The first uses ADB to read information; some queries will be denied on a production Android build, which is normal.
 
-## Identidad que debes registrar
+## Identity You Must Record
 
-La unidad de este proyecto ya está identificada así:
+The target unit for this project is identified as follows:
 
-| Campo | Valor |
+| Field | Value |
 |---|---|
-| Modelo | `SM-X510` |
-| Variante | Wi-Fi / `gts9fewifi` |
-| Build Android | `BP4A.251205.006` |
-| Versión AP/PDA | `X510XXUCEZE4` |
-| Sistema | Android 16 / One UI 8.5 |
-| Binario de bootloader | `C` = U12 |
-| CSC activo | `EUX` |
-| Familia multi-CSC | `OXM` |
-| Versión CSC | `X510OXMCEZE4` |
+| Model | `SM-X510` |
+| Variant | Wi-Fi / `gts9fewifi` |
+| Android Build | `BP4A.251205.006` |
+| AP/PDA Version | `X510XXUCEZE4` |
+| System | Android 16 / One UI 8.5 |
+| Bootloader Binary | `C` = U12 |
+| Active CSC | `EUX` |
+| Multi-CSC Family | `OXM` |
+| CSC Version | `X510OXMCEZE4` |
 
-En `X510XXUCEZE4`, `X510` identifica la familia del modelo, `XX` la rama
-internacional, `U` una actualización funcional y `C` es el contador binario
-del bootloader (12). El resto codifica la generación/fecha de la revisión. El
-prefijo `BP4A.251205.006` pertenece a la base de Android y no sustituye al
-identificador AP de Samsung.
+In `X510XXUCEZE4`, `X510` identifies the model family, `XX` the international release branch, `U` a feature update, and `C` is the bootloader binary generation counter (12). The remainder encodes build generation and date. The prefix `BP4A.251205.006` belongs to the Android base platform and does not replace the Samsung AP identifier.
 
-La cadena bruta observada `SAOMC_SM-x510_oxm_eux_16_0001EUX/EUX/` confirma el CSC
-activo `EUX`, la familia multi-CSC `OXM` y Android 16. No forma parte del kernel,
-pero es necesaria para elegir un firmware completo coherente y una copia de
-restauración adecuada.
+The observed raw string `SAOMC_SM-x510_oxm_eux_16_0001EUX/EUX/` confirms the active CSC `EUX`, multi-CSC family `OXM`, and Android 16. It is not part of the kernel, but is necessary for selecting a coherent full stock firmware package and an appropriate restore image.
 
-Guarda en el cuaderno de pruebas:
+Record in your testing log:
 
-- modelo completo (`SM-X510...` o `SM-X516...`);
-- región/CSC;
-- versión de bootloader y número de compilación;
-- revisión de hardware si Android la expone;
-- hash SHA-256 del paquete AP original;
-- salida de `getprop`, `/proc/cmdline` y mapa de particiones.
+- Full model designation (`SM-X510...` or `SM-X516...`);
+- Region / CSC;
+- Bootloader version and build number;
+- Hardware revision if exposed by Android;
+- SHA-256 hash of the original AP package;
+- Output of `getprop`, `/proc/cmdline`, and partition map.
 
-Se conservan dos bases separadas:
+Two separate base source trees are maintained:
 
-- SM-X510 Wi-Fi: `underdog54/android_kernel_samsung_gts9fewifi`, rama `stock`,
-  commit `9a752a83347461b3785711760ba925fcabea3071`, importación `X510XXU3BXDG` y
-  kernel 5.15.123;
-- SM-X516 5G: `Fede2782/android_kernel_samsung_gts9fe`, commit
-  `56f84616c0263aa85ccbbfb77f69af2fe4aa4bb6`, importación `X516BXXU7CYE1` y
-  kernel 5.15.153.
+- SM-X510 Wi-Fi: `underdog54/android_kernel_samsung_gts9fewifi`, `stock` branch, commit `9a752a83347461b3785711760ba925fcabea3071`, `X510XXU3BXDG` import, kernel 5.15.123;
+- SM-X516 5G: `Fede2782/android_kernel_samsung_gts9fe`, commit `56f84616c0263aa85ccbbfb77f69af2fe4aa4bb6`, `X516BXXU7CYE1` import, kernel 5.15.153.
 
-Ninguna demuestra por sí sola que coincida con tu firmware instalado. Cuando
-exista una fuente OSRC exacta para tu build, se debe comparar y preferir esa
-versión.
+Neither source tree proves by itself that it matches your installed firmware. When an exact OSRC source release exists for your build, it must be compared and prioritized.
 
-En este caso ya sabemos que **no coincide**: `X510XXU3BXDG` es U3/Android 14 y
-la tablet ejecuta `X510XXUCEZE4`, U12/Android 16. No se debe degradar el
-bootloader ni tratar un kernel U3 como imagen de arranque U12.
+In this case we already know they **do not match**: `X510XXU3BXDG` is U3/Android 14 while the tablet runs `X510XXUCEZE4`, U12/Android 16. Do not downgrade the bootloader or treat a U3 kernel as a U12 boot image.
 
-## Variantes
+## Variants
 
-| Modelo | Conectividad | Riesgo particular |
+| Model | Connectivity | Specific Risk |
 |---|---|---|
-| SM-X510 | Wi-Fi | no debe recibir overlays/configuración de módem |
-| SM-X516/B/N | Wi-Fi + 5G | añade módem, memoria reservada e interfaces CP |
+| SM-X510 | Wi-Fi | Must not receive modem overlays or modem configuration |
+| SM-X516/B/N | Wi-Fi + 5G | Adds modem, reserved memory, and CP interfaces |
 
-`gts9fewifi` y `gts9fe` comparten mucho código, pero no son intercambiables. Una
-DT incorrecta puede asignar dos drivers al mismo registro, GPIO o reloj.
+`gts9fewifi` and `gts9fe` share substantial code, but are not interchangeable. An incorrect Device Tree can assign two drivers to the same register range, GPIO pin, or clock.
 
-## Política de pruebas
+## Testing Policy
 
-1. Mantén el firmware oficial completo y una forma conocida de restaurarlo.
-2. Nunca escribas `boot`, `vendor_boot`, `dtbo`, `vbmeta` o `super` sin verificar
-   modelo, tamaño de partición y hash.
-3. Genera una imagen nueva a partir de la imagen stock; no inventes parámetros de
-   cabecera, offsets o AVB.
-4. En la primera prueba, no montes UFS en escritura. El initramfs usa `ro`.
-5. Cambia una sola variable por intento y guarda el log completo.
-6. No pruebes carga/batería con drivers incompletos: usa alimentación estable y
-   vigila temperatura fuera del software experimental.
+1. Maintain full official stock firmware and a known working procedure to restore it.
+2. Never flash `boot`, `vendor_boot`, `dtbo`, `vbmeta`, or `super` without verifying model, partition size, and hash.
+3. Generate new images derived from the stock image; do not invent header parameters, offsets, or AVB descriptors.
+4. On the first test boot, do not mount UFS read-write. The initramfs uses `ro`.
+5. Change only a single variable per attempt and preserve the complete serial/system log.
+6. Do not test charging or battery management with incomplete drivers: use stable external power and monitor temperature externally from experimental software.
 
-No hay scripts de flasheo en este repositorio. Es deliberado: la transición de
-M1 (artefactos construidos) a M2 (primer boot) requiere conocer tu unidad real.
+There are no flashing scripts in this repository. This is intentional: transitioning from M1 (built artifacts) to M2 (first hardware boot) requires knowing your actual physical unit.

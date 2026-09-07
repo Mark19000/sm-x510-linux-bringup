@@ -1,176 +1,176 @@
 # Minimal Modification Set — SM-X510 U12/EZE4
 
-> **SUPERSEDED — NO USAR COMO PLAN OPERATIVO.** Conservado como auditoría histórica U11. Contiene conclusiones invalidadas sobre el mínimo, `dtbo` y flags AVB. La autoridad actual es `docs/boot-chain/minimum-first-boot-image-set.md`; el veredicto vigente es `CANNOT_YET_BE_DETERMINED`.
+> **SUPERSEDED — DO NOT USE AS AN OPERATIONAL PLAN.** Preserved as a historical U11 audit. Contains invalidated conclusions regarding the minimum, `dtbo`, and AVB flags. Current authority is `docs/boot-chain/minimum-first-boot-image-set.md`; the prevailing verdict is `CANNOT_YET_BE_DETERMINED`.
 
-Fecha: 2026-08-24
-Alcance: primer experimento con kernel propio, sin flashear ni generar imágenes ejecutables.
-Estado: auditoría estática de imágenes stock y artefactos U11 ya presentes en el repositorio.
+Date: 2026-08-24
+Scope: first experiment with custom kernel, without flashing or generating executable images.
+Status: static audit of stock images and U11 artifacts already present in the repository.
 
-## Resumen Ejecutivo
+## Executive Summary
 
-- **ERRATA:** el root protege `boot`, `init_boot` y `vendor_boot` mediante HASH directo; `dtbo` mediante CHAIN a su vbmeta hijo, cuyo HASH cubre `dtbo`. Cada imagen inspeccionada contiene además vbmeta embebido.
-- **HECHO:** `boot.img` aporta el kernel; `init_boot.img` aporta sólo ramdisk GKI; `vendor_boot.img` aporta vendor ramdisk, DTB base comprimido Samsung y bootconfig; `dtbo.img` aporta tres overlays.
-- **HECHO:** El kernel U11 construido es `5.15.180` y los inventarios stock EZE4 corresponden a `5.15.189-android13-3`. Con `MODVERSIONS=y` y vermagic distinto, los 281 módulos del vendor ramdisk stock deben tratarse como incompatibles hasta demostrar lo contrario.
-- **HECHO:** Los tres overlays U11 disponibles son byte-idénticos a los overlays extraídos de `dtbo.img` EZE4. Por tanto, `dtbo.img` stock es candidato válido para permanecer sin cambios en el experimento mínimo, sujeto a la política del bootloader desbloqueado.
-- **ERRATA:** esa conclusión operativa queda retirada. Tras unlock, `boot-only` es el candidato mecánicamente mínimo para un marcador EZE4, pero la aceptación Samsung del hash roto es **UNKNOWN**; no hay conjunto probado.
+- **ERRATA:** root protects `boot`, `init_boot`, and `vendor_boot` via direct HASH; `dtbo` via CHAIN to its child vbmeta, whose HASH covers `dtbo`. Each inspected image also contains embedded vbmeta.
+- **FACT:** `boot.img` provides the kernel; `init_boot.img` provides only GKI ramdisk; `vendor_boot.img` provides vendor ramdisk, compressed Samsung base DTB, and bootconfig; `dtbo.img` provides three overlays.
+- **FACT:** The built U11 kernel is `5.15.180` and stock EZE4 inventories correspond to `5.15.189-android13-3`. With `MODVERSIONS=y` and different vermagic, the 281 modules of the stock vendor ramdisk must be treated as incompatible until proven otherwise.
+- **FACT:** The three available U11 overlays are byte-identical to the overlays extracted from EZE4 `dtbo.img`. Therefore, stock `dtbo.img` is a valid candidate to remain unchanged in the minimal experiment, subject to unlocked bootloader policy.
+- **ERRATA:** that operational conclusion is withdrawn. After unlock, `boot-only` is the mechanically minimal candidate for an EZE4 marker, but Samsung acceptance of the broken hash is **UNKNOWN**; there is no proven set.
 
-## Evidencia Encontrada
+## Discovered Evidence
 
-### Inspección directa
+### Direct inspection
 
-| Imagen | Formato | Contenido relevante | AVB embebido |
+| Image | Format | Relevant content | Embedded AVB |
 |---|---|---|---|
-| `artifacts/stock/images/boot.img` | Android boot v4 | kernel 39,356,928 B; ramdisk ausente | footer + vbmeta SHA256_RSA4096 |
-| `artifacts/stock/images/init_boot.img` | Android boot v4 | sin kernel; ramdisk GKI LZ4-legacy de 2,486,802 B | footer + vbmeta SHA256_RSA4096 |
-| `artifacts/stock/images/vendor_boot.img` | vendor boot v4 | vendor ramdisk LZ4-legacy de 18,077,432 B; DTB Samsung comprimido de 239,652 B; bootconfig `buildtime_bootconfig=enable` | footer + vbmeta SHA256_RSA4096 |
+| `artifacts/stock/images/boot.img` | Android boot v4 | kernel 39,356,928 B; ramdisk absent | footer + vbmeta SHA256_RSA4096 |
+| `artifacts/stock/images/init_boot.img` | Android boot v4 | no kernel; GKI LZ4-legacy ramdisk of 2,486,802 B | footer + vbmeta SHA256_RSA4096 |
+| `artifacts/stock/images/vendor_boot.img` | vendor boot v4 | vendor ramdisk LZ4-legacy of 18,077,432 B; compressed Samsung DTB of 239,652 B; bootconfig `buildtime_bootconfig=enable` | footer + vbmeta SHA256_RSA4096 |
 | `artifacts/stock/images/dtbo.img` | DTBO v0 | 3 overlays; custom `[0,0]`, `[1,3]`, `[4,32]` | footer + vbmeta SHA256_RSA4096 |
-| `artifacts/stock/images/vbmeta.img` | vbmeta | clave pública SHA-1 `b6924fd490355eca36e5a5cd9c4d2b4bd6434029`; rollback index global 0; flags 0 | raíz de confianza |
+| `artifacts/stock/images/vbmeta.img` | vbmeta | public key SHA-1 `b6924fd490355eca36e5a5cd9c4d2b4bd6434029`; global rollback index 0; flags 0 | root of trust |
 
-### Descriptores del vbmeta raíz
+### Root vbmeta descriptors
 
-- Hash descriptor `boot`: tamaño original `39,363,360`; digest `3f28d10f...31a420c`.
-- Hash descriptor `init_boot`: tamaño original `2,495,248`; digest `4f514634...f32efc`.
-- Hash descriptor `vendor_boot`: tamaño original `18,334,480`; digest `7c5898f8...050da7`.
-- Hash descriptor `dtbo`: tamaño original `542,896`; digest `47c853eb...e2dde`.
+- Hash descriptor `boot`: original size `39,363,360`; digest `3f28d10f...31a420c`.
+- Hash descriptor `init_boot`: original size `2,495,248`; digest `4f514634...f32efc`.
+- Hash descriptor `vendor_boot`: original size `18,334,480`; digest `7c5898f8...050da7`.
+- Hash descriptor `dtbo`: original size `542,896`; digest `47c853eb...e2dde`.
 - Chain partitions: `dtbo` RIL 1, `prism` RIL 2, `optics` RIL 3.
 
-Los cuatro hash descriptors tienen `flags=0`. No hay indicación estática de tolerancia a modificaciones en estado bloqueado.
+The four hash descriptors have `flags=0`. There is no static indication of tolerance for modifications in the locked state.
 
-### ABI del vendor ramdisk stock
+### Stock vendor ramdisk ABI
 
-**HECHOS:**
+**FACTS:**
 
-- Inventario EZE4: 281 módulos en `modules.load` y `modules.dep`.
-- Kernel U11: 282 módulos con vermagic `5.15.180 SMP preempt mod_unload modversions aarch64`.
-- Referencia stock documentada: `5.15.189-android13-3-33478785`.
-- Ambos lados usan `CONFIG_MODVERSIONS=y`. El árbol U11 tiene `Module.symvers`, pero no existe tabla CRC comparable del kernel stock en este repositorio.
-- Los primeros módulos stock incluyen `exynos-chipid_v2.ko`, `exynos-reboot.ko`, `sec_debug_base_early.ko`, `clk_exynos.ko`, `exynos_mct_v3.ko`, `s3c2410_wdt.ko` y `pinctrl-samsung-core.ko`.
-- En el build U11 auditado, chipid, clocks S5E8835, MCT v3, watchdog y pinctrl core son modulares; GIC base es built-in (`CONFIG_EXYNOS_GIC=y`).
-- `CONFIG_MODULE_SIG_FORCE` y `CONFIG_SECURITY_LOCKDOWN_LSM` no están activos en el kernel U11 auditado. El rechazo automático por firma no debe sobreestimarse; el bloqueante principal es vermagic/CRC/ABI binaria/CFI.
+- EZE4 inventory: 281 modules in `modules.load` and `modules.dep`.
+- U11 kernel: 282 modules with vermagic `5.15.180 SMP preempt mod_unload modversions aarch64`.
+- Documented stock reference: `5.15.189-android13-3-33478785`.
+- Both sides use `CONFIG_MODVERSIONS=y`. The U11 tree has `Module.symvers`, but no comparable CRC table of the stock kernel exists in this repository.
+- The first stock modules include `exynos-chipid_v2.ko`, `exynos-reboot.ko`, `sec_debug_base_early.ko`, `clk_exynos.ko`, `exynos_mct_v3.ko`, `s3c2410_wdt.ko`, and `pinctrl-samsung-core.ko`.
+- In the audited U11 build, chipid, S5E8835 clocks, MCT v3, watchdog, and pinctrl core are modular; base GIC is built-in (`CONFIG_EXYNOS_GIC=y`).
+- `CONFIG_MODULE_SIG_FORCE` and `CONFIG_SECURITY_LOCKDOWN_LSM` are not active in the audited U11 kernel. Automatic rejection by signature should not be overestimated; the primary blocker is vermagic/CRC/binary ABI/CFI.
 
-**HIPÓTESIS:**
+**HYPOTHESES:**
 
-- Si un init o loader intenta cargar los módulos stock con el kernel U11, el fallo normal esperado comienza por formato/vermagic y continúa con CRC/símbolos desconocidos cuando aplique. El comportamiento exacto depende del loader y de la política de errores.
-- Si el vendor ramdisk se entrega pero no se procesa, el kernel puede alcanzar `/init`; sin drivers tempranos críticos integrados, puede quedarse sin clocks/timers/pinctrl funcionales o colgar antes de userspace.
+- If an init or loader attempts to load stock modules with the U11 kernel, standard failure begins with format/vermagic and continues with unknown CRC/symbols where applicable. Exact behavior depends on the loader and error policy.
+- If the vendor ramdisk is delivered but not processed, the kernel may reach `/init`; without critical early drivers integrated, it may lack functional clocks/timers/pinctrl or hang prior to userspace.
 
 ### DTBO
 
-Comparación byte a byte:
+Byte-by-byte comparison:
 
-| Overlay stock | Artefacto U11 | Resultado |
+| Stock overlay | U11 artifact | Result |
 |---|---|---|
 | `overlay-00-id-00000000-rev-00000000.dtbo` | `gts9fewifi_eur_open_w00_r00.dtbo` | BYTE-IDENTICAL |
 | `overlay-01-id-00000000-rev-00000000.dtbo` | `gts9fewifi_eur_open_w00_r01.dtbo` | BYTE-IDENTICAL |
 | `overlay-02-id-00000000-rev-00000000.dtbo` | `gts9fewifi_eur_open_w00_r04.dtbo` | BYTE-IDENTICAL |
 
-Esto respalda mantener `dtbo.img` stock en el primer experimento. No elimina la incertidumbre sobre cómo selecciona overlay el bootloader Samsung ni sobre comprobaciones adicionales propias del fabricante.
+This supports keeping stock `dtbo.img` in the first experiment. It does not eliminate uncertainty regarding how the Samsung bootloader selects the overlay or additional vendor-specific checks.
 
-## Qué Significa
+## What This Means
 
-### Tabla de decisión por imagen
+### Decision table by image
 
-| Imagen | Función | Necesario modificar | Puede permanecer stock | Riesgo |
+| Image | Function | Modification required | Can remain stock | Risk |
 |---|---|---|---|---|
-| `boot.img` | Entregar el kernel propio al bootloader | Sí, para ejecutar kernel U11 | No, si el objetivo es ejecutar ese kernel bajo UNLOCKED | Invalida descriptor AVB; posible warning orange/red; bajo LOCKED probablemente impide handoff |
-| `init_boot.img` | Aportar ramdisk GKI/genérico inicial | Depende: sí si `/init` propio o initramfs experimental sustituye al stock; no si se usa el ramdisk GKI stock intacto | Sólo si su contenido sigue siendo compatible con el kernel U11 y no carga código ABI cruzada | Ramdisk stock Android puede esperar entorno/vendor Android16 y ocultar o impedir `/init` experimental |
-| `vendor_boot.img` | Aportar vendor ramdisk, DTB base y bootconfig | No como requisito estructural si el kernel tiene todos los drivers pre-`/init` built-in y se evita procesar sus DLKM stock; sí si se quiere reemplazar DTB/bootconfig o eliminar módulos incompatibles | Hipótesis riesgosa: DT/bootconfig correctos, pero 281 módulos `5.15.189` son NO-GO para kernel `5.15.180` | Carga ABI cruzada puede fallar por vermagic/CRC; fallos en clocks/MCT/pinctrl pueden impedir userspace; mantener stock reduce cambios pero no riesgo funcional |
-| `dtbo.img` | Aplicar overlay según revisión de hardware | No en este momento | Sí como candidato fuerte: overlays U11 son byte-idénticos a EZE4 | Selección bootloader y políticas Samsung no verificadas; cualquier cambio rompe AVB innecesariamente |
-| `vbmeta.img` | Anclar hashes, claves, rollback indexes y chain partitions | Sí en un flujo UNLOCKED coherente: regenerar/firmar con clave controlada o usar política de verificación deshabilitada validada por el bootloader | No si cambia `boot` o `init_boot`; el vbmeta stock seguiría anclando hashes antiguos | Firma incorrecta o flags mal interpretados pueden producir RED-state/no-boot; regeneración no autoriza flasheo |
+| `boot.img` | Deliver custom kernel to bootloader | Yes, to run U11 kernel | No, if the objective is running that kernel under UNLOCKED | Invalidates AVB descriptor; possible orange/red warning; under LOCKED likely prevents handoff |
+| `init_boot.img` | Provide generic/GKI initial ramdisk | Depends: yes if custom `/init` or experimental initramfs replaces stock; no if intact stock GKI ramdisk is used | Only if its content remains compatible with U11 kernel and does not load cross-ABI code | Stock Android ramdisk may expect Android16 vendor/environment and hide or prevent experimental `/init` |
+| `vendor_boot.img` | Provide vendor ramdisk, base DTB, and bootconfig | Not as a structural requirement if kernel has all pre-`/init` drivers built-in and processing its stock DLKMs is avoided; yes if replacing DTB/bootconfig or removing incompatible modules | Risky hypothesis: DT/bootconfig correct, but 281 `5.15.189` modules are NO-GO for `5.15.180` kernel | Cross-ABI loading may fail via vermagic/CRC; failures in clocks/MCT/pinctrl may prevent userspace; keeping stock reduces changes but not functional risk |
+| `dtbo.img` | Apply overlay according to hardware revision | Not at this time | Yes as a strong candidate: U11 overlays are byte-identical to EZE4 | Bootloader selection and Samsung policies unverified; any change breaks AVB unnecessarily |
+| `vbmeta.img` | Anchor hashes, keys, rollback indexes, and chain partitions | Yes in a coherent UNLOCKED flow: regenerate/sign with controlled key or use disabled-verification policy validated by bootloader | No if `boot` or `init_boot` changes; stock vbmeta would continue anchoring old hashes | Incorrect signature or misinterpreted flags can produce RED-state/no-boot; regeneration does not authorize flashing |
 
-### Preguntas específicas
+### Specific questions
 
-#### ¿Cuál es el mínimo conjunto absoluto?
+#### What is the absolute minimum set?
 
-Desde el punto de vista de contenido ejecutable:
+From the executable content perspective:
 
-1. `boot.img` con kernel U11;
-2. `vbmeta.img` coherente con las imágenes cambiadas y aceptable por el bootloader en estado UNLOCKED;
-3. un camino de initramfs controlado.
+1. `boot.img` with U11 kernel;
+2. `vbmeta.img` consistent with changed images and acceptable by bootloader in UNLOCKED state;
+3. a controlled initramfs path.
 
-Ese tercer punto puede materializarse de dos formas:
+That third point can materialize in two ways:
 
-- **Ruta A:** modificar `init_boot.img` (y posiblemente `vendor_boot.img`) para entregar initramfs/módulos U11 coherentes. Conjunto práctico: 3–4 imágenes.
-- **Ruta B:** usar ramdisk stock intacto sólo si el kernel U11 lleva todo lo necesario hasta `/init` como built-in y ningún proceso carga los 281 módulos stock. Conjunto nominal: 2 imágenes (`boot`, `vbmeta`), pero esta ruta es una hipótesis condicionada a build/configuración y al comportamiento del ramdisk Android stock.
+- **Path A:** modify `init_boot.img` (and possibly `vendor_boot.img`) to deliver coherent U11 initramfs/modules. Practical set: 3–4 images.
+- **Path B:** use intact stock ramdisk only if U11 kernel carries everything needed up to `/init` as built-in and no process loads the 281 stock modules. Nominal set: 2 images (`boot`, `vbmeta`), but this path is a hypothesis conditioned on build/configuration and stock Android ramdisk behavior.
 
-Por tanto, no existe todavía un “mínimo físico” universal: depende del perfil initramfs y del build U11 elegido.
+Therefore, a universal "physical minimum" does not yet exist: it depends on the initramfs profile and chosen U11 build.
 
-#### Si sólo cambias `boot.img` e `init_boot.img`, ¿puede `vendor_boot` quedar stock?
+#### If you only change `boot.img` and `init_boot.img`, can `vendor_boot` remain stock?
 
-Sólo bajo tres condiciones simultáneas:
+Only under three simultaneous conditions:
 
-1. Estado UNLOCKED y vbmeta regenerado/coherente aceptado por el bootloader.
-2. El DTB base stock sigue siendo correcto para el hardware y kernel U11.
-3. Ningún componente carga los módulos `5.15.189` contenidos en el vendor ramdisk, o el loader tolera y aísla esos fallos sin afectar el camino hasta `/init`.
+1. UNLOCKED state and regenerated/coherent vbmeta accepted by bootloader.
+2. Stock base DTB remains correct for hardware and U11 kernel.
+3. No component loads the `5.15.189` modules contained in vendor ramdisk, or the loader tolerates and isolates those failures without affecting the path to `/init`.
 
-La primera condición pertenece al experimento AVB. Las otras dos son factibles sólo con evidencia adicional. Mantener `vendor_boot` stock conserva DTB/bootconfig, pero entrega un inventario incompatible; no es recomendable como primera prueba salvo que el kernel tenga los drivers tempranos críticos built-in y se controle explícitamente el loader de módulos.
+The first condition belongs to the AVB experiment. The other two are feasible only with additional evidence. Keeping `vendor_boot` stock preserves DTB/bootconfig, but delivers an incompatible inventory; it is not recommended as a first test unless the kernel has critical early drivers built-in and the module loader is explicitly controlled.
 
-#### ¿Qué pasa si los 281 módulos stock llegan al kernel U11?
+#### What happens if the 281 stock modules reach the U11 kernel?
 
-**Escenario inferido, no observado:**
+**Inferred scenario, not observed:**
 
-- El vermagic `5.15.189-android13-3` no coincide con `5.15.180`; la carga normal falla antes de resolver símbolos.
-- Con `MODVERSIONS=y`, incluso ignorando vermagic, faltan tablas CRC stock para demostrar igualdad ABI.
-- `CONFIG_CFI_CLANG=y` añade riesgo de discrepancia binaria de callbacks más allá de nombres/CRC.
-- Fallos en módulos tempranos pueden dejar el sistema sin clocks, MCT, pinctrl o identidad SoC. Dependiendo del driver y probe, el resultado puede ser error, hang o panic.
-- Si el loader ignora fallos individuales, el boot puede alcanzar `/init`, pero con subsistemas esenciales ausentes; eso no es un éxito y complica el diagnóstico.
+- Vermagic `5.15.189-android13-3` does not match `5.15.180`; normal loading fails before resolving symbols.
+- With `MODVERSIONS=y`, even ignoring vermagic, stock CRC tables are missing to demonstrate ABI equality.
+- `CONFIG_CFI_CLANG=y` adds risk of binary callback discrepancy beyond names/CRC.
+- Failures in early modules can leave the system without clocks, MCT, pinctrl, or SoC identity. Depending on the driver and probe, the outcome may be error, hang, or panic.
+- If the loader ignores individual failures, boot may reach `/init`, but with essential subsystems absent; that is not a success and complicates diagnostics.
 
-#### ¿Puede `dtbo.img` quedar stock si los overlays U11 son byte-idénticos?
+#### Can `dtbo.img` remain stock if U11 overlays are byte-identical?
 
-Sí, como decisión técnica de contenido. Los tres artefactos comparados son idénticos byte a byte. Quedan dos incertidumbres separadas:
+Yes, as a technical content decision. The three compared artifacts are byte-by-byte identical. Two separate uncertainties remain:
 
-- política del bootloader al seleccionar overlay y validar `dtbo` en estado UNLOCKED/vbmeta alternativo;
-- selección correcta de revisión de hardware, aún no observada físicamente.
+- bootloader policy when selecting overlay and validating `dtbo` under UNLOCKED / alternative vbmeta state;
+- correct hardware revision selection, not yet observed physically.
 
-No modificar `dtbo` reduce variables y preserva el comportamiento de selección stock.
+Not modifying `dtbo` reduces variables and preserves stock selection behavior.
 
-#### ¿Siempre hay que regenerar `vbmeta.img`? ¿Basta un flag?
+#### Must `vbmeta.img` always be regenerated? Is a flag enough?
 
-Si cambia cualquier imagen anclada por el vbmeta raíz, su descriptor deja de coincidir. La clave OEM no está disponible. En un dispositivo UNLOCKED, una hipótesis es usar `VERIFICATION_DISABLED` (`flags=2`), siempre que el bootloader Samsung respete esa política. `flags=1` es `HASHTREE_DISABLED`, no desactiva hashes/firmas; `flags=3` combina ambos bits.
+If any image anchored by root vbmeta changes, its descriptor ceases to match. The OEM key is not available. On an UNLOCKED device, one hypothesis is using `VERIFICATION_DISABLED` (`flags=2`), provided the Samsung bootloader respects that policy. `flags=1` is `HASHTREE_DISABLED`, which does not disable hashes/signatures; `flags=3` combines both bits.
 
-Ningún valor es automáticamente suficiente:
+No value is automatically sufficient:
 
-- **HECHO:** el vbmeta stock tiene flags 0 y firma OEM.
-- **HIPÓTESIS:** el bootloader desbloqueado acepta un vbmeta alternativo con `flags=2` o `flags=3`.
-- **HIPÓTESIS:** Samsung no añade comprobaciones adicionales que hagan fallar esa configuración.
+- **FACT:** stock vbmeta has flags 0 and OEM signature.
+- **HYPOTHESIS:** unlocked bootloader accepts an alternative vbmeta with `flags=2` or `flags=3`.
+- **HYPOTHESIS:** Samsung does not add additional checks that cause that configuration to fail.
 
-El experimento AVB debe definir primero una ruta de recuperación validada. Bajo LOCKED no debe asumirse que ningún flag permita boot.
+The AVB experiment must first define a validated recovery route. Under LOCKED it must not be assumed that any flag permits boot.
 
-## Riesgos
+## Risks
 
-| Riesgo | Clase | Mitigación propuesta |
+| Risk | Class | Proposed mitigation |
 |---|---|---|
-| Mezclar kernel U11 con 281 módulos stock U12 | Alto | Tratar como NO-GO; usar initramfs U11 coherente o drivers tempranos built-in |
-| Creer que cambiar sólo boot/vbmeta basta | Crítico si se usa ramdisk stock Android | Definir explícitamente quién provee `/init` y qué módulos se cargan |
-| Modificar DTBO sin necesidad | Medio | Mantener stock porque los overlays son idénticos |
-| Asumir `flags=2/3` universalmente válido | Alto | Mantenerlo como hipótesis Samsung hasta validar recovery y obtener autorización futura |
-| Ocultar fallos de módulo por loader tolerante | Medio-Alto | Registrar cada resultado de carga; no interpretar llegada a shell como compatibilidad total |
-| Confundir rechazo AVB con crash temprano de kernel | Alto | Usar matriz de señales: warning persistente, Download Mode, enumeración USB y consumo |
+| Mixing U11 kernel with 281 stock U12 modules | High | Treat as NO-GO; use coherent U11 initramfs or built-in early drivers |
+| Believing changing only boot/vbmeta is sufficient | Critical if stock Android ramdisk is used | Explicitly define who provides `/init` and which modules are loaded |
+| Modifying DTBO unnecessarily | Medium | Keep stock because overlays are identical |
+| Assuming `flags=2/3` is universally valid | High | Maintain as Samsung hypothesis until validating recovery and obtaining future authorization |
+| Concealing module failures via tolerant loader | Medium-High | Record every load result; do not interpret reaching a shell as full compatibility |
+| Confusing AVB rejection with early kernel crash | High | Use signal matrix: persistent warning, Download Mode, USB enumeration, and power consumption |
 
-## Hipótesis
+## Hypotheses
 
-1. Un kernel U11 con chipid, clock S5E8835, MCT v3, pinctrl y PMU básico built-in puede alcanzar `/init` sin procesar módulos stock U12.
-2. El ramdisk GKI stock puede convivir con ese kernel sólo si no impone dependencias incompatibles antes del `/init` experimental.
-3. Hipótesis histórica corregida: el bootloader UNLOCKED acepta imágenes modificadas con `VERIFICATION_DISABLED` (`flags=2`) mientras `vendor_boot` y `dtbo` siguen stock. La aceptación Samsung permanece **UNKNOWN** y el conjunto ya no es el candidato mínimo canónico.
-4. La selección DTBO stock funciona sin cambio de imagen porque el contenido overlay es equivalente byte a byte.
-5. Samsung no exige una cadena Knox/RPMB adicional incompatible con este esquema.
+1. A U11 kernel with chipid, S5E8835 clock, MCT v3, pinctrl, and basic PMU built-in can reach `/init` without processing stock U12 modules.
+2. Stock GKI ramdisk can coexist with that kernel only if it does not impose incompatible dependencies prior to experimental `/init`.
+3. Corrected historical hypothesis: UNLOCKED bootloader accepts modified images with `VERIFICATION_DISABLED` (`flags=2`) while `vendor_boot` and `dtbo` remain stock. Samsung acceptance remains **UNKNOWN** and the set is no longer the canonical minimal candidate.
+4. Stock DTBO selection works without image change because overlay content is byte-by-byte equivalent.
+5. Samsung does not require an additional Knox/RPMB chain incompatible with this scheme.
 
-Ninguna hipótesis anterior autoriza un intento físico por sí sola.
+No prior hypothesis authorizes a physical attempt on its own.
 
-## Experimentos Recomendados
+## Recommended Experiments
 
-Todos son auditorías locales o preparación de plan; ninguno genera imagen flasheable.
+All are local audits or plan preparation; none generates a flashable image.
 
-1. **Cerrar ruta built-in:** auditar config/build necesarios para integrar drivers pre-userspace críticos como `=y` y verificar que `/init` no dependa del vendor ramdisk stock.
-2. **Definir initramfs mínimo U11:** empaquetado local no flasheable para medir tamaño y dependencias; separar perfil MINIMAL de SEC_DEBUG.
-3. **Simular composición de imágenes:** calcular offsets, tamaños y hashes de boot/init_boot/vbmeta candidatos sin escribir particiones.
-4. **Probar política AVB localmente:** verificar cadenas candidatas con avbtool y documentar qué descriptor debería fallar en cada combinación.
-5. **Calibrar baseline stock:** plan de observación USB/consumo/display con firmware actual antes de cualquier cambio físico.
-6. **Decidir orden físico:** tras cerrar earlycon/sec_debug y unlock, empezar por el menor número de imágenes cambiadas que garantice initramfs coherente; no optimizar por “menos bytes” sino por menos incertidumbre.
+1. **Close built-in path:** audit config/build necessary to integrate critical pre-userspace drivers as `=y` and verify that `/init` does not depend on stock vendor ramdisk.
+2. **Define minimal U11 initramfs:** non-flashable local packaging to measure size and dependencies; separate MINIMAL profile from SEC_DEBUG.
+3. **Simulate image composition:** calculate offsets, sizes, and hashes of candidate boot/init_boot/vbmeta without writing partitions.
+4. **Test AVB policy locally:** verify candidate chains with avbtool and document which descriptor should fail in each combination.
+5. **Calibrate stock baseline:** USB/power/display observation plan with current firmware before any physical change.
+6. **Decide physical order:** after closing earlycon/sec_debug and unlock, start with the smallest number of changed images that guarantees coherent initramfs; do not optimize for "fewer bytes" but for less uncertainty.
 
-## Documentación Propuesta
+## Proposed Documentation
 
-- Este documento como fuente canónica del conjunto mínimo de modificación.
-- `docs/boot-chain/avb-experiment-plan.md` debe definir estados, señales y recuperación.
-- `docs/debugging/earlycon-analysis.md` debe decidir cmdline/bootconfig antes de fijar `boot`/`vendor_boot`.
-- `docs/debugging/sec-debug-firstboot-profile.md` debe fijar módulos y orden de carga del initramfs.
-- Actualizar `docs/first-boot-experiment-plan-v2.md` con la conclusión: el mínimo real depende de la ruta initramfs/built-in, y el vendor ramdisk stock U12 no debe cargarse contra kernel U11.
+- This document as canonical source of minimal modification set.
+- `docs/boot-chain/avb-experiment-plan.md` must define states, signals, and recovery.
+- `docs/debugging/earlycon-analysis.md` must decide cmdline/bootconfig before fixing `boot`/`vendor_boot`.
+- `docs/debugging/sec-debug-firstboot-profile.md` must fix modules and load order of initramfs.
+- Update `docs/first-boot-experiment-plan-v2.md` with the conclusion: real minimum depends on initramfs/built-in path, and stock U12 vendor ramdisk must not be loaded against U11 kernel.

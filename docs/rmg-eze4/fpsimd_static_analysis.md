@@ -1,16 +1,16 @@
-# Análisis Estático: Macros `SLIDE_ROUTE_FPSIMD` y `PRODUCTION_STACK_PI_RIGHT_ONLY`
+# Static Analysis: Macros `SLIDE_ROUTE_FPSIMD` and `PRODUCTION_STACK_PI_RIGHT_ONLY`
 
-- **Objetivo**: Investigación estática del propósito, dependencias arquitectónicas, código controlado y justificación técnica de las macros de configuración encontradas en el target ZG3 (`src/targets/gts9fewifi-X510XXSEEZG3/target.h`).
-- **Repositorio Auditado**: `Root-My-Galaxy-Payloads-ZG3` (branch `gts9fewifi-X510XXSEEZG3-v4`)
-- **Fecha de Auditoría**: 2026-09-06
-- **Ámbito**: Exclusivamente análisis de diseño de software y compatibilidad arquitectónica.
+- **Objective**: Static investigation of the purpose, architectural dependencies, controlled code, and technical justification of the configuration macros found in the ZG3 target (`src/targets/gts9fewifi-X510XXSEEZG3/target.h`).
+- **Audited Repository**: `Root-My-Galaxy-Payloads-ZG3` (branch `gts9fewifi-X510XXSEEZG3-v4`)
+- **Audit Date**: 2026-09-06
+- **Scope**: Exclusively software design analysis and architectural compatibility.
 
 ---
 
 ## 1. Macro: `SLIDE_ROUTE_FPSIMD`
 
-### 1.1 Declaración y Definición
-- En `src/common.h`:
+### 1.1 Declaration and Definition
+- In `src/common.h`:
   ```c
   #define SLIDE_ROUTE_PSELECT 0
   #define SLIDE_ROUTE_MCAST   1
@@ -18,14 +18,14 @@
   ...
   #define SLIDE_USE_FPSIMD (SLIDE_ROUTE == SLIDE_ROUTE_FPSIMD)
   ```
-- En `src/targets/gts9fewifi-X510XXSEEZG3/target.h`:
+- In `src/targets/gts9fewifi-X510XXSEEZG3/target.h`:
   ```c
   #define SLIDE_ROUTE SLIDE_ROUTE_FPSIMD
   ```
 
-### 1.2 Código que Controla
-1. **Puntos de Bifurcación**:
-   - `src/slide_app.c`: Durante la inicialización del subproceso hijo (`slide_log_child_context`) y el punto de sincronización de la pila de espera (`slide_pi_worker_thread`), selecciona la función de copia:
+### 1.2 Controlled Code
+1. **Branch Points**:
+   - `src/slide_app.c`: During child sub-process initialization (`slide_log_child_context`) and the wait stack synchronization point (`slide_pi_worker_thread`), selects the copy function:
      ```c
      #if SLIDE_USE_MCAST
        slide_mcast_stack_copy();
@@ -35,54 +35,54 @@
        slide_pselect_stack_copy();
      #endif
      ```
-   - `src/fpsimd.c`: Compila condicionalmente el manejador de señales, la inspección de registros vectoriales de ARM64 y el hilo consumidor con `sched_setattr`.
-   - `src/util.c`: Habilita rutinas auxiliares de afinidad y deshabilitación de `rseq` específicas de la ruta.
+   - `src/fpsimd.c`: Conditionally compiles the signal handler, ARM64 vector register inspection, and the consumer thread with `sched_setattr`.
+   - `src/util.c`: Enables route-specific affinity and `rseq` disabling auxiliary routines.
 
-### 1.3 Estructuras y Características del Kernel Involucradas
-- **Mecanismo de Entrega de Señales ARM64 (`sigaction` / `rt_sigreturn`)**:
-  - Al recibir una señal (en este caso `SIGUSR2` enviada mediante `tgkill()`), el kernel de Linux construye en el espacio de usuario (o en la pila alternativa de señales) un marco de contexto `struct ucontext_t`.
-  - La cabecera de extensión ARM64 (`uc_mcontext.__reserved`) contiene bloques de contexto encabezados por `struct _aarch64_ctx`.
-  - Entre estos bloques se incluye `struct fpsimd_context` con el número mágico `FPSIMD_MAGIC` (`0x46508001`).
-  - Dicha estructura contiene el volcado de los 32 registros vectoriales de 128 bits de la FPU/NEON (`vregs[32]`, totalizando 512 bytes de datos continuos).
-- **Ventana de Escritura y Alias de Estructuras**:
-  - A través del manejador de señales, el código ubica el registro `fpsimd_context` y escribe un `fake_waiter` dentro del espacio `vregs`.
-  - Al reanudar la ejecución o interactuar con el planificador, los datos colocados en `vregs` se reflejan en la pila según la alineación `FPSIMD_WAITER_OFF`.
+### 1.3 Kernel Structures and Features Involved
+- **ARM64 Signal Delivery Mechanism (`sigaction` / `rt_sigreturn`)**:
+  - Upon receiving a signal (in this case `SIGUSR2` sent via `tgkill()`), the Linux kernel constructs a `struct ucontext_t` context frame in user space (or on the alternate signal stack).
+  - The ARM64 extension header (`uc_mcontext.__reserved`) contains context blocks headed by `struct _aarch64_ctx`.
+  - Among these blocks, `struct fpsimd_context` is included with magic number `FPSIMD_MAGIC` (`0x46508001`).
+  - This structure contains the dump of the 32 128-bit vector registers of the FPU/NEON (`vregs[32]`, totaling 512 bytes of contiguous data).
+- **Write Window and Structure Aliasing**:
+  - Through the signal handler, the code locates the `fpsimd_context` record and writes a `fake_waiter` inside `vregs` space.
+  - Upon resuming execution or interacting with the scheduler, the data placed in `vregs` is reflected on the stack according to the `FPSIMD_WAITER_OFF` alignment.
 
-### 1.4 Evolución Histórica en el Repositorio
-- **Commit `529d88a` (2026-08-19, por `zainarbani`)**: *"Add fpsimd route & refactor"*.
-  - Introduce `src/fpsimd.c` y define `SLIDE_ROUTE_FPSIMD 2`.
-  - Retira la dependencia exclusiva de sockets multicast (`setsockopt` / `IP_MSFILTER`) y de `pselect6`.
-- **Commit `0062f3d` (2026-08-28, por `zainarbani`)**: *"Switch to fpsimd route"*.
-  - Migra los targets `a54x-A546BXXSLFZG3` y `a54x-A546EXXSKFZF4` (SoC Exynos 1380 / `s5e8835`) hacia `SLIDE_ROUTE_FPSIMD`.
-- **Commit `b7a854e` (2026-09-01, por `Hameed Musharaf K`)**: *"V4: FPSIMD route fully working on gts9fewifi-X510XXSEEZG3"*.
-  - Adapta y valida la ruta FPSIMD para la Galaxy Tab S9 FE Wi-Fi (`SM-X510`), reportando éxito de ejecución en el intento 1/8.
+### 1.4 Historical Evolution in the Repository
+- **Commit `529d88a` (2026-08-19, by `zainarbani`)**: *"Add fpsimd route & refactor"*.
+  - Introduces `src/fpsimd.c` and defines `SLIDE_ROUTE_FPSIMD 2`.
+  - Retires exclusive dependency on multicast sockets (`setsockopt` / `IP_MSFILTER`) and `pselect6`.
+- **Commit `0062f3d` (2026-08-28, by `zainarbani`)**: *"Switch to fpsimd route"*.
+  - Migrates targets `a54x-A546BXXSLFZG3` and `a54x-A546EXXSKFZF4` (Exynos 1380 SoC / `s5e8835`) to `SLIDE_ROUTE_FPSIMD`.
+- **Commit `b7a854e` (2026-09-01, by `Hameed Musharaf K`)**: *"V4: FPSIMD route fully working on gts9fewifi-X510XXSEEZG3"*.
+  - Adapts and validates the FPSIMD route for Galaxy Tab S9 FE Wi-Fi (`SM-X510`), reporting execution success on attempt 1/8.
 
-### 1.5 Diagnóstico de Naturaleza: ¿Hardware, Kernel o Build?
-- **Nivel de Dependencia**: **Arquitectura de CPU / Subsistema de Señales de Kernel**.
-- **Justificación**:
-  - No depende de un offset arbitrario de firmware; se basa en la ABI pública de señales de ARM64 (`asm/sigcontext.h`).
-  - Se adoptó en dispositivos Exynos 1380 debido a que las políticas estrictas de SELinux en Android restringen ciertas llamadas a sockets de red (`mcast`), mientras que la entrega de señales y el manejo de registros FP/SIMD son operaciones completamente estándar para cualquier hilo en espacio de usuario.
-  - **Relevancia para EZE4**: Dado que EZE4 comparte la misma arquitectura ARM64 v8.2-A y el mismo kernel 5.15 con la misma convención de llamadas de señales, la ruta `SLIDE_ROUTE_FPSIMD` es conceptualmente idéntica entre ZG3 y EZE4.
+### 1.5 Nature Diagnostic: Hardware, Kernel, or Build?
+- **Dependency Level**: **CPU Architecture / Kernel Signal Subsystem**.
+- **Justification**:
+  - Does not depend on an arbitrary firmware offset; relies on the public ARM64 signal ABI (`asm/sigcontext.h`).
+  - Adopted on Exynos 1380 devices because strict SELinux policies on Android restrict certain network socket calls (`mcast`), whereas signal delivery and FP/SIMD register handling are completely standard operations for any user-space thread.
+  - **Relevance for EZE4**: Since EZE4 shares the same ARM64 v8.2-A architecture and the same 5.15 kernel with the same signal calling conventions, the `SLIDE_ROUTE_FPSIMD` route is conceptually identical between ZG3 and EZE4.
 
 ---
 
 ## 2. Macro: `PRODUCTION_STACK_PI_RIGHT_ONLY`
 
-### 2.1 Declaración y Definición
-- En `src/targets/gts9fewifi-X510XXSEEZG3/target.h`:
+### 2.1 Declaration and Definition
+- In `src/targets/gts9fewifi-X510XXSEEZG3/target.h`:
   ```c
   #define PRODUCTION_STACK_PI_RIGHT_ONLY 0
   ```
-- En otros targets (`a54x-A546BXXSLFZG3`, `e1s-S921BXXSFDZE1`, `e2s-S926BXXUEDZDR`):
+- In other targets (`a54x-A546BXXSLFZG3`, `e1s-S921BXXSFDZE1`, `e2s-S926BXXUEDZDR`):
   ```c
   #define PRODUCTION_STACK_PI_RIGHT_ONLY 1
   ```
 
-### 2.2 Código que Controla
-Esta macro modula el armado del árbol rojo-negro (rbtree) del waiter simulado en las rutinas de copia (`fpsimd.c`, `mcast.c`, `pselect.c`):
+### 2.2 Controlled Code
+This macro modulates assembling the simulated waiter's red-black tree (rbtree) in copy routines (`fpsimd.c`, `mcast.c`, `pselect.c`):
 
 ```c
-/* En src/fpsimd.c, src/mcast.c, src/pselect.c */
+/* In src/fpsimd.c, src/mcast.c, src/pselect.c */
 #if defined(PRODUCTION_STACK_PI_RIGHT_ONLY) && PRODUCTION_STACK_PI_RIGHT_ONLY
   if (slide_oracle_parent == fake_fops &&
       slide_oracle_target == data_addr(ASHMEM_MISC_FOPS)) {
@@ -95,27 +95,27 @@ Esta macro modula el armado del árbol rojo-negro (rbtree) del waiter simulado e
 #endif
 ```
 
-Cuando `PRODUCTION_STACK_PI_RIGHT_ONLY` está definido en `0` (como en el target `gts9fewifi-X510XXSEEZG3`):
-- Se mantiene la asignación por defecto:
+When `PRODUCTION_STACK_PI_RIGHT_ONLY` is defined as `0` (as in target `gts9fewifi-X510XXSEEZG3`):
+- Default assignment is maintained:
   - `tree_left = slide_oracle_target;`
   - `tree_right = 0;`
   - `pi_parent = slide_oracle_parent;`
-  - `pi_left = 0;` *(corrección incorporada en el commit b7a854e: "pi_left=NULL fix in fpsimd.c")*
+  - `pi_left = 0;` *(fix incorporated in commit b7a854e: "pi_left=NULL fix in fpsimd.c")*
   - `pi_right = 0;`
 
-### 2.3 Estructuras y Características del Kernel Involucradas
-- **Estructura del Árbol de Prioridad (`struct rb_node` en `struct rt_mutex_waiter`)**:
-  - En el subsistema de cerrojos con herencia de prioridad, los waiters se ordenan en un árbol rojo-negro según su prioridad y su dirección de memoria.
-  - Al insertar un nodo simulado en la estructura del cerrojo, el algoritmo compara la clave/dirección del nodo padre (`rb_parent`) con el nodo a insertar (`slide_oracle_target`).
-  - Dependiendo de si la dirección virtual relativa del símbolo objetivo (como `ASHMEM_MISC_FOPS`) es mayor o menor que el nodo padre en el espacio virtual del kernel, el hijo debe situarse estrictamente en la rama izquierda (`rb_left`) o en la rama derecha (`rb_right`).
+### 2.3 Kernel Structures and Features Involved
+- **Priority Tree Structure (`struct rb_node` in `struct rt_mutex_waiter`)**:
+  - In the priority inheritance locking subsystem, waiters are ordered in a red-black tree according to their priority and memory address.
+  - When inserting a simulated node into the lock structure, the algorithm compares the key/address of the parent node (`rb_parent`) with the node to insert (`slide_oracle_target`).
+  - Depending on whether the relative virtual address of the target symbol (such as `ASHMEM_MISC_FOPS`) is greater than or less than the parent node in kernel virtual address space, the child must be situated strictly on the left branch (`rb_left`) or right branch (`rb_right`).
 
-### 2.4 Justificación de `0` en Galaxy Tab S9 FE (ZG3)
-- En terminales móviles como el Galaxy S24 (`e1s`) o Galaxy S24+ (`e2s`), la ubicación de las variables de fops y tablas dinámicas en el espacio virtual exigía vincular la rama derecha (`PRODUCTION_STACK_PI_RIGHT_ONLY 1`).
-- En la Galaxy Tab S9 FE (`SM-X510`), el autor del target descubrió empíricamente que para este binario concreto de kernel (`ZG3`), la inserción sólo es válida orientada hacia la rama izquierda (`tree_left = slide_oracle_target`), obligando a fijar `PRODUCTION_STACK_PI_RIGHT_ONLY 0`.
+### 2.4 Justification of `0` on Galaxy Tab S9 FE (ZG3)
+- On mobile devices such as Galaxy S24 (`e1s`) or Galaxy S24+ (`e2s`), the location of fops variables and dynamic tables in virtual address space required linking the right branch (`PRODUCTION_STACK_PI_RIGHT_ONLY 1`).
+- On Galaxy Tab S9 FE (`SM-X510`), the target author discovered empirically that for this specific kernel binary (`ZG3`), insertion is only valid oriented toward the left branch (`tree_left = slide_oracle_target`), requiring setting `PRODUCTION_STACK_PI_RIGHT_ONLY 0`.
 
-### 2.5 Diagnóstico de Naturaleza: ¿Hardware, Kernel o Build?
-- **Nivel de Dependencia**: **Layout Virtual del Kernel / Firmware Build**.
-- **Justificación**:
-  - Depende directamente de la dirección virtual relativa de los símbolos en la imagen del kernel (`System.map`) y de las decisiones del enlazador (LLD) sobre el ordenamiento de secciones `.data` y `.rodata`.
-  - **Relevancia para EZE4**: En la Sección 4 de la auditoría preliminar, se demostró que las direcciones virtuales y desplazamientos de símbolos en EZE4 difieren sustancialmente de ZG3 (por ejemplo, `init_task` se desplazó de `0x239fd80` a `0x233f0c0`, y `kmalloc_caches` de `0x1b04c70` a `0x1ab9250`).
-  - Por lo tanto, si en EZE4 la relación de orden entre las direcciones virtuales de los nodos padre e hijo difiere, esta macro no puede heredarse a ciegas y requerirá una validación estática rigurosa de las direcciones relativas del `System.map` de EZE4.
+### 2.5 Nature Diagnostic: Hardware, Kernel, or Build?
+- **Dependency Level**: **Kernel Virtual Layout / Firmware Build**.
+- **Justification**:
+  - Directly depends on the relative virtual address of symbols in the kernel image (`System.map`) and linker (LLD) decisions on `.data` and `.rodata` section ordering.
+  - **Relevance for EZE4**: In Section 4 of the preliminary audit, virtual addresses and symbol offsets in EZE4 were shown to differ substantially from ZG3 (for example, `init_task` shifted from `0x239fd80` to `0x233f0c0`, and `kmalloc_caches` from `0x1b04c70` to `0x1ab9250`).
+  - Therefore, if the ordering relationship between parent and child node virtual addresses differs in EZE4, this macro cannot be inherited blindly and requires rigorous static validation of relative addresses from the EZE4 `System.map`.

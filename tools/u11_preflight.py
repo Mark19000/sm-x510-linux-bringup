@@ -429,9 +429,9 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
          if reproducible else "falta comparación válida de dos runs limpios del perfil fijo"),
         str(repro_path.relative_to(root)) if repro_path.exists() else None,
     )
-    audit.add("exact_eze4_source", "WARN", "la solicitud OSRC X510XXUCEZE4 está pendiente; U11 no es U12/EZE4")
-    audit.add("hardware_observation", "WARN", "sin consola ni prueba física; M2/M3 no observados")
-    audit.add("physical_write_gate", "WARN", "NO-GO: este informe nunca autoriza flash, firma ni downgrade")
+    audit.add("exact_eze4_source", "WARN", "OSRC X510XXUCEZE4 request is pending; U11 is not U12/EZE4")
+    audit.add("hardware_observation", "WARN", "no console or physical testing; M2/M3 not observed")
+    audit.add("physical_write_gate", "WARN", "NO-GO: this report never authorizes flashing, signing, or downgrade")
 
     offline_ids = (
         "identity_separation", "osrc_hashes", "build_hashes", "build_identity",
@@ -464,34 +464,34 @@ def markdown(result: dict[str, object]) -> str:
     gates = result["gates"]
     profiles = result["initramfs_profiles"]
     lines = [
-        "# Preflight offline U11 para M2/M3",
+        "# U11 Offline Preflight for M2/M3",
         "",
-        "Este informe comprueba coherencia offline. **Nunca autoriza escribir en la tablet.**",
+        "This report verifies offline consistency. **It never authorizes writing to the tablet.**",
         "",
-        "## Veredicto",
+        "## Verdict",
         "",
-        f"- análisis offline U11: `{'READY' if gates['offline_u11_analysis_ready'] else 'NOT READY'}`",
-        f"- payload M3: `{'READY' if gates['m3_payload_ready'] else 'NOT READY'}`",
-        f"- M2 observado en hardware: `{str(gates['m2_observed']).lower()}`",
-        f"- M3 observado en hardware: `{str(gates['m3_observed']).lower()}`",
-        f"- escritura física: `{gates['physical_write']}`",
+        f"- U11 offline analysis: `{'READY' if gates['offline_u11_analysis_ready'] else 'NOT READY'}`",
+        f"- M3 payload: `{'READY' if gates['m3_payload_ready'] else 'NOT READY'}`",
+        f"- M2 observed on hardware: `{str(gates['m2_observed']).lower()}`",
+        f"- M3 observed on hardware: `{str(gates['m3_observed']).lower()}`",
+        f"- physical write: `{gates['physical_write']}`",
         "",
-        "## Initramfs frente a init_boot EZE4",
+        "## Initramfs vs EZE4 init_boot",
         "",
-        "| perfil | módulos | LZ4 (B) | margen (B) | cabe |",
+        "| profile | modules | LZ4 (B) | margin (B) | fits |",
         "|---|---:|---:|---:|---|",
     ]
     for name in ("minimal", "ufs", "usb"):
         item = profiles[name]
-        lines.append(f"| `{name}` | {item['module_count']} | {item['bytes']} | {item['margin']} | {'sí' if item['fits'] else 'no'} |")
-    lines.extend(("", "## Comprobaciones", "", "| estado | comprobación | detalle |", "|---|---|---|"))
+        lines.append(f"| `{name}` | {item['module_count']} | {item['bytes']} | {item['margin']} | {'yes' if item['fits'] else 'no'} |")
+    lines.extend(("", "## Checks", "", "| status | check | detail |", "|---|---|---|"))
     for item in result["checks"]:
         lines.append(f"| `{item['status']}` | `{item['id']}` | {item['detail']} |")
     lines.extend((
-        "", "## Cómo leer el resultado", "",
-        "`READY` sólo significa que los insumos offline son coherentes entre sí. Los estados",
-        "DTS incompletos, la falta de source EZE4 exacto y la",
-        "ausencia de observación física mantienen la puerta de escritura en `NO-GO`.", "",
+        "", "## How to Read the Result", "",
+        "`READY` only means that offline inputs are consistent with each other. Incomplete",
+        "DTS states, lack of exact EZE4 source, and the",
+        "absence of physical observation keep the write gate at `NO-GO`.", "",
     ))
     return "\n".join(lines)
 

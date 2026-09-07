@@ -1,38 +1,35 @@
-# 12. Preflight de la primera prueba física
+# 12. Preflight for First Physical Hardware Boot Test
 
-## Veredicto actual: NO-GO
+## Current Verdict: NO-GO
 
-Los artefactos de referencia sirven para el laboratorio offline, pero **no se
-deben flashear**. La puerta no se abre porque “caben” o porque compilan; se abre
-sólo cuando todas las evidencias de identidad, recuperación, observabilidad y
-autenticidad están completas.
+Reference artifacts serve offline lab validation, but **must not be flashed**. The gate does not open simply because payloads fit within partition size budgets or compile cleanly; it opens only when all evidence regarding identity, recovery, observability, and authenticity is complete.
 
-| Puerta | Evidencia actual | Estado |
+| Gate | Current Evidence | Status |
 |---|---|---|
-| modelo/firmware | SM-X510, EUX/OXM, X510XXUCEZE4, U12 | completa |
-| copia oficial | ZIP y particiones extraídas con hashes | completa |
-| formato | boot/init_boot/vendor_boot v4 medidos | completa |
-| build offline | Image, DTB/DTBO, 282 módulos, initramfs | completa |
-| integridad del empaquetado | round trip byte a byte | completa |
-| AVB stock | firma RSA4096 y digest verifican | completa |
-| AVB candidato | digest no coincide, como era previsible | **bloquea** |
-| fuente kernel EZE4 | sólo existe referencia U3 conocida | **bloquea** |
-| revisión efectiva | tabla r00/r01/r04 conocida, elección física no | **bloquea** |
-| consola observable | UART/USB/pstore sin validar en la unidad | **bloquea** |
-| desbloqueo/Knox | estado y consecuencias no aceptados/registrados | **bloquea** |
-| restauración ensayada | firmware disponible, procedimiento no probado | **bloquea** |
+| Model / Firmware | SM-X510, EUX/OXM, X510XXUCEZE4, U12 | Complete |
+| Official Stock Package | Complete firmware ZIP and extracted partitions with hashes | Complete |
+| Image Formats | Android v4 boot, init_boot, and vendor_boot measured | Complete |
+| Offline Build Pipeline | Image, DTB, DTBOs, 282 modules, initramfs profiles | Complete |
+| Packaging Integrity | Byte-identical unpack/repack round trip verified | Complete |
+| Stock AVB | RSA4096 signature and partition digests verify | Complete |
+| Candidate AVB | Digest mismatch detected, as expected | **BLOCKS** |
+| EZE4 Kernel Source | Only known U3 reference exists | **BLOCKS** |
+| Effective Hardware Revision | r00/r01/r04 table known, physical choice unobserved | **BLOCKS** |
+| Observable Console | UART/USB/pstore unvalidated on physical unit | **BLOCKS** |
+| Bootloader Unlock / Knox | State and consequences not accepted / recorded by owner | **BLOCKS** |
+| Restored Recovery Procedure | Firmware available, flashing restore unvalidated | **BLOCKS** |
 
-Un único `bloquea` mantiene el veredicto NO-GO.
+A single `BLOCKS` maintains the overall `NO-GO` verdict.
 
-## Recogida segura y de sólo lectura
+## Safe Read-Only Diagnostic Collection
 
-Con Android arrancado y depuración USB autorizada:
+With stock Android running and USB debugging authorized:
 
 ```sh
 ./scripts/collect-device.sh
 ```
 
-Después revisa, no sólo recolectes:
+Review results thoroughly:
 
 ```sh
 sed -n '1,120p' reports/device-*/identity.txt
@@ -41,14 +38,11 @@ sed -n '1,220p' reports/device-*/partitions-by-name.txt
 file reports/device-*/running.dtb
 ```
 
-Debes confirmar otra vez `SM-X510`, `X510XXUCEZE4`, bootloader U12 y EUX. Si
-`running.dtb` está vacío por permisos de Android, se anota como dato ausente; no
-se adivina el overlay.
+Re-confirm `SM-X510`, `X510XXUCEZE4`, U12 bootloader, and EUX CSC. If `running.dtb` is empty due to Android security permissions, record it as missing data; do not guess the active overlay.
 
-No uses en esta fase `adb root`, `dd`, escrituras a `/dev/block`, cambios de
-slot, Odin/Heimdall ni comandos de reboot a modos de actualización.
+Do not use `adb root`, `dd`, direct writes to `/dev/block`, slot changes, Odin/Heimdall, or reboot commands into download/recovery mode during this phase.
 
-## Evidencia offline que debe pasar en cada build
+## Offline Evidence Required for Every Build
 
 ```sh
 make test
@@ -60,11 +54,9 @@ DIST=artifacts/kernel/wifi/reference-dist
 ./scripts/verify-avb-candidates.sh
 ```
 
-El último comando **debe** decir dos cosas a la vez: stock válido y candidato
-rechazado por digest. Que un candidato AVB-inválido sea rechazado es una prueba
-del verificador, no una autorización para desactivar AVB.
+The final command **must** report two things simultaneously: stock passes verification, and candidate is rejected by digest. Rejecting an AVB-invalid candidate proves the validator works; it does not authorize disabling AVB verification.
 
-Registra además:
+Also record:
 
 ```sh
 cat "$DIST/BUILD-METADATA"
@@ -72,60 +64,46 @@ cat artifacts/stock/boot-layout.json
 cat artifacts/candidates/reference/SHA256SUMS
 ```
 
-## Condiciones necesarias antes de diseñar un intento
+## Mandatory Conditions Prior to Designing a Boot Attempt
 
-1. Obtener y comparar el código OSRC correspondiente a EZE4, o justificar cada
-   divergencia que afecte DT/Kconfig/ABI. La referencia U3 no cumple esta puerta.
-2. Identificar la revisión/overlay de la unidad mediante evidencia del
-   bootloader o DT efectivo.
-3. Documentar el estado real de OEM Unlock, el borrado de datos y la posible
-   alteración irreversible de Knox. La decisión corresponde al propietario.
-4. Disponer de una ruta de restauración oficial compatible con U12, alimentación
-   estable, cable fiable y otro equipo desde el que recuperarla.
-5. Tener una salida observable anterior a UFS: consola válida, USB ACM probado
-   en esa ruta o almacenamiento persistente de logs entendido.
-6. Resolver AVB con el flujo admitido por un bootloader legítimamente
-   desbloqueado. No usar claves Samsung inexistentes, imágenes “vbmeta disable”
-   de terceros ni downgrade.
-7. Definir qué única variable cambia y cuál es el criterio temporal de aborto.
+1. Obtain and compare the exact OSRC source corresponding to EZE4, or formally justify every divergence affecting DT, Kconfig, and ABI. The U3 reference does not satisfy this gate.
+2. Identify the active hardware revision and overlay of the physical unit via bootloader diagnostic evidence or runtime Device Tree.
+3. Document the actual OEM Unlock state, data wipe implications, and potential permanent Knox alteration. The decision belongs exclusively to the device owner.
+4. Establish an official restoration path compatible with U12, stable external power, reliable cabling, and a secondary host system prepared for emergency recovery.
+5. Secure an observable output channel prior to UFS initialization: verified serial console, pre-tested USB ACM gadget, or proven persistent crash logging.
+6. Resolve AVB through the legitimate workflow supported by an unlocked bootloader. Do not fabricate Samsung signing keys, flash third-party "vbmeta disable" hacks, or attempt bootloader downgrade.
+7. Explicitly define the single variable being modified and the temporal abort criteria.
 
-## Diseño del primer intento cuando todas las puertas estén verdes
+## First Attempt Design Once All Gates Pass
 
-El primer objetivo será únicamente M2/M3: mensaje temprano y ejecución de
-`/init`. Debe usar el initramfs `MODULES_MODE=none`, sin raíz persistente y sin
-drivers de carga experimentales. UFS, pantalla y Wi-Fi no forman parte de la
-prueba inicial.
+The initial test target is strictly milestone M2/M3: early kernel banner and execution of `/init`. It must use initramfs `MODULES_MODE=none`, no persistent root, and no experimental charging drivers. UFS storage, graphical display, and Wi-Fi are outside the scope of the initial test.
 
-Antes de cualquier escritura futura crea una ficha inmutable:
+Before any future hardware write, create an immutable attempt record:
 
 ```text
-ID del intento:
-Fecha UTC:
-Modelo/AP/CSC/bootloader/hwrev:
-Hash firmware oficial:
-Commit fuente exacta y patchset_sha256:
-SHA Image, DTB, DTBO, CPIO e imagen contenedora:
-Resultado de AVB y política del bootloader:
-Canal de consola y prueba previa:
-Procedimiento de restauración y equipo disponible:
-Único cambio:
-Timeout y condición de aborto:
+Attempt ID:
+UTC Date/Time:
+Model / AP / CSC / Bootloader / Hw-Rev:
+Official Stock Firmware Hash:
+Exact Source Commit and patchset_sha256:
+SHA-256 for Image, DTB, DTBO, CPIO, and Container Image:
+AVB Result and Bootloader Policy:
+Console Channel and Preflight Test:
+Restoration Runbook and Available Host Machine:
+Single Variable Changed:
+Timeout and Abort Condition:
 ```
 
-Tras el intento se adjunta el log bruto aunque esté vacío. Un reinicio sin log
-no demuestra que “el kernel no funciona”; sólo localiza el fallo antes del
-primer canal observable.
+Following the attempt, attach the raw console log even if empty. A silent reboot without output does not prove "the kernel fails to execute"; it simply isolates the failure to before the first observable output channel.
 
-## Señales de parada inmediata
+## Immediate Stop Triggers
 
-- el modelo, AP, CSC, binario o tamaño no coincide;
-- aparece cualquier intención de bajar U12 a U3;
-- el archivo no tiene el hash anotado en la ficha;
-- el verificador AVB falla por una razón distinta a la esperada;
-- no existe copia oficial/restauración o se depende de una descarga posterior;
-- la tablet está caliente, con batería inestable o sin alimentación fiable;
-- se propone probar simultáneamente kernel, DTBO, vbmeta y rootfs nuevos.
+- Model, AP, CSC, binary counter, or partition sizing mismatches;
+- Any proposal to downgrade bootloader from U12 to U3;
+- File hashes diverging from values recorded in the attempt sheet;
+- AVB verification failing for an unexpected reason;
+- Missing local stock recovery firmware or reliance on future internet downloads during recovery;
+- Tablet running hot, unstable battery voltage, or lacking stable external power;
+- Proposal to test new kernel, DTBO, vbmeta, and rootfs simultaneously.
 
-Ante cualquiera de estas condiciones se vuelve al análisis offline. Parar en
-preflight es un resultado correcto: evita convertir una incógnita técnica en
-una pérdida de datos o un dispositivo no recuperable.
+Encountering any of these conditions requires an immediate return to offline analysis. Stopping during preflight is a successful safety outcome: it prevents turning a technical unknown into data loss or a non-recoverable device brick.

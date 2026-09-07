@@ -1,6 +1,6 @@
-# Diferencias entre revisiones de placa
+# Board Revision Differences
 
-Resumen de `diff --stat` respecto a r04 (no implica que r04 sea tu hardware):
+Summary of `diff --stat` against r04 (does not imply that r04 is your hardware):
 
 ```text
 r00 -> r04

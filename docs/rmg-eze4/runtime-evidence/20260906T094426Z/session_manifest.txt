@@ -1,0 +1,54 @@
+SESSION_ID=20260906T094426Z
+HOST_TIMESTAMP_UTC=2026-09-06T09:44:26Z
+OBSERVER=CODEX
+OBSERVATION_MODE=STOCK_NON_INVASIVE
+GIT_COMMIT=ab7b76e17ba0f67000a5889c7147685401b0065a
+GIT_STATUS_BEGIN
+ M PROJECT_STATUS.md
+ M README.md
+ M docs/boot-chain/avb-experiment-plan.md
+ M docs/boot-chain/minimal-modification-set.md
+ M docs/first-boot-experiment-plan-v2.md
+ M docs/first-boot-experiment-plan.md
+ M reports/2026-08-24-preflight-validation.md
+?? audit/
+?? configs/eze4-patches.sha256
+?? configs/eze4-x510xxuceze4.env
+?? docs/architecture/
+?? docs/boot-chain/eze4-avb-trust-graph.md
+?? docs/boot-chain/first-custom-kernel-experiment.md
+?? docs/boot-chain/minimum-first-boot-image-set.md
+?? docs/boot-chain/unlock-evidence-matrix.md
+?? docs/decisions/
+?? docs/hardware/download-mode-capture-checklist.md
+?? docs/hardware/evidence/
+?? docs/hardware/post-unlock-stock-baseline.md
+?? docs/hardware/recovery-readiness-v2.md
+?? docs/hardware/recovery-runbook.md
+?? docs/migration/
+?? docs/rmg-eze4/
+?? patches/downstream/eze4/
+?? reports/2026-09-05-adversarial-first-boot-review.md
+?? reports/2026-09-05-hardware-preflight-v2.md
+?? reports/2026-09-05-pre-unlock-closure.md
+?? reports/2026-09-05-pre-unlock-errata-audit.md
+?? reports/2026-09-05-sm-x510-u12-bootloader-unlock-investigation.md
+?? reports/eze4-source-intake/
+?? reports/eze4-validation/
+?? scratch/
+?? scripts/build-eze4-baseline-guest.sh
+?? scripts/build-eze4-in-lima.sh
+?? scripts/compare-build-runs.py
+?? scripts/verify-eze4-abi.py
+?? tests/test_eze4_pipeline.py
+?? tools/rmg-eze4/
+GIT_STATUS_END
+ADB_VERSION_BEGIN
+Android Debug Bridge version 1.0.41
+Version 37.0.1-15733141
+Installed as /opt/homebrew/bin/adb
+Running on Darwin 27.0.0 (arm64)
+ADB_VERSION_END
+DEVICE_SERIAL=UNAVAILABLE
+DEVICE_SERIAL_CONFIRMED=R52XB02QQPD
+BASELINE_CONFIRMED_UTC=2026-09-06T09:45:24Z

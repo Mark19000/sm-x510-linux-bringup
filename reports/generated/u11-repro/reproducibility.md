@@ -1,9 +1,9 @@
-# Reproducibilidad del build U11 fijo
+# Reproducibility of Fixed U11 Build
 
-- resultado: `PASS`
-- primer run: `x510xxsbdzb4-u11-fixed8-20260823` (19 ficheros)
-- segundo run: `x510xxsbdzb4-u11-fixed9-20260823` (19 ficheros)
-- escritura física: `NO-GO`
+- result: `PASS`
+- first run: `x510xxsbdzb4-u11-fixed8-20260823` (19 files)
+- second run: `x510xxsbdzb4-u11-fixed9-20260823` (19 files)
+- physical write: `NO-GO`
 
-Todos los ficheros publicados, incluido el tar reproducible con los 282
-módulos, son idénticos byte a byte entre dos árboles limpios.
+All published files, including the reproducible tar with the 282
+modules, are byte-for-byte identical between two clean trees.

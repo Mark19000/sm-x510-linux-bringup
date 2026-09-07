@@ -1,54 +1,54 @@
-# Errata Técnico de Fase 2A: Desplazamientos de `task_struct` en `remove_waiter()`
+# Phase 2A Technical Errata: task_struct Offsets in remove_waiter()
 
-- **Documento Corregido**: `docs/rmg-eze4/stock_rtmutex_binary_verification.md` (Sección 5, punto 4)
-- **Fecha de Errata**: 2026-09-06
-- **Alcance**: Corrección de la atribución del operando `#2208` en el desensamblado del binario stock EZE4 (`Image.stock`) y resolución formal de los miembros situados en `0x8a0` y `0x8a8`.
+- **Corrected Document**: `docs/rmg-eze4/stock_rtmutex_binary_verification.md` (Section 5, item 4)
+- **Errata Date**: 2026-09-06
+- **Scope**: Correction of operand attribution `#2208` in stock EZE4 binary disassembly (`Image.stock`) and formal resolution of members located at `0x8a0` and `0x8a8`.
 
 ---
 
-## 1. Identificación del Error en Fase 2A
+## 1. Identification of Error in Phase 2A
 
-En el informe de Fase 2A, la Sección 5 afirmaba:
+In the Phase 2A report, Section 5 stated:
 > *"4. `TASK_STRUCT_PI_TOP_TASK_OFF`: `0x8a8` (decimal 2208 + 8). Evidencia: `ldr x8, [x21, #2208]` en `0xffffffc009150734` y `0xffffffc009150748`."*
 
-### Error Matemático y Semántico:
-- **Conversión Base**: $2208_{10} = \mathbf{0x8a0}_{16}$ (exacto), **no** `0x8a8`.
-- **Interpretación Errónea**: La instrucción `ldr x8, [x21, #2208]` no estaba accediendo al puntero `pi_top_task`, sino a otro miembro específico de la estructura.
-- **Acción Correctiva**: No propagar dicha atribución y determinar mediante Ground Truth (BTF / DWARF) la asignación precisa de los offsets `0x8a0` y `0x8a8`.
+### Mathematical and Semantic Error:
+- **Base Conversion**: $2208_{10} = \mathbf{0x8a0}_{16}$ (exact), **not** `0x8a8`.
+- **Erroneous Interpretation**: The `ldr x8, [x21, #2208]` instruction was not accessing the `pi_top_task` pointer, but another specific member of the structure.
+- **Corrective Action**: Do not propagate this attribution, and determine via Ground Truth (BTF / DWARF) the precise assignment of offsets `0x8a0` and `0x8a8`.
 
 ---
 
-## 2. Resolución Mediante BTF y DWARF (`vmlinux` EZE4)
+## 2. Resolution via BTF and DWARF (EZE4 `vmlinux`)
 
-La inspección de la estructura `struct task_struct` (Type ID 462) en el BTF y DWARF del kernel EZE4 revela la siguiente disposición física contigua:
+Inspection of `struct task_struct` (Type ID 462) in BTF and DWARF of the EZE4 kernel reveals the following contiguous physical layout:
 
 ```
-/* Offset Decimal */  /* Offset Hex */  /* Tipo y Miembro */
+/* Decimal Offset */  /* Hex Offset */  /* Type and Member */
 2176                  0x880              spinlock_t alloc_lock; (size: 4)
 2180                  0x884              raw_spinlock_t pi_lock; (size: 4)
 2184                  0x888              struct wake_q_node wake_q; (size: 8)
 2192                  0x890              int wake_q_count; (size: 4)
-                      [Hueco de alineación de 4 bytes]
+                      [4-byte alignment hole]
 2200                  0x898              struct rb_root_cached pi_waiters; (size: 16)
 2216                  0x8a8              struct task_struct *pi_top_task; (size: 8)
 2224                  0x8b0              struct rt_mutex_waiter *pi_blocked_on; (size: 8)
 ```
 
-### Desglose Interno de `struct rb_root_cached` (Type ID 496):
-El campo `pi_waiters` no es un puntero simple, sino una estructura de 16 bytes que optimiza el árbol rojo-negro reteniendo un puntero directo al nodo de mayor prioridad (`rb_leftmost`):
+### Internal Breakdown of `struct rb_root_cached` (Type ID 496):
+The `pi_waiters` field is not a simple pointer, but a 16-byte structure optimizing the red-black tree by retaining a direct pointer to the highest priority node (`rb_leftmost`):
 
 ```c
 struct rb_root_cached {
-    struct rb_root rb_root;     /* Offset +0 (en task_struct: 2200 / 0x898), size: 8 */
-    struct rb_node *rb_leftmost;/* Offset +8 (en task_struct: 2208 / 0x8a0), size: 8 */
+    struct rb_root rb_root;     /* Offset +0 (in task_struct: 2200 / 0x898), size: 8 */
+    struct rb_node *rb_leftmost;/* Offset +8 (in task_struct: 2208 / 0x8a0), size: 8 */
 };
 ```
 
 ---
 
-## 3. Asignación Definitiva de Offsets
+## 3. Definitive Offset Assignment
 
-| Offset Decimal | Offset Hexadecimal | Miembro en `struct task_struct` | Tipo de Dato | Tamaño |
+| Decimal Offset | Hex Offset | Member in `struct task_struct` | Data Type | Size |
 | :---: | :---: | :--- | :--- | :---: |
 | **2200** | **`0x898`** | `pi_waiters.rb_root` | `struct rb_root` (`struct rb_node *`) | 8 bytes |
 | **2208** | **`0x8a0`** | `pi_waiters.rb_leftmost` | `struct rb_node *` | 8 bytes |
@@ -57,24 +57,24 @@ struct rb_root_cached {
 
 ---
 
-## 4. Reinterpretación del Desensamblado de `Image.stock`
+## 4. Reinterpretation of `Image.stock` Disassembly
 
-En la función `remove_waiter()` del binario de fábrica:
-- `x21` almacena el puntero `owner` (`struct task_struct *`).
-- En la línea `ffffffc009150734`:
+In factory binary function `remove_waiter()`:
+- `x21` stores the `owner` pointer (`struct task_struct *`).
+- At line `ffffffc009150734`:
   ```asm
   ffffffc009150734:  f94452a8  ldr  x8, [x21, #2208]
   ```
-  La instrucción desreferencia `owner->pi_waiters.rb_leftmost` (offset `0x8a0` / 2208), extrayendo el nodo del árbol rojo-negro que representa al waiter de mayor prioridad en la cola del propietario.
-- En la línea `ffffffc009150748`:
+  The instruction dereferences `owner->pi_waiters.rb_leftmost` (offset `0x8a0` / 2208), extracting the red-black tree node representing the highest priority waiter in the owner's queue.
+- At line `ffffffc009150748`:
   ```asm
   ffffffc009150748:  f90452a0  str  x0, [x21, #2208]
   ```
-  La instrucción actualiza `owner->pi_waiters.rb_leftmost = x0` tras la reorganización del árbol.
+  The instruction updates `owner->pi_waiters.rb_leftmost = x0` following tree reorganization.
 
-### Estado de `TASK_STRUCT_PI_TOP_TASK_OFF`:
-- La macro en el target ZG3 define:
+### Status of `TASK_STRUCT_PI_TOP_TASK_OFF`:
+- The macro in target ZG3 defines:
   ```c
   #define FAKE_TASK_PI_TOP_TASK_OFF 0x8a8
   ```
-- **Conclusión**: El valor `0x8a8` para `pi_top_task` es **completamente correcto** en EZE4 (offset 2216). El error de Fase 2A fue únicamente citar `#2208` (`0x8a0`) como prueba de `0x8a8`, cuando `#2208` corresponde a `pi_waiters.rb_leftmost`.
+- **Conclusion**: The value `0x8a8` for `pi_top_task` is **completely correct** on EZE4 (offset 2216). The error in Phase 2A was solely citing `#2208` (`0x8a0`) as evidence for `0x8a8`, when `#2208` corresponds to `pi_waiters.rb_leftmost`.

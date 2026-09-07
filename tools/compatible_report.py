@@ -63,19 +63,19 @@ def main() -> int:
     for compatible in sorted(counts):
         main_hits = mainline.get(compatible, [])
         vendor_hits = vendor.get(compatible, [])
-        status = "exacto" if main_hits else "ausente"
+        status = "exact" if main_hits else "absent"
         rows.append((compatible, counts[compatible], status, vendor_hits, main_hits))
 
-    exact = sum(1 for row in rows if row[2] == "exacto")
+    exact = sum(1 for row in rows if row[2] == "exact")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as output:
-        output.write("# Compatibles DT: downstream frente a mainline\n\n")
-        output.write("Informe mecánico: una coincidencia sólo significa que la cadena aparece "
-                     "en el checkout; no demuestra compatibilidad eléctrica ni funcional.\n\n")
-        output.write(f"- Cadenas únicas: {len(rows)}\n")
-        output.write(f"- Coincidencia textual exacta en mainline: {exact}\n")
-        output.write(f"- Sin coincidencia exacta: {len(rows) - exact}\n\n")
-        output.write("| compatible | usos DT | mainline | ejemplo vendor | ejemplo mainline |\n")
+        output.write("# DT Compatibles: Downstream vs Mainline\n\n")
+        output.write("Mechanical report: a match only means the string appears "
+                     "in the checkout; it does not demonstrate electrical or functional compatibility.\n\n")
+        output.write(f"- Unique strings: {len(rows)}\n")
+        output.write(f"- Exact textual match in mainline: {exact}\n")
+        output.write(f"- Without exact match: {len(rows) - exact}\n\n")
+        output.write("| compatible | DT uses | mainline | vendor example | mainline example |\n")
         output.write("|---|---:|---|---|---|\n")
         for compatible, uses, status, vendor_hits, main_hits in rows:
             output.write(
@@ -83,10 +83,9 @@ def main() -> int:
                 f"`{esc(vendor_hits[0]) if vendor_hits else '-'} ` | "
                 f"`{esc(main_hits[0]) if main_hits else '-'} ` |\n"
             )
-    print(f"{args.output}: {len(rows)} compatibles, {exact} coincidencias exactas")
+    print(f"{args.output}: {len(rows)} compatibles, {exact} exact matches")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

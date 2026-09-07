@@ -1,45 +1,45 @@
 # Independent Risk Review — First Boot Preparation
 
-Fecha: 2026-08-24  
-Objetivo: SM-X510 Wi-Fi, firmware físico `X510XXUCEZE4` / U12 / EZE4  
-Candidato actual: kernel OSRC U11 `X510XXSBDZB4`, Linux 5.15.180  
-Modo: revisión independiente de riesgos. Sólo lectura del repositorio. No se modificaron scripts, código ni imágenes.
+Date: 2026-08-24
+Target: SM-X510 Wi-Fi, physical firmware `X510XXUCEZE4` / U12 / EZE4
+Current candidate: OSRC U11 kernel `X510XXSBDZB4`, Linux 5.15.180
+Mode: independent risk review. Repository read-only. No scripts, code, or images were modified.
 
-## Resumen ejecutivo
+## Executive Summary
 
-El proyecto tiene una base documental fuerte y una puerta física coherente en **NO-GO**, pero la fase reciente introdujo tres riesgos importantes:
+The project has a strong documentary foundation and a coherent physical gate at **NO-GO**, but the recent phase introduced three important risks:
 
-1. **Contradicción operativa entre documentos**: `docs/hardware-observation-plan.md` todavía recomienda preparar `earlycon`, `ramoops` y caminos orientados al primer flasheo con un tono más avanzado que el veredicto vigente de `PROJECT_STATUS.md`, `docs/12-preflight-primera-prueba.md` y la auditoría ABI. Sin marcarlo explícitamente como documento antiguo, puede ser seguido por error.
+1. **Operational contradiction between documents**: `docs/hardware-observation-plan.md` still recommends preparing `earlycon`, `ramoops`, and paths oriented toward first flashing with a more advanced tone than the current verdict of `PROJECT_STATUS.md`, `docs/12-preflight-primera-prueba.md`, and the ABI audit. Without explicitly marking it as an old document, it could be followed in error.
 
-2. **El plan actual contiene una sintaxis inválida de `earlycon`**: propone `earlycon=samsung,0x13800000`, pero el driver auditable registra el nombre `exynos4210` para el compatible `samsung,exynos4210-uart`. Además, UART0 está `disabled`, usa modo USI v2 y depende de configuración previa del bootloader y pines físicos no demostrados. Por tanto, ausencia de UART no puede interpretarse como prueba de que el kernel no arrancó.
+2. **The current plan contains an invalid `earlycon` syntax**: it proposes `earlycon=samsung,0x13800000`, but the auditable driver registers the name `exynos4210` for compatible `samsung,exynos4210-uart`. Furthermore, UART0 is `disabled`, uses USI v2 mode, and depends on prior bootloader configuration and unproven physical pins. Therefore, absence of UART cannot be interpreted as proof that the kernel failed to boot.
 
-3. **La firma de módulos fue mal caracterizada en revisiones anteriores**: en el árbol U11 auditado, `CONFIG_MODULE_SIG_PROTECT=y` hace que la aplicación de `sig_enforce` se compile como `false`. Los módulos sin firma válida no son bloqueados por esa opción; se cargan con advertencia/taint. El bloqueante real sigue siendo vermagic, CRC de `MODVERSIONS`, diferencias binarias y CFI, especialmente frente a módulos stock U12.
+3. **Module signing was mischaracterized in previous reviews**: in the audited U11 tree, `CONFIG_MODULE_SIG_PROTECT=y` causes `sig_enforce` enforcement to compile as `false`. Modules lacking a valid signature are not blocked by this option; they load with a warning/taint. The true blocker remains vermagic, `MODVERSIONS` CRC, binary differences, and CFI, especially against stock U12 modules.
 
-No existe todavía una ruta de recuperación garantizada. El mejor camino disponible es restaurar el firmware oficial completo desde la copia local verificada mediante Download Mode, pero ese procedimiento no ha sido ensayado en esta unidad. El desbloqueo probablemente borra datos y puede activar de forma irreversible el Warranty Bit de Knox; las consecuencias exactas en este modelo y versión no están confirmadas.
+No guaranteed recovery path exists yet. The best available path is restoring complete official firmware from the verified local copy via Download Mode, but that procedure has not been rehearsed on this unit. Unlocking likely wipes data and may irreversibly trip the Knox Warranty Bit; exact consequences on this model and version remain unconfirmed.
 
-Mientras esas incertidumbres permanezcan abiertas, cualquier intento físico prematuro convertiría un problema reversible de ingeniería en un riesgo innecesario de pérdida de datos o de dispositivo.
+While these uncertainties remain open, any premature physical attempt would convert a reversible engineering problem into an unnecessary risk of data or device loss.
 
-## Hallazgos críticos
+## Critical Findings
 
-### C1 — Contradicción entre el plan antiguo y la puerta física vigente
+### C1 — Contradiction between legacy plan and active physical gate
 
-**Problema.**
+**Problem.**
 
-`docs/hardware-observation-plan.md` recomienda preparar:
+`docs/hardware-observation-plan.md` recommends preparing:
 
 - `earlycon=exynos4210,mmio32,0x13800000`;
-- reservar una región nueva para `ramoops`;
-- alternar imágenes experimentales;
-- usar señales USB/consumo para decidir si el kernel llegó a ejecutarse.
+- reserving a new region for `ramoops`;
+- alternating experimental images;
+- using USB signals/power draw to decide whether the kernel reached execution.
 
-En cambio, los documentos y auditorías más recientes establecen:
+In contrast, the most recent documents and audits establish:
 
-- `NO-GO` hasta validar desbloqueo, recuperación, observabilidad y política AVB;
-- no añadir `ramoops` ni memoria nueva;
-- priorizar `sec_debug`/DSS existente;
-- tratar consumo USB y enumeración como hipótesis por calibrar.
+- `NO-GO` until unlocking, recovery, observability, and AVB policy are validated;
+- do not add `ramoops` or new memory reservations;
+- prioritize existing `sec_debug`/DSS;
+- treat USB power consumption and enumeration as hypotheses to be calibrated.
 
-Evidencia principal:
+Primary evidence:
 
 - `docs/hardware-observation-plan.md`
 - `reports/2026-08-23-u11-eze4-binary-abi-audit.md`
@@ -47,76 +47,76 @@ Evidencia principal:
 - `reports/2026-08-24-crash-logging-audit-u11.md`
 - `docs/first-boot-experiment-plan.md`
 
-**Riesgo.**
+**Risk.**
 
-Un ingeniero que lea primero el plan antiguo podría preparar `ramoops`, activar consola UART o diseñar un intento de arranque sin pasar por las puertas actuales de seguridad.
+An engineer reading the legacy plan first might prepare `ramoops`, enable UART console, or design a boot attempt without passing through the current safety gates.
 
-**Clasificación.**
+**Classification.**
 
-Hipótesis operativa peligrosa mientras no se marque el documento antiguo como obsoleto o supersedido.
+Dangerous operational hypothesis as long as the legacy document is not marked as obsolete or superseded.
 
-**Acción mínima segura.**
+**Minimal Safe Action.**
 
-Documentar explícitamente qué partes de `hardware-observation-plan.md` quedan históricas y cuáles siguen válidas. Esto es una corrección de documentación, no una autorización para flashear.
+Explicitly document which parts of `hardware-observation-plan.md` remain historical and which remain valid. This is a documentation fix, not an authorization to flash.
 
 ---
 
-### C2 — Sintaxis inválida de `earlycon` y canal UART no demostrado
+### C2 — Invalid `earlycon` syntax and unproven UART channel
 
-**Hecho verificado en fuente.**
+**Verified Fact in Source.**
 
-En el driver Samsung auditable:
+In the auditable Samsung driver:
 
-- `OF_EARLYCON_DECLARE(exynos4210, "samsung,exynos4210-uart", ...)` registra el nombre `exynos4210`.
-- El nodo real UART0 usa compatible `samsung,exynos-uart`, no el compatible registrado por `OF_EARLYCON_DECLARE`.
+- `OF_EARLYCON_DECLARE(exynos4210, "samsung,exynos4210-uart", ...)` registers the name `exynos4210`.
+- The actual UART0 node uses compatible `samsung,exynos-uart`, not the compatible registered by `OF_EARLYCON_DECLARE`.
 
-Por tanto, la variante propuesta en `docs/first-boot-experiment-plan.md`:
+Therefore, the variant proposed in `docs/first-boot-experiment-plan.md`:
 
 ```text
 earlycon=samsung,0x13800000
 ```
 
-no es la forma genérica correcta. La forma coherente con el driver sería:
+is not the correct generic form. The form consistent with the driver would be:
 
 ```text
 earlycon=exynos4210,mmio32,0x13800000
 ```
 
-Esta era precisamente la cadena usada en `docs/hardware-observation-plan.md`, lo que confirma una regresión documental.
+This was precisely the string used in `docs/hardware-observation-plan.md`, confirming a documentation regression.
 
-**Riesgos adicionales no resueltos.**
+**Additional Unresolved Risks.**
 
-UART0 en el DT stock EZE4/U12:
+UART0 in stock EZE4/U12 DT:
 
-- dirección `0x13800000`;
+- address `0x13800000`;
 - `status = "disabled"`;
-- pines `gpq0-0` y `gpq0-1`;
-- propiedad `samsung,usi-serial-v2`;
-- referencia a configuración USI en `sysreg_peri_usi`;
-- relojes y gates dependientes del CMU.
+- pins `gpq0-0` and `gpq0-1`;
+- property `samsung,usi-serial-v2`;
+- reference to USI configuration in `sysreg_peri_usi`;
+- clocks and gates dependent on the CMU.
 
-El earlycon genérico puede escribir directamente en MMIO aunque el nodo esté `disabled`, pero no configura por sí solo pinmux, modo USI ni clock gates. Depende de que el bootloader deje el hardware usable. Además, no hay evidencia física de que esos pines sean accesibles sin abrir la tablet.
+Generic earlycon can write directly to MMIO even if the node is `disabled`, but it does not configure pinmux, USI mode, or clock gates on its own. It depends on the bootloader leaving the hardware in a usable state. Furthermore, there is no physical evidence that these pins are accessible without opening the tablet.
 
-**Conclusión operativa.**
+**Operational Conclusion.**
 
-Aunque se corrija la sintaxis, un resultado con cero bytes UART seguirá siendo ambiguo. Puede significar:
+Even if syntax is corrected, a result with zero UART bytes will remain ambiguous. It can mean:
 
-1. el kernel nunca recibió control;
-2. el kernel murió antes de inicializar earlycon;
-3. earlycon escribió correctamente pero el canal físico no está disponible;
-4. el bootloader dejó UART, USI o clocks en estado no usable.
+1. the kernel never received control;
+2. the kernel died before initializing earlycon;
+3. earlycon wrote correctly but the physical channel is unavailable;
+4. the bootloader left UART, USI, or clocks in an unusable state.
 
-Ningún intento debe usar “no hay UART” como señal única de fallo pre-kernel.
+No attempt should use "no UART" as the sole signal of pre-kernel failure.
 
 ---
 
-### C3 — Firma de módulos: riesgo anterior sobrestimado y riesgo ABI persistente
+### C3 — Module signing: previous risk overestimated and persistent ABI risk
 
-**Corrección importante.**
+**Important Correction.**
 
-Una revisión previa afirmó que `CONFIG_MODULE_SIG_PROTECT=y` impide cargar módulos no firmados bajo lockdown. En el árbol U11 auditable eso no es correcto.
+A previous review asserted that `CONFIG_MODULE_SIG_PROTECT=y` prevents loading unsigned modules under lockdown. In the auditable U11 tree, that is incorrect.
 
-Evidencia directa en `kernel.config`:
+Direct evidence in `kernel.config`:
 
 ```text
 CONFIG_MODULE_SIG=y
@@ -124,7 +124,7 @@ CONFIG_MODULE_SIG=y
 CONFIG_MODULE_SIG_PROTECT=y
 ```
 
-Evidencia directa en `kernel/module.c` del árbol:
+Direct evidence in `kernel/module.c` in tree:
 
 ```c
 #if defined(CONFIG_MODULE_SIG) && !defined(CONFIG_MODULE_SIG_PROTECT)
@@ -135,25 +135,25 @@ static bool sig_enforce = IS_ENABLED(CONFIG_MODULE_SIG_FORCE);
 #endif
 ```
 
-Con `CONFIG_MODULE_SIG_PROTECT=y`, la aplicación de `sig_enforce` se compila como `false`. El rechazo por falta de firma no ocurre por esa ruta; los módulos pueden cargarse con advertencia/taint.
+With `CONFIG_MODULE_SIG_PROTECT=y`, enforcement of `sig_enforce` compiles as `false`. Rejection due to lack of signature does not occur through that path; modules can load with warning/taint.
 
-**Qué significa.**
+**What this means.**
 
-- La firma no es hoy el principal bloqueante para módulos construidos con el mismo kernel U11.
-- Tampoco es válido asumir que los módulos stock U12 puedan cargarse: el desfase `5.15.180` frente a `5.15.189-android13-3`, los CRC de `MODVERSIONS`, los tipos bajo `CONFIG_CFI_CLANG=y` y las diferencias de build siguen siendo bloqueantes reales.
-- La mezcla kernel U11 con vendor_ramdisk U12 sigue siendo `NO-GO`.
+- Signing is currently not the primary blocker for modules built with the same U11 kernel.
+- Neither is it valid to assume stock U12 modules can load: the mismatch between `5.15.180` and `5.15.189-android13-3`, `MODVERSIONS` CRCs, types under `CONFIG_CFI_CLANG=y`, and build differences remain real blockers.
+- Mixing U11 kernel with U12 vendor_ramdisk remains `NO-GO`.
 
-**Riesgo residual.**
+**Residual Risk.**
 
-El comportamiento runtime puede tener hooks Samsung adicionales. Esta conclusión corrige el análisis estático dominante, pero debe confirmarse con la primera observación real de `modprobe`.
+Runtime behavior may contain additional Samsung hooks. This conclusion corrects the dominant static analysis, but must be confirmed with the first actual observation of `modprobe`.
 
 ---
 
-### C4 — Anti-rollback, Knox y recuperación tratados con demasiada ligereza
+### C4 — Anti-rollback, Knox, and recovery treated too lightly
 
-**Estado AVB observable.**
+**Observable AVB State.**
 
-El `vbmeta.img` stock EZE4 muestra:
+Stock EZE4 `vbmeta.img` shows:
 
 ```text
 Rollback Index: 0
@@ -161,7 +161,7 @@ Rollback Index Location: 0
 Flags: 0
 ```
 
-y las ubicaciones encadenadas conocidas son:
+and known chained locations are:
 
 ```text
 dtbo   -> Rollback Index Location 1
@@ -169,19 +169,19 @@ prism  -> Rollback Index Location 2
 optics -> Rollback Index Location 3
 ```
 
-Con índices observados en `0`, un vbmeta de prueba que mantenga los mismos índices no debería, por sí solo, subir el piso anti-rollback de AVB. Un intento fallido tampoco sube rollback automáticamente: el incremento ocurre cuando el dispositivo acepta metadatos con valores mayores, típicamente durante actualización oficial.
+With observed indices at `0`, a test vbmeta maintaining the same indices should not, by itself, raise the AVB anti-rollback floor. A failed attempt also does not raise rollback automatically: increments occur when the device accepts metadata with higher values, typically during official update.
 
-**Incógnitas Samsung no cubiertas por AVB genérico.**
+**Samsung Unknowns Not Covered by Generic AVB.**
 
-No está demostrado si el bootloader aplica además:
+It is unproven whether the bootloader also enforces:
 
-- contador binario del bootloader;
-- protección por fecha de security patch;
-- almacenamiento RPMB adicional;
-- validaciones Knox propias;
-- comprobaciones sobre `bootloader`, `ldfw`, `tzsw`, `prism` u otras particiones firmadas.
+- bootloader binary counter;
+- security patch date protection;
+- additional RPMB storage;
+- proprietary Knox validations;
+- checks on `bootloader`, `ldfw`, `tzsw`, `prism`, or other signed partitions.
 
-El vbmeta stock también expone propiedades como:
+Stock vbmeta also exposes properties like:
 
 ```text
 com.android.build.boot.os_version = '13'
@@ -189,178 +189,178 @@ com.android.build.system.os_version = '16'
 com.android.build.*.security_patch = '2026-05-05'
 ```
 
-Si se genera un vbmeta experimental, conservar índices y evitar rebajar o eliminar propiedades relevantes es una precaución obligatoria hasta entender la política real del modelo.
+If generating an experimental vbmeta, preserving indices and avoiding dropping or lowering relevant properties is a mandatory precaution until the model's actual policy is understood.
 
-**Knox/eFuse/desbloqueo.**
+**Knox / eFuse / Unlocking.**
 
-La documentación propia del repositorio afirma correctamente que desbloquear normalmente borra datos y puede activar de forma irreversible el Warranty Bit de Knox. Lo que no está confirmado es:
+The repository's own documentation correctly affirms that unlocking normally wipes data and can irreversibly trip the Knox Warranty Bit. What is not confirmed is:
 
-- si este SM-X510 Wi-Fi permite desbloqueo en esta región/build;
-- el procedimiento exacto en Android 16 / One UI 8.5;
-- si existe temporizador obligatorio;
-- qué funcionalidades Knox se pierden de forma permanente;
-- cómo reacciona exactamente el bootloader tras unlock con vbmeta regenerado.
+- whether this SM-X510 Wi-Fi permits unlocking in this region/build;
+- the exact procedure on Android 16 / One UI 8.5;
+- whether a mandatory waiting timer exists;
+- which Knox features are permanently lost;
+- how the bootloader reacts after unlock with regenerated vbmeta.
 
-Sin consentimiento explícito del propietario y registro de consecuencias, ningún paso de desbloqueo es aceptable.
+Without explicit owner consent and recorded consequences, no unlocking step is acceptable.
 
-**Recovery path actual.**
+**Current Recovery Path.**
 
-Existe firmware oficial completo local y con hash verificado, pero eso no es una ruta garantizada. Falta ensayar, sólo lectura o en condiciones controladas:
+Complete official firmware exists locally with verified hashes, but that is not a guaranteed route. What is missing is rehearsing, in read-only or controlled conditions:
 
-1. entrada reproducible a Download Mode;
-2. identificación del dispositivo por el equipo host;
-3. herramienta y protocolo compatibles con U12/EZE4;
-4. procedimiento completo de restauración oficial con BL/AP/CSC coherentes;
-5. validación posterior del dispositivo restaurado.
+1. reproducible entry into Download Mode;
+2. device identification by the host machine;
+3. tool and protocol compatible with U12/EZE4;
+4. complete official restoration procedure with coherent BL/AP/CSC;
+5. post-restoration device validation.
 
-Además, un kernel experimental puede no controlar carga/batería. Una sesión larga puede agotar la batería justo en un estado donde el dispositivo no pueda entrar a Download Mode. Este riesgo térmico/eléctrico no aparece suficientemente destacado en el plan vigente.
+Furthermore, an experimental kernel may not manage battery/charging. A long session could drain the battery precisely into a state where the device cannot enter Download Mode. This thermal/electrical risk is not sufficiently highlighted in the active plan.
 
-**Regla derivada.**
+**Derived Rule.**
 
-No hay recuperación “garantizada”; sólo hay una ruta de recuperación probable y todavía no ensayada. Mientras sea así, el primer intento físico sigue bloqueado.
+There is no "guaranteed" recovery; there is only a probable, un-rehearsed recovery path. As long as this is the case, the first physical attempt remains blocked.
 
-## Hallazgos importantes
+## Important Findings
 
-### I1 — Perfiles initramfs: tamaños y closures aún no cerrados
+### I1 — Initramfs profiles: sizes and closures not yet finalized
 
-Los hechos medidos muestran tensiones entre objetivos:
+Measured facts show tensions between goals:
 
-- el perfil USB actual no cabe en el espacio del ramdisk stock de `init_boot`;
-- el perfil SEC_DEBUG estimado entre ~0,9 y ~1,2 MiB LZ4 no ha sido medido;
-- los closures cortos pueden omitir dependencias de plataforma;
-- los grupos escalonados incluyen módulos como chipid, pinctrl o reboot cuyo probe puede fallar de forma visible o incluso causar reset.
+- the current USB profile does not fit in the stock `init_boot` ramdisk space;
+- the SEC_DEBUG profile estimated between ~0.9 and ~1.2 MiB LZ4 has not been measured;
+- short closures can omit platform dependencies;
+- staged groups include modules like chipid, pinctrl, or reboot whose probe may fail visibly or even cause a reset.
 
-Esto no autoriza construir imágenes todavía. Antes de cualquier GO deben completarse auditorías locales:
+This does not authorize building images yet. Before any GO, local audits must be completed:
 
-1. closure estático completo por grupo;
-2. medición real de cpio/LZ4 en directorios temporales;
-3. simulación del orden de `modprobe`;
-4. decisión explícita sobre `pinctrl-samsung-core` y dependencias de PMU/DSS.
+1. full static closure per group;
+2. real measurement of cpio/LZ4 in temporary directories;
+3. simulation of `modprobe` order;
+4. explicit decision on `pinctrl-samsung-core` and PMU/DSS dependencies.
 
-### I2 — sec_debug no es una red de seguridad universal
+### I2 — sec_debug is not a universal safety net
 
-El sistema Samsung es valioso, pero su alcance real es limitado:
+The Samsung system is valuable, but its actual reach is limited:
 
-- DSS y los handlers empiezan a capturar después de que los módulos cargan y hacen probe;
-- un fallo antes de userspace puede no dejar nada recuperable;
-- recuperar DRAM requiere un segundo contexto vivo;
-- `/dev/block/by-name/debug` existe como ruta en DT, pero su presencia, permisos y semántica de escritura no están probadas;
-- `panic_to_wdt=0` está presente por defecto en el análisis actual.
+- DSS and handlers begin capturing after modules load and probe;
+- a crash before userspace may leave nothing recoverable;
+- recovering DRAM requires a second live context;
+- `/dev/block/by-name/debug` exists as a DT path, but its presence, permissions, and write semantics are unproven;
+- `panic_to_wdt=0` is present by default in the current analysis.
 
-Por tanto, sec_debug mejora la probabilidad de diagnóstico, pero no convierte un fallo temprano en evidencia garantizada.
+Therefore, sec_debug improves diagnostic probability, but does not turn an early crash into guaranteed evidence.
 
-### I3 — El diff DT U11→EZE4 es sólido, pero no absoluto
+### I3 — The U11→EZE4 DT diff is solid, but not absolute
 
-Los tres overlays Wi-Fi r00/r01/r04 son idénticos byte a byte entre U11 y stock EZE4. Eso es evidencia fuerte.
+The three Wi-Fi overlays r00/r01/r04 are byte-for-byte identical between U11 and stock EZE4. That is strong evidence.
 
-Sin embargo, el comparador semántico del DTB base reporta estado incompleto, con 14 referencias externas sin resolver y limitaciones de extracción automatizada. Decir “ninguna diferencia afecta pre-printk” es una hipótesis bien fundamentada, no una equivalencia formal completa.
+However, the base DTB semantic comparator reports incomplete status, with 14 unresolved external references and automated extraction limitations. Saying "no difference affects pre-printk" is a well-founded hypothesis, not a complete formal equivalence.
 
-La estrategia prudente sigue siendo mantener DTB y DTBO stock salvo necesidad demostrada, en lugar de generalizar equivalencia.
+The prudent strategy remains keeping stock DTB and DTBO unless necessity is proven, rather than generalizing equivalence.
 
-### I4 — Las señales USB/consumo son hipótesis, no predicciones calibradas
+### I4 — USB/power signals are hypotheses, not calibrated predictions
 
-Los umbrales como “menos de ~20 mA” o “más de 100 mA sostenido” no provienen de mediciones de esta unidad. Tampoco se ha observado todavía:
+Thresholds such as "under ~20 mA" or "over 100 mA sustained" do not come from measurements of this unit. Neither has been observed yet:
 
-- patrón real de Download Mode;
-- transición bootloader→kernel;
-- aparición o desaparición del gadget ACM;
-- efecto de un crash temprano sobre enumeración USB;
-- comportamiento de backlight/pantalla con kernel propio.
+- actual Download Mode pattern;
+- bootloader→kernel transition;
+- appearance or disappearance of the ACM gadget;
+- effect of an early crash on USB enumeration;
+- backlight/display behavior with custom kernel.
 
-Sólo después de un baseline stock repetible podrán interpretarse las mismas señales durante un boot experimental.
+Only after a repeatable stock baseline can the same signals be interpreted during an experimental boot.
 
-### I5 — Operación de particiones, slots y vbmeta insuficientemente especificada
+### I5 — Partition operations, slots, and vbmeta insufficiently specified
 
-Antes de cualquier futuro intento, el plan debe definir:
+Before any future attempt, the plan must define:
 
-- slot activo real;
-- si se escribe un slot, ambos, o se evita manipulación de slots;
-- preservación exacta del tamaño de partición y padding;
-- tratamiento del bootconfig de `vendor_boot`;
-- conservación de rollback index y propiedades relevantes en vbmeta experimental;
-- prohibición explícita de tocar `bootloader`, `tzsw`, `ldfw`, `prism`, `optics` u otras particiones de confianza.
+- actual active slot;
+- whether one slot, both, or slot manipulation is avoided;
+- exact preservation of partition size and padding;
+- handling of `vendor_boot` bootconfig;
+- preservation of rollback index and relevant properties in experimental vbmeta;
+- explicit prohibition of touching `bootloader`, `tzsw`, `ldfw`, `prism`, `optics`, or other trust partitions.
 
-La ambigüedad aquí puede transformar un experimento recuperable en un estado confuso de arranque.
+Ambiguity here can turn a recoverable experiment into a confusing boot state.
 
-## Hallazgos menores
+## Minor Findings
 
-### M1 — Typo heredado en informe de crash logging
+### M1 — Legacy typo in crash logging report
 
-`reports/2026-08-24-crash-logging-audit-u11.md` menciona transitoriamente `ignore_logline`; el parámetro correcto es `ignore_loglevel`. El propio texto lo reconoce, pero debe corregirse antes de usarlo como referencia operativa.
+`reports/2026-08-24-crash-logging-audit-u11.md` transiently mentions `ignore_logline`; the correct parameter is `ignore_loglevel`. The text itself acknowledges this, but it should be corrected before using it as an operational reference.
 
-### M2 — Inclusión de `sec_class` poco justificada
+### M2 — Poorly justified inclusion of `sec_class`
 
-Algunas propuestas lo colocan primero por ser infraestructura Samsung, pero no se demostró que forme parte del closure duro mínimo. Debe incluirse sólo si la auditoría de dependencias lo exige.
+Some proposals place it first for being Samsung infrastructure, but it was not proven to be part of the minimal hard closure. It should be included only if dependency auditing requires it.
 
-### M3 — Recomendación vieja de ramoops sigue activa en documento antiguo
+### M3 — Old ramoops recommendation still active in legacy document
 
-Ya está cubierto por C1, pero merece mención específica porque contradice directamente la decisión actual de no crear reservas nuevas.
+Already covered by C1, but deserves specific mention because it directly contradicts the current decision not to create new reservations.
 
-### M4 — Estado DWC3 Exynos debe describirse con precisión
+### M4 — DWC3 Exynos state must be described accurately
 
-El `.config` U11 muestra `CONFIG_USB_DWC3_EXYNOS=y`. Algunas notas intermedias hablan del controlador como módulo. Para el diseño final debe distinguirse claramente entre glue built-in, capas genéricas y funciones gadget.
+The U11 `.config` shows `CONFIG_USB_DWC3_EXYNOS=y`. Some intermediate notes describe the controller as a module. For the final design, a clear distinction must be made between built-in glue, generic layers, and gadget functions.
 
-## Información crítica ausente
+## Critical Missing Information
 
-Antes de convertir el plan en intento físico faltan datos concretos:
+Before converting the plan into a physical attempt, concrete data is missing:
 
-1. estado real de OEM unlocking y política exacta de desbloqueo en esta unidad;
-2. advertencia visual y texto exacto tras unlock;
-3. comportamiento Samsung tras vbmeta regenerado o con verificación deshabilitada;
-4. cmdline final entregado por el bootloader;
-5. slot activo y mapa de particiones en ejecución;
-6. revisión de hardware y DTBO realmente aplicado;
-7. accesibilidad física de UART0/USI sin desmontar;
-8. VID/PID y tiempos de enumeración en Download Mode;
-9. patrón eléctrico stock calibrado;
-10. comportamiento de carga/batería bajo kernel de rescate;
-11. existencia y permisos de `/dev/block/by-name/debug`;
-12. respuesta real de `modprobe` ante módulos U11 sin firma válida;
-13. política Samsung adicional sobre rollback/security patch/RPMB.
+1. actual state of OEM unlocking and exact unlock policy on this unit;
+2. visual warning and exact text after unlock;
+3. Samsung behavior after regenerated vbmeta or with verification disabled;
+4. final cmdline delivered by the bootloader;
+5. active slot and partition map at runtime;
+6. hardware revision and DTBO actually applied;
+7. physical accessibility of UART0/USI without disassembly;
+8. VID/PID and enumeration timing in Download Mode;
+9. calibrated stock electrical pattern;
+10. charging/battery behavior under rescue kernel;
+11. existence and permissions of `/dev/block/by-name/debug`;
+12. actual `modprobe` response to U11 modules without valid signature;
+13. additional Samsung policy on rollback/security patch/RPMB.
 
-## Recomendaciones operativas
+## Operational Recommendations
 
-### Puertas obligatorias antes de reconsiderar el NO-GO
+### Mandatory Gates Before Reconsidering NO-GO
 
-1. Reconciliar documentación: marcar `docs/hardware-observation-plan.md` como histórico o supersedirlo explícitamente.
-2. Corregir toda referencia futura de earlycon a la forma validable por fuente:
+1. Reconcile documentation: mark `docs/hardware-observation-plan.md` as historical or explicitly supersede it.
+2. Correct all future earlycon references to the source-validatable form:
 
    ```text
    earlycon=exynos4210,mmio32,0x13800000
    ```
 
-3. Registrar por escrito que cero UART no prueba fallo pre-kernel.
-4. Medir tamaño LZ4 real del perfil MINIMAL + SEC_DEBUG escalonado en artefactos temporales, sin generar imagen flasheable.
-5. Validar closures completos de cada grupo de módulos con `modules.dep` y orden simulado.
-6. Calibrar baseline stock: vídeo, enumeración USB, consumo, tiempos y temperatura.
-7. Documentar consentimiento del propietario respecto a borrado de datos y posible pérdida irreversible de Knox.
-8. Identificar procedimiento de desbloqueo específico para el modelo/región/build antes de ejecutarlo.
-9. Ensayar la ruta de recuperación: entrada a Download Mode, detección por host y restauración oficial completa con hashes verificados.
-10. Definir condición de batería mínima, tiempo máximo de sesión y criterio térmico de parada.
-11. Conservar siempre rollback index `0` y propiedades relevantes en cualquier vbmeta de laboratorio.
-12. Prohibir explícitamente escrituras a particiones de confianza y downgrades.
+3. Record in writing that zero UART does not prove pre-kernel failure.
+4. Measure actual LZ4 size of the staged MINIMAL + SEC_DEBUG profile in temporary artifacts, without generating a flashable image.
+5. Validate full closures of each module group with `modules.dep` and simulated order.
+6. Calibrate stock baseline: video, USB enumeration, power draw, timing, and temperature.
+7. Document owner consent regarding data wipe and possible irreversible Knox loss.
+8. Identify specific unlock procedure for the model/region/build before executing it.
+9. Rehearse recovery path: Download Mode entry, host detection, and complete official restoration with verified hashes.
+10. Define minimum battery condition, maximum session duration, and thermal stop criteria.
+11. Always preserve rollback index `0` and relevant properties in any laboratory vbmeta.
+12. Explicitly prohibit writes to trust partitions and downgrades.
 
-### Regla de interpretación
+### Interpretation Rule
 
-Ningún resultado negativo debe considerarse concluyente mientras:
+No negative result should be considered conclusive as long as:
 
-- no exista baseline stock comparable;
-- el estado de desbloqueo y política AVB estén sin confirmar;
-- el canal de observabilidad no haya sido validado;
-- la ruta de recuperación no haya sido ensayada.
+- no comparable stock baseline exists;
+- unlock state and AVB policy remain unconfirmed;
+- the observability channel has not been validated;
+- the recovery path has not been rehearsed.
 
-Un boot silencioso no es información suficiente. Es una variable ambigua hasta que se demuestre qué canales funcionan.
+A silent boot is not sufficient information. It is an ambiguous variable until it is proven which channels function.
 
-## Veredicto
+## Verdict
 
-La preparación offline debe continuar, pero el primer contacto físico sigue siendo **NO-GO**.
+Offline preparation should continue, but first physical contact remains **NO-GO**.
 
-Los siguientes pasos de mayor valor son documentales y de laboratorio seguro:
+The most valuable next steps are documentary and safe laboratory tasks:
 
-1. reconciliar planes antiguos y nuevos;
-2. corregir earlycon y su interpretación;
-3. medir initramfs SEC_DEBUG;
-4. calibrar baseline stock;
-5. investigar y registrar unlock/Knox/recuperación para esta unidad exacta.
+1. reconcile legacy and new plans;
+2. correct earlycon and its interpretation;
+3. measure SEC_DEBUG initramfs;
+4. calibrate stock baseline;
+5. investigate and record unlock/Knox/recovery for this exact unit.
 
-Sólo después de cerrar esas evidencias tiene sentido discutir un experimento físico mínimo.
+Only after closing these evidence items does discussing a minimal physical experiment make sense.

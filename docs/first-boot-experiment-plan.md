@@ -1,361 +1,361 @@
 # First Boot Experiment Plan
 
-> **Errata 2026-09-05:** `--flags 1` significa `HASHTREE_DISABLED`, no disable-verification. `VERIFICATION_DISABLED` es `flags=2`; la aceptación Samsung de flags 2/3 sigue UNKNOWN. Este plan anterior no es autoridad operativa; véase `docs/boot-chain/minimum-first-boot-image-set.md`.
+> **Errata 2026-09-05:** `--flags 1` signifies `HASHTREE_DISABLED`, not disable-verification. `VERIFICATION_DISABLED` is `flags=2`; Samsung acceptance of flags 2/3 remains UNKNOWN. This earlier plan is not an operational authority; see `docs/boot-chain/minimum-first-boot-image-set.md`.
 
-Fecha de consolidación: 2026-08-24
-Alcance: Samsung Galaxy Tab S9 FE SM-X510, variante U12/EZE4
-Modo del documento: preparación de auditoría. No autoriza flasheo ni modifica artefactos existentes.
+Consolidation date: 2026-08-24
+Scope: Samsung Galaxy Tab S9 FE SM-X510, U12/EZE4 variant
+Document mode: audit preparation. Does not authorize flashing or modify existing artifacts.
 
-## Estado Actual
+## Current State
 
-Las afirmaciones se clasifican como **EVIDENCIA CONFIRMADA** cuando proceden de inspección estática verificada o de artefactos presentes en el repositorio, y como **HIPÓTESIS** cuando requieren validación física.
+Assertions are classified as **CONFIRMED EVIDENCE** when derived from verified static inspection or artifacts present in the repository, and as **HYPOTHESIS** when requiring physical validation.
 
-### Cadena de arranque y AVB
+### Boot Chain and AVB
 
-**EVIDENCIA CONFIRMADA**
+**CONFIRMED EVIDENCE**
 
-- `boot.img`, `init_boot.img`, `vendor_boot.img` y `dtbo.img` tienen footers y vbmeta embebidos firmados con `SHA256_RSA4096`. La verificación estática con `avbtool` fue correcta.
-- El vbmeta raíz tiene `flags=0` y rollback index global `0`.
-- El vbmeta raíz contiene hash descriptors para `boot`, `init_boot`, `vendor_boot` y `dtbo`; además encadena los vbmeta de `dtbo`, `prism` y `optics`.
-- `init_boot.img` no contiene kernel. Contiene el ramdisk GKI genérico comprimido con LZ4 legacy.
-- `vendor_boot.img` contiene vendor ramdisk LZ4, bootconfig y un DTB comprimido con formato propietario Samsung.
-- Bajo bootloader LOCKED, cambiar cualquiera de las particiones cubiertas por hash invalida el descriptor firmado. En ese estado el kernel propio no debe considerarse ejecutable.
+- `boot.img`, `init_boot.img`, `vendor_boot.img`, and `dtbo.img` have embedded footers and vbmeta signed with `SHA256_RSA4096`. Static verification with `avbtool` succeeded.
+- Root vbmeta has `flags=0` and global rollback index `0`.
+- Root vbmeta contains hash descriptors for `boot`, `init_boot`, `vendor_boot`, and `dtbo`; it also chains the vbmeta structs of `dtbo`, `prism`, and `optics`.
+- `init_boot.img` contains no kernel. It contains the generic GKI ramdisk compressed with legacy LZ4.
+- `vendor_boot.img` contains vendor ramdisk LZ4, bootconfig, and a compressed DTB with proprietary Samsung format.
+- Under LOCKED bootloader, changing any partition covered by a hash invalidates the signed descriptor. In that state, custom kernel must not be considered executable.
 
-**HIPÓTESIS**
+**HYPOTHESIS**
 
-- El bootloader Samsung aplica exactamente la política AOSP esperada en estado UNLOCKED y tolera un vbmeta regenerado con verificación deshabilitada.
-- No existen comprobaciones Samsung adicionales relevantes más allá de AVB, Knox/RPMB o políticas específicas del dispositivo.
-- El bootloader selecciona el overlay DTBO según revisión de hardware y compone parámetros finales de línea de mandatos no observables por completo en las imágenes stock.
+- Samsung bootloader implements the expected AOSP policy in UNLOCKED state and tolerates a regenerated vbmeta with verification disabled.
+- No relevant additional Samsung checks exist beyond AVB, Knox/RPMB, or device-specific policies.
+- Bootloader selects the DTBO overlay by hardware revision and composes final command-line parameters not fully observable in stock images.
 
-### ABI entre kernel U11 y vendor U12/EZE4
+### ABI Between U11 Kernel and U12/EZE4 Vendor
 
-**EVIDENCIA CONFIRMADA**
+**CONFIRMED EVIDENCE**
 
-- El kernel U11 construido reporta vermagic `5.15.180 SMP preempt mod_unload modversions aarch64`.
-- Los inventarios stock apuntan a un entorno `5.15.189-android13-3`; no hay compatibilidad de vermagic directa.
-- Ambos lados declaran `CONFIG_MODVERSIONS=y`. El árbol U11 tiene `Module.symvers`, pero no hay tabla CRC comparable del kernel stock ni módulos stock binarios suficientes para demostrar compatibilidad ABI.
-- La mezcla del vendor_ramdisk stock U12 con el kernel U11 es NO-GO hasta disponer de evidencia CRC/símbolos.
-- En el build U11 actual, los drivers tempranos críticos `EXYNOS_CHIPID_V2`, reloj S5E8835, MCT v3, watchdog y pinctrl Samsung son modulares, no built-in. La base GIC sí es built-in.
-- `CONFIG_MODULE_SIG_PROTECT=y`, pero `CONFIG_MODULE_SIG_FORCE` no está activo y `CONFIG_SECURITY_LOCKDOWN_LSM` no está activo en el build U11 auditado. Por tanto, el rechazo incondicional por firma no es la conclusión correcta; el bloqueante principal es vermagic/CRC/CFI.
+- Built U11 kernel reports vermagic `5.15.180 SMP preempt mod_unload modversions aarch64`.
+- Stock inventories point to a `5.15.189-android13-3` environment; no direct vermagic compatibility exists.
+- Both sides declare `CONFIG_MODVERSIONS=y`. The U11 tree has `Module.symvers`, but no comparable stock kernel CRC table nor sufficient stock binary modules exist to demonstrate ABI compatibility.
+- Mixing stock U12 vendor_ramdisk with the U11 kernel is NO-GO until CRC/symbol evidence is available.
+- In the current U11 build, early critical drivers `EXYNOS_CHIPID_V2`, S5E8835 clock, MCT v3, watchdog, and Samsung pinctrl are modular, not built-in. Base GIC is built-in.
+- `CONFIG_MODULE_SIG_PROTECT=y`, but `CONFIG_MODULE_SIG_FORCE` is not active and `CONFIG_SECURITY_LOCKDOWN_LSM` is not active in the audited U11 build. Therefore, unconditional signature rejection is not the correct conclusion; the primary blocker is vermagic/CRC/CFI.
 
-**HIPÓTESIS**
+**HYPOTHESIS**
 
-- Recompilar el kernel U11 con chipid, relojes, timer, pinctrl, PMU y soporte básico de reinicio integrados puede permitir alcanzar `/init` sin depender del cierre ABI del vendor ramdisk stock.
-- CFI y diferencias binarias pueden producir fallos tardíos aunque los símbolos coincidan.
+- Recompiling the U11 kernel with chipid, clocks, timer, pinctrl, PMU, and basic reboot support built-in may permit reaching `/init` without relying on stock vendor ramdisk ABI closure.
+- CFI and binary differences may cause late failures even if symbols match.
 
-### Device tree y arranque pre-printk
+### Device Tree and Pre-Printk Boot
 
-**EVIDENCIA CONFIRMADA**
+**CONFIRMED EVIDENCE**
 
-- `sec_debug_next` está definido en los overlays, no en el DTB base: dirección física `0x91200000`, tamaño `0x200000`, propiedad `no-map`.
-- Existen regiones Samsung/DSS ya cableadas, incluidas `log_kernel` en `0xFD010000`, `wdtmsg` en `0x8ADB11000`, historial ITMON y regiones adicionales de depuración.
-- PSCI es versión 1.0 con conducción SMC. Las ocho CPU usan PSCI como método de arranque/apagado.
-- El controlador global documentado es GIC-400/GICv2 en `0x12B00000`. No hay ITS.
-- El arch_timer ARMv8 declara `clock-frequency = <26000000>` y la línea stock fuerza `clocksource=arch_sys_counter`.
-- El oscilador principal declarado es de 52 MHz y el CMU central usa compatible `samsung,s5e8835-clock`.
-- El diff conocido entre U11 y EZE4 se limita a cuatro propiedades asociadas a EMS, MFC y SCSC/Wi-Fi. Ninguna pertenece al conjunto memoria/PSCI/GIC/timer/clocks.
-- El cmdline stock observable usa `console=ram` y no incluye `earlycon=`. `CONFIG_SERIAL_EARLYCON=y` y `CONFIG_SERIAL_SAMSUNG=y` están compiladas en U11.
+- `sec_debug_next` is defined in overlays, not in base DTB: physical address `0x91200000`, size `0x200000`, `no-map` property.
+- Hardwired Samsung/DSS regions exist, including `log_kernel` at `0xFD010000`, `wdtmsg` at `0x8ADB11000`, ITMON history, and additional debug regions.
+- PSCI is version 1.0 with SMC conduit. All eight CPUs use PSCI as boot/power-down method.
+- Documented global interrupt controller is GIC-400/GICv2 at `0x12B00000`. No ITS.
+- ARMv8 arch_timer declares `clock-frequency = <26000000>` and stock line enforces `clocksource=arch_sys_counter`.
+- Declared main oscillator is 52 MHz and central CMU uses compatible `samsung,s5e8835-clock`.
+- Known diff between U11 and EZE4 is limited to four properties associated with EMS, MFC, and SCSC/Wi-Fi. None belong to memory/PSCI/GIC/timer/clocks.
+- Observable stock cmdline uses `console=ram` and includes no `earlycon=`. `CONFIG_SERIAL_EARLYCON=y` and `CONFIG_SERIAL_SAMSUNG=y` are built into U11.
 
-**HIPÓTESIS**
+**HYPOTHESIS**
 
-- Los cuatro diffs U11→EZE4 son irrelevantes antes del primer printk. Esta conclusión es sólida pero el análisis semántico del diff no elimina toda incertidumbre residual.
-- Sin parámetro efectivo `earlycon=` u otro mecanismo Samsung temprano, un kernel vivo puede permanecer silencioso incluso si supera la inicialización básica.
-- El bootloader normalmente deja UART/clock gates en un estado usable, pero no hay prueba física en este dispositivo.
+- The four U11→EZE4 diffs are irrelevant prior to first printk. This conclusion is sound, but semantic diff analysis does not eliminate all residual uncertainty.
+- Without an effective `earlycon=` parameter or other early Samsung mechanism, a live kernel may remain silent even if it passes basic initialization.
+- Bootloader normally leaves UART/clock gates in a usable state, but there is no physical proof on this device.
 
-### Observabilidad Samsung y sec_debug
+### Samsung Observability and sec_debug
 
-**EVIDENCIA CONFIRMADA**
+**CONFIRMED EVIDENCE**
 
-- `sec_debug`, DSS y `reset_reason` están representados por nodos DT y por módulos construidos en el árbol U11.
-- El perfil USB/initramfs actual no carga el conjunto completo necesario para activar sec_debug/DSS.
-- La recuperación post-mortem requiere un contexto secundario: shell USB ACM, Android stock funcional, modo recovery/download accesible o lectura posterior de almacenamiento/región física.
+- `sec_debug`, DSS, and `reset_reason` are represented by DT nodes and modules built in the U11 tree.
+- Current USB/initramfs profile does not load the full set needed to activate sec_debug/DSS.
+- Post-mortem recovery requires a secondary context: USB ACM shell, functional stock Android, accessible recovery/download mode, or subsequent storage/physical region readout.
 
-**HIPÓTESIS**
+**HYPOTHESIS**
 
-- Un perfil reducido de 12 módulos puede activar sec_debug y DSS sin reservar memoria nueva ni modificar DT.
-- Tras una falla posterior, `sec_debug_next`, `log_kernel`, `wdtmsg` o `/proc/last_kmsg` conservarán evidencia suficiente para diagnosticar el primer boot.
+- A reduced 12-module profile can activate sec_debug and DSS without reserving new memory or modifying DT.
+- After a subsequent crash, `sec_debug_next`, `log_kernel`, `wdtmsg`, or `/proc/last_kmsg` will retain sufficient evidence to diagnose first boot.
 
-Fuente detallada: [`docs/debugging/sec-debug-analysis.md`](../debugging/sec-debug-analysis.md).
+Detailed source: [`docs/debugging/sec-debug-analysis.md`](../debugging/sec-debug-analysis.md).
 
 ### Initramfs
 
-**EVIDENCIA CONFIRMADA**
+**CONFIRMED EVIDENCE**
 
-- Existe un perfil MINIMAL funcional de aproximadamente 674 KiB LZ4, frente a aproximadamente 2.49 MiB de ramdisk stock en `init_boot`.
-- El perfil DEBUG/USB actual contiene 45 módulos y ocupa aproximadamente 2.9 MiB LZ4, por lo que no cabe dentro del tamaño stock.
-- El cierre propuesto para sec_debug tiene 12 módulos únicos y menos de 800 KiB raw. Su tamaño final LZ4 todavía no ha sido medido.
+- A functional MINIMAL profile of ~674 KiB LZ4 exists, compared to ~2.49 MiB stock ramdisk in `init_boot`.
+- Current DEBUG/USB profile contains 45 modules and occupies ~2.9 MiB LZ4, thus exceeding stock size.
+- Proposed closure for sec_debug has 12 unique modules and is under 800 KiB raw. Its final LZ4 size has not yet been measured.
 
-**HIPÓTESIS**
+**HYPOTHESIS**
 
-- El perfil sec_debug escalonado cabe en `init_boot` junto al busybox base.
-- Puede reducirse el cierre USB actual eliminando dependencias no obligatorias, pero esa poda requiere experimentación incremental.
+- Staged sec_debug profile fits in `init_boot` alongside base busybox.
+- Current USB closure can be trimmed by eliminating non-mandatory dependencies, but pruning requires incremental experimentation.
 
-## Incertidumbres
+## Uncertainties
 
-| ID | Incertidumbre | Impacto operativo |
+| ID | Uncertainty | Operational Impact |
 |---|---|---|
-| U1 | Estado real de bootloader: OEM unlock activado, UNLOCKED confirmado y política Samsung tras unlock. | Determina si cualquier kernel propio puede recibir control. Es condición previa absoluta. |
-| U2 | Parámetro exacto de consola temprana y estado físico de UART/USB al handoff. | Sin señal temprana, distinguir fallo AVB de fallo pre-driver depende solo de consumo, resets y post-mortem. |
-| U3 | Comportamiento real del bootloader ante vbmeta alternativo con `VERIFICATION_DISABLED` (`flags=2`). | Define si el experimento mínimo llega a la primera instrucción del kernel. |
-| U4 | Cierre exacto de dependencias runtime de sec_debug/DSS sobre DTB+overlay EZE4. | Una lista corta puede fallar por dependencia indirecta ausente; una lista amplia aumenta riesgo de panic temprano. |
-| U5 | Necesidad real de pinctrl-samsung-core y otros drivers plataforma para probes de sec_debug/DSS. | Puede provocar probes fallidos silenciosos aunque los `.ko` carguen. |
-| U6 | Tamaño LZ4 real del perfil sec_debug escalonado. | Condiciona empaquetado final de `init_boot` o vendor ramdisk propio. |
-| U7 | Cmdline final compuesto por el bootloader y aplicación garantizada del overlay correcto. | Puede alterar observabilidad y reserva de `sec_debug_next`. |
-| U8 | Señales USB y de consumo específicas de este hardware. | La matriz diagnóstica es marco experimental, no predicción validada. |
-| U9 | Compatibilidad CFI/binaria más allá de CRC y vermagic. | Riesgo de fallo tardío difícil de interpretar sin logs. |
+| U1 | Actual bootloader state: OEM unlock enabled, UNLOCKED confirmed, and Samsung post-unlock policy. | Determines whether custom kernel can receive control. Absolute prerequisite. |
+| U2 | Exact early console parameter and physical UART/USB state at handoff. | Without early signal, distinguishing AVB failure from pre-driver failure relies entirely on current draw, resets, and post-mortem. |
+| U3 | Actual bootloader behavior with alternative vbmeta having `VERIFICATION_DISABLED` (`flags=2`). | Defines whether minimal experiment reaches first kernel instruction. |
+| U4 | Exact runtime dependency closure of sec_debug/DSS on EZE4 DTB+overlay. | Short list may fail due to missing indirect dependency; broad list increases early panic risk. |
+| U5 | Actual need for pinctrl-samsung-core and other platform drivers for sec_debug/DSS probes. | May cause silent probe failures even if `.ko` modules load. |
+| U6 | Actual LZ4 size of staged sec_debug profile. | Conditions final packaging of `init_boot` or custom vendor ramdisk. |
+| U7 | Final cmdline composed by bootloader and guaranteed application of correct overlay. | May alter observability and `sec_debug_next` reservation. |
+| U8 | Hardware-specific USB and power draw signals on this unit. | Diagnostic matrix is experimental framework, not validated prediction. |
+| U9 | CFI/binary compatibility beyond CRC and vermagic. | Risk of late failure difficult to interpret without logs. |
 
-## Riesgos
+## Risks
 
-### Críticos
+### Critical
 
-1. **C1 — Experimento incompleto de boot chain:** no basta sustituir `boot.img` y vbmeta. Con kernel U11, también hay que evitar entregar el vendor_ramdisk stock incompatible. El alcance mínimo realista afecta al menos `boot.img`, `vendor_boot.img` y/o `init_boot.img`, además de vbmeta.
-2. **C2 — Ausencia de consola temprana probada:** el cmdline stock no activa `earlycon`. Este es el mayor bloqueante de observabilidad en tiempo real y debe tratarse como parte del diseño, no como detalle posterior.
-3. **C3 — Estado de bootloader desconocido:** sin confirmar UNLOCKED y su efecto real en este modelo, ningún intento físico cumple criterio de seguridad informativa.
+1. **C1 — Incomplete boot chain experiment:** Replacing only `boot.img` and vbmeta is insufficient. With U11 kernel, feeding incompatible stock vendor_ramdisk must also be avoided. Realistic minimal scope affects at least `boot.img`, `vendor_boot.img`, and/or `init_boot.img`, plus vbmeta.
+2. **C2 — Absence of proven early console:** Stock cmdline does not enable `earlycon`. This is the single largest real-time observability blocker and must be treated as part of design, not an afterthought.
+3. **C3 — Unknown bootloader state:** Without confirming UNLOCKED and its actual effect on this model, no physical attempt satisfies informational safety criteria.
 
-### Importantes
+### Important
 
-1. **I1 — Firma sobrestimada, ABI subestimada:** el problema principal es CRC/vermagic/CFI, no un rechazo automático por firma en el build U11 auditado.
-2. **I2 — Carga monolítica de sec_debug peligrosa:** cargar los 12 módulos de golpe puede perder evidencia si un driver con `panic()` en probe falla. La carga debe escalonarse.
-3. **I3 — Dependencias plataforma ocultas:** el closure estático corto puede omitir módulos necesarios para probes reales.
-4. **I4 — Señales no validadas:** la matriz USB/consumo es hipótesis estructurada y debe calibrarse primero contra el firmware stock.
-5. **I5 — Contradicción pinctrl:** el informe ABI identifica pinctrl como bloqueante modular y el borrador sec_debug no lo incluía. Debe resolverse con auditoría de closures antes del paquete final.
-6. **I6 — Regiones reservadas y firmware:** usar direcciones fijas sin conocer el mapa vivo puede confundir fallo de driver con colisión o acceso inválido.
+1. **I1 — Signature overestimated, ABI underestimated:** Primary issue is CRC/vermagic/CFI, not automatic signature rejection in the audited U11 build.
+2. **I2 — Monolithic sec_debug load hazardous:** Loading all 12 modules at once can lose evidence if a driver with `panic()` in probe fails. Loading must be staged.
+3. **I3 — Hidden platform dependencies:** Short static closure may omit modules needed for actual probes.
+4. **I4 — Unvalidated signals:** USB/current matrix is structured hypothesis and must first be calibrated against stock firmware.
+5. **I5 — pinctrl contradiction:** ABI report identifies pinctrl as modular blocker while sec_debug draft did not include it. Must be resolved with closure audit prior to final packaging.
+6. **I6 — Reserved regions and firmware:** Using fixed addresses without knowing live map may confuse driver failure with collision or invalid access.
 
-### Menores
+### Minor
 
-1. Corregir referencias tipográficas heredadas, como `ignore_loglevel`, al transcribir mandatos operativos.
-2. Evitar incluir `sec_class` sin justificar necesidad concreta en el closure final.
-3. No presentar el diff U11→EZE4 como absoluto cuando proviene de comparación parcialmente automatizada.
+1. Correct inherited typographical references, such as `ignore_loglevel`, when transcribing operational commands.
+2. Avoid including `sec_class` without justifying concrete necessity in final closure.
+3. Do not present U11→EZE4 diff as absolute when derived from partially automated comparison.
 
-## Experimento Mínimo
+## Minimal Experiment
 
-Este es el diseño objetivo. La sesión actual no genera imágenes ni scripts definitivos. Antes del intento físico deben completarse los bloqueantes listados al final.
+This is the target design. The current session generates no images or final scripts. Blockers listed at the end must be resolved before physical attempt.
 
-### Objetivo único del primer boot
+### Single Objective of First Boot
 
-Determinar si el kernel U11 recibe control desde el bootloader y alcanza userspace mínimo, maximizando la posibilidad de obtener evidencia post-mortem mediante infraestructura Samsung existente.
+Determine whether U11 kernel receives control from bootloader and reaches minimal userspace, maximizing probability of obtaining post-mortem evidence via existing Samsung infrastructure.
 
-No es objetivo del primer intento tener USB, display, almacenamiento completo ni Linux normal.
+Having USB, display, full storage, or standard Linux is not an objective for the first attempt.
 
-### Precondiciones obligatorias
+### Mandatory Preconditions
 
-1. Confirmar visualmente que OEM unlocking está habilitado y que el dispositivo está en estado UNLOCKED.
-2. Registrar advertencia visible al arrancar y acceso estable a Download Mode con firmware stock.
-3. Medir baseline stock sin modificar nada:
-   - corriente USB durante arranque;
-   - tiempos aproximados de fases visibles;
-   - enumeraciones USB observables;
-   - comportamiento de backlight/pantalla;
-   - tiempo total hasta Android o reset.
-4. Guardar copias intactas de todas las imágenes stock y hashes correspondientes.
+1. Visually confirm OEM unlocking is enabled and device is in UNLOCKED state.
+2. Record visible boot warning and stable access to Download Mode on stock firmware.
+3. Measure stock baseline with zero modifications:
+   - USB current during boot;
+   - approximate timing of visible phases;
+   - observable USB enumerations;
+   - backlight/screen behavior;
+   - total time to Android or reset.
+4. Preserve intact copies of all stock images and corresponding hashes.
 
-### Alcance de imágenes
+### Scope of Images
 
-El experimento necesita un conjunto coherente, no una sustitución única:
+The experiment requires a coherent set, not a single replacement:
 
-| Imagen | Contenido objetivo | Motivo |
+| Image | Target Content | Rationale |
 |---|---|---|
-| `boot.img` | Kernel U11 reproducible. Preferible con chipid, clocks S5E8835, MCT v3, PMU, pinctrl core y soporte básico de reboot integrados. | Reduce dependencia crítica del vendor ramdisk stock e intenta llegar a `/init`. |
-| `vendor_boot.img` | Vendor ramdisk propio mínimo o vacío controlado; DTB EZE4 stock preservado; bootconfig controlado. | Elimina el vendor_ramdisk U12 incompatible sin descartar el DT base/overlay entregado por bootloader. |
-| `init_boot.img` | Perfil MINIMAL + paquete sec_debug escalonado, medido y autocontenido. | Proporciona marcadores de userspace y activa observabilidad post-mortem. |
-| `vbmeta.img` | Generación de auditoría con verificación deshabilitada o firma de test, según política confirmada tras unlock. | Permite que las imágenes modificadas sean aceptadas bajo UNLOCKED. |
+| `boot.img` | Reproducible U11 kernel. Preferably with chipid, S5E8835 clocks, MCT v3, PMU, pinctrl core, and basic reboot support built-in. | Reduces critical dependency on stock vendor ramdisk and attempts to reach `/init`. |
+| `vendor_boot.img` | Minimal or controlled empty custom vendor ramdisk; preserved stock EZE4 DTB; controlled bootconfig. | Eliminates incompatible U12 vendor_ramdisk without discarding base/overlay DT delivered by bootloader. |
+| `init_boot.img` | MINIMAL profile + staged, measured, self-contained sec_debug package. | Provides userspace markers and activates post-mortem observability. |
+| `vbmeta.img` | Audit generation with verification disabled or test key, per policy confirmed post-unlock. | Enables modified images to be accepted under UNLOCKED. |
 
-`dtbo.img` debe mantenerse stock salvo hallazgo posterior que demuestre incompatibilidad. Cambiar DT innecesariamente contaminaría el resultado.
+`dtbo.img` must remain stock unless subsequent findings demonstrate incompatibility. Unnecessarily changing DT would contaminate results.
 
-### Initramfs sec_debug escalonado
+### Staged sec_debug Initramfs
 
-Usar como referencia el perfil MINIMAL existente, creando un perfil experimental nuevo sin editar scripts vigentes.
+Use existing MINIMAL profile as reference, creating a new experimental profile without modifying current scripts.
 
-Fase de arranque propuesta dentro de `/init`:
+Proposed boot phase inside `/init`:
 
-1. Montar `proc`, `sysfs` y `devtmpfs`.
-2. Emitir marcadores de fase en todas las salidas disponibles.
-3. Cargar grupo A de bajo riesgo:
+1. Mount `proc`, `sysfs`, and `devtmpfs`.
+2. Emit phase markers across all available outputs.
+3. Load low-risk Group A:
    - `exynos-pmu-if`;
    - `dss`;
    - `sec_debug_dprt`;
    - `sec_debug_base_early`.
-4. Pausa corta, registrar éxito/fallo y comprobar sysfs/procs creados.
-5. Solo si el grupo A no reinicia, cargar grupo B:
+4. Short pause, log success/failure, and check created sysfs/procs.
+5. Only if Group A causes no reboot, load Group B:
    - `exynos-chipid_v2`;
-   - `pinctrl-samsung-core` si el closure final lo confirma;
+   - `pinctrl-samsung-core` if final closure confirms;
    - `sec_debug_mode`;
    - `sec_debug_extra_info`.
-6. Solo si el grupo B sobrevive, cargar grupo C:
+6. Only if Group B survives, load Group C:
    - `sec_debug_reset_reason`;
    - `exynos-reboot`;
    - `hardlockup-watchdog`;
    - `sec_reboot`;
    - `sec_debug`.
-7. Volcar estado detectado a consola/buffer y entrar en shell de rescate o espera controlada.
+7. Dump detected state to console/buffer and enter rescue shell or controlled wait.
 
-Cada paso debe registrar nombre de módulo, código de retorno y rutas sysfs observadas antes de continuar.
+Each step must record module name, return code, and observed sysfs paths before continuing.
 
-### Línea de mandatos experimental
+### Experimental Command Line
 
-Ejecutar dos variantes de auditoría local antes de decidir el paquete físico:
+Run two local audit variants before deciding physical package:
 
-**Variante A — máxima compatibilidad:**
+**Variant A — maximum compatibility:**
 
 ```text
 console=ram clocksource=arch_sys_counter ignore_loglevel
 ```
 
-**Variante B — prueba temprana de consola:**
+**Variant B — early console probe:**
 
 ```text
 console=ram clocksource=arch_sys_counter ignore_loglevel earlycon=samsung,0x13800000
 ```
 
-La dirección `0x13800000` corresponde al nodo UART documentado en el DT auditado, pero el formato exacto aceptado por el driver U11 debe confirmarse en fuente/build antes de flashear. Si no se valida, la primera prueba física debe usar la variante A y depender de sec_debug/consumo.
+The address `0x13800000` corresponds to the UART node documented in the audited DT, but the exact format accepted by the U11 driver must be confirmed in source/build before flashing. If unvalidated, first physical test must use Variant A and rely on sec_debug/power draw.
 
-Añadir parámetros propios con prefijo estable, por ejemplo `gts9fe.first_boot=1`, para identificar el experimento desde runtime/post-mortem.
+Add custom parameters with stable prefix, e.g. `gts9fe.first_boot=1`, to identify experiment in runtime/post-mortem.
 
-### Protocolo de observación
+### Observation Protocol
 
-Durante el primer boot:
+During first boot:
 
-1. Grabar vídeo continuo de pantalla/backlight.
-2. Capturar tráfico/enumeración USB con host Linux y log timestamped.
-3. Medir corriente USB con resolución suficiente para distinguir fases gruesas.
-4. Definir timeout máximo sin señal y volver a Download Mode usando combinación física documentada.
-5. Tras cada reset, intentar recuperación por contexto secundario disponible: Android stock, recovery, download tools o lectura posterior de región persistente.
-6. Documentar siempre timestamps relativos desde inserción de cable o pulsación de power.
+1. Record continuous video of screen/backlight.
+2. Capture USB traffic/enumeration with timestamped Linux host log.
+3. Measure USB current with resolution sufficient to distinguish coarse phases.
+4. Define maximum timeout without signal and return to Download Mode using documented physical key combination.
+5. After each reset, attempt recovery via available secondary context: stock Android, recovery, download tools, or subsequent persistent region readout.
+6. Always record relative timestamps from cable insertion or power button press.
 
-## Señales Esperadas
+## Expected Signals
 
-Todas las señales son **HIPÓTESIS EXPERIMENTALES** hasta calibrarse en este dispositivo concreto.
+All signals are **EXPERIMENTAL HYPOTHESES** until calibrated on this specific hardware.
 
-| Señal observada | Interpretación probable | Confianza | Acción de diagnóstico |
+| Observed Signal | Probable Interpretation | Confidence | Diagnostic Action |
 |---|---|---|---|
-| Warning naranja/roja persiste y nunca desaparece. | Fallo/rechazo en boot chain; kernel posiblemente no recibe control. | Alta conceptual, media en Samsung. | Verificar estado UNLOCKED, vbmeta y descriptores. |
-| Download Mode sigue accesible siempre. | Bootloader sano y independiente del kernel. | Alta. | Repetir con logging y cambiar una variable por vez. |
-| Interfaz bootloader aparece y desaparece; después no aparece nada. | Handoff ocurrió; fallo muy temprano o kernel vivo silencioso. | Media. | Comparar consumo y probar variante A/B de cmdline. |
-| Aparece gadget ACM estable. | Kernel, UDC/PHY y userspace alcanzaron configuración USB. | Media-alta si el perfil USB está presente; baja en perfil sec_debug mínimo. | Abrir shell y extraer logs/módulos cargados. |
-| Aparece dispositivo USB breve y desaparece. | Kernel avanzó hacia gadget y crasheó/reset. | Media-baja. | Priorizar recuperación sec_debug/DSS y correlacionar consumo. |
-| Consumo plano tipo bootloader. | Probablemente no hubo handoff efectivo. | Hipótesis. | Baseline stock obligatorio para comparar patrón. |
-| Spike seguido de caída/reset. | Ejecución temprana seguida de panic/watchdog/fallo de memoria. | Hipótesis. | Recuperar reset_reason, wdtmsg y last_kmsg. |
-| Reset cíclico con periodo estable. | Panic automático, watchdog o fallo determinista temprano. | Media. | Variar cmdline/initramfs y medir cambio de periodo. |
-| Backlight se enciende y apaga abruptamente. | Fase display alcanzada o reset; ambiguo sin logs. | Baja. | No usar como señal única. |
-| Ningún síntoma cambia entre variantes. | Posible rechazo previo al kernel o consola/driver inactivo. | Media. | Revisar boot chain antes de seguir depurando kernel. |
+| Orange/red warning persists and never clears. | Failure/rejection in boot chain; kernel likely does not receive control. | High conceptually, medium in Samsung. | Verify UNLOCKED state, vbmeta, and descriptors. |
+| Download Mode remains consistently accessible. | Healthy bootloader independent of kernel. | High. | Repeat with logging and change one variable at a time. |
+| Bootloader UI appears and disappears; nothing follows. | Handoff occurred; very early failure or live silent kernel. | Medium. | Compare power draw and test Variant A/B cmdline. |
+| Stable ACM gadget appears. | Kernel, UDC/PHY, and userspace reached USB configuration. | Medium-high if USB profile present; low in minimal sec_debug profile. | Open shell and extract logs/loaded modules. |
+| USB device appears briefly and disappears. | Kernel progressed toward gadget and crashed/reset. | Medium-low. | Prioritize sec_debug/DSS recovery and correlate power draw. |
+| Flat power draw matching bootloader. | Likely no effective handoff. | Hypothesis. | Stock baseline mandatory to compare pattern. |
+| Spike followed by drop/reset. | Early execution followed by panic/watchdog/memory fault. | Hypothesis. | Recover reset_reason, wdtmsg, and last_kmsg. |
+| Cyclic reset with stable period. | Automatic panic, watchdog, or deterministic early crash. | Medium. | Vary cmdline/initramfs and measure period shift. |
+| Backlight abruptly turns on and off. | Display phase reached or reset; ambiguous without logs. | Low. | Do not use as sole signal. |
+| No symptom changes between variants. | Possible pre-kernel rejection or inactive console/driver. | Medium. | Review boot chain before continuing kernel debugging. |
 
-## Interpretación de Resultados
+## Result Interpretation
 
 ```text
-¿El dispositivo entra en Download Mode?
+Does device enter Download Mode?
 ├─ NO
-│  └─ Detener. Fallo de bootloader/power/storage o protocolo incorrecto.
-│     Acción: recuperar con combinación oficial y documentar nivel de brick.
+│  └─ Halt. Bootloader/power/storage failure or incorrect protocol.
+│     Action: recover with official key combination and document brick level.
 │
-└─ SÍ
-   ¿Arranque stock baseline reproduce patrón conocido?
+└─ YES
+   Does stock baseline boot reproduce known pattern?
    ├─ NO
-   │  └─ Resolver entorno de medición o estado del dispositivo antes de probar kernel.
+   │  └─ Resolve measurement environment or device state before testing kernel.
    │
-   └─ SÍ
-      ¿Warning UNLOCKED aparece con conjunto experimental?
+   └─ YES
+      Does UNLOCKED warning appear with experimental set?
       ├─ NO
-      │  └─ Fallo boot chain/vbmeta/política Samsung.
-      │     Acción: auditar vbmeta, slots y política unlock; no culpar aún al kernel.
+      │  └─ Boot chain/vbmeta/Samsung policy failure.
+      │     Action: audit vbmeta, slots, and unlock policy; do not blame kernel yet.
       │
-      └─ SÍ
-         ¿Hay transición distinta tras warning?
+      └─ YES
+         Is there a distinct transition after warning?
          ├─ NO
-         │  └─ Kernel no recibió control o murió en primeras instrucciones.
-         │     Acción: verificar entry/load addresses, DTB entregado y estado EL1/EL2.
+         │  └─ Kernel did not receive control or halted in initial instructions.
+         │     Action: verify entry/load addresses, delivered DTB, and EL1/EL2 state.
          │
-         └─ SÍ
-            ¿Consumo/enumeración muestra nueva fase?
+         └─ YES
+            Does power draw/enumeration show new phase?
             ├─ NO
-            │  └─ Fallo pre-printk o kernel silencioso.
-            │     Acción: recuperar sec_debug/DSS; repetir solo cambiando earlycon/cmdline.
+            │  └─ Pre-printk failure or silent kernel.
+            │     Action: recover sec_debug/DSS; repeat altering only earlycon/cmdline.
             │
-            ├─ FASE BREVE + RESET
-            │  └─ Kernel corrió y falló antes de userspace/gadget estable.
-            │     Acción: clasificar con wdtmsg/reset_reason/last_kmsg y revisar timers/GIC/DT.
+            ├─ BRIEF PHASE + RESET
+            │  └─ Kernel ran and failed prior to userspace/stable gadget.
+            │     Action: classify with wdtmsg/reset_reason/last_kmsg and review timers/GIC/DT.
             │
-            ├─ GADGET ACM ESTABLE
-            │  └─ Éxito parcial alto: userspace/controlador USB alcanzados.
-            │     Acción: extraer dmesg, cmdline, iomem, módulos y estado sec_debug.
+            ├─ STABLE ACM GADGET
+            │  └─ High partial success: userspace/USB controller reached.
+            │     Action: extract dmesg, cmdline, iomem, modules, and sec_debug state.
             │
-            └─ RESET DESPUÉS DE MARCADORES INITRAMFS
-               └─ Userspace alcanzado; fallo en fase/module probe.
-                  Acción: aislar último grupo cargado y validar closure/pinctrl/DT.
+            └─ RESET AFTER INITRAMFS MARKERS
+               └─ Userspace reached; failure during phase/module probe.
+                  Action: isolate last loaded group and validate closure/pinctrl/DT.
 ```
 
-Regla general: un resultado negativo solo se considera concluyente si baseline stock, estado unlock, imágenes usadas y método de recuperación quedaron registrados.
+General rule: a negative result is considered conclusive only if stock baseline, unlock state, used images, and recovery method were recorded.
 
-## Siguiente Decisión Después del Primer Intento
+## Next Decision After First Attempt
 
-### Resultado 1 — Rechazo evidente de boot chain
+### Result 1 — Evident Boot Chain Rejection
 
-Prioridad:
+Priority:
 
-1. Auditar política real Samsung en UNLOCKED.
-2. Probar vbmeta de test conocido válido bajo esta política.
-3. Confirmar slot activo y qué imagen lee realmente el bootloader.
+1. Audit actual Samsung policy in UNLOCKED.
+2. Test known-valid test vbmeta under this policy.
+3. Confirm active slot and which image bootloader actually reads.
 
-No continuar ajustando kernel hasta que una imagen marcadora pueda recibir control.
+Do not continue tuning kernel until a marker image can receive control.
 
-### Resultado 2 — Handoff pero silencio total
+### Result 2 — Handoff but Total Silence
 
-Prioridad:
+Priority:
 
-1. Recuperar cualquier contenido de sec_debug/DSS/reset_reason.
-2. Repetir con variante A/B de cmdline, cambiando solo ese campo.
-3. Auditar formato exacto de `earlycon` y estado de UART clocks en el kernel U11.
-4. Considerar instrumentación mínima adicional solo si post-mortem no aporta datos.
+1. Recover any sec_debug/DSS/reset_reason content.
+2. Repeat with Variant A/B cmdline, changing only that field.
+3. Audit exact `earlycon` format and UART clock state in U11 kernel.
+4. Consider minimal additional instrumentation only if post-mortem yields no data.
 
-### Resultado 3 — Reset temprano antes de userspace
+### Result 3 — Early Reset Prior to Userspace
 
-Prioridad:
+Priority:
 
-1. Clasificar reset reason/watchdog.
-2. Validar DTB/DTBO aplicado y regiones reservadas vivas.
-3. Reducir variables: kernel sin initramfs opcional, luego MINIMAL, luego sec_debug.
-4. Convertir drivers críticos modulares a built-in si los `.ko` impiden la fase temprana.
+1. Classify reset reason/watchdog.
+2. Validate applied DTB/DTBO and live reserved regions.
+3. Reduce variables: kernel without optional initramfs, then MINIMAL, then sec_debug.
+4. Convert critical modular drivers to built-in if `.ko` modules prevent early phase.
 
-### Resultado 4 — Userspace alcanzado
+### Result 4 — Userspace Reached
 
-Prioridad:
+Priority:
 
-1. Extraer evidencia completa: `dmesg`, `cmdline`, `/proc/iomem`, sysfs, módulos cargados y errores.
-2. Confirmar si sec_debug quedó realmente activo y dónde expone datos.
-3. Pasar de MINIMAL a perfil sec_debug completo de forma incremental.
-4. Solo después abordar USB ACM como canal permanente.
+1. Extract full evidence: `dmesg`, `cmdline`, `/proc/iomem`, sysfs, loaded modules, and errors.
+2. Confirm whether sec_debug became active and where it exposes data.
+3. Progress from MINIMAL to full sec_debug profile incrementally.
+4. Only then tackle USB ACM as permanent channel.
 
-### Resultado 5 — Falla en carga de módulos
+### Result 5 — Module Loading Failure
 
-Prioridad:
+Priority:
 
-1. Separar error de formato/vermagic, símbolo/CRC, firma, probe o dependencia.
-2. Reconstruir closure con `modules.dep` completo y probar grupos aún más pequeños.
-3. Corregir la contradicción pinctrl con evidencia de probe real.
+1. Separate format/vermagic, symbol/CRC, signature, probe, or dependency error.
+2. Reconstruct closure with full `modules.dep` and test smaller groups.
+3. Correct pinctrl contradiction with actual probe evidence.
 
-## Bloqueantes Pendientes
+## Pending Blockers
 
-Estos puntos impiden pasar hoy al primer intento físico:
+These items prevent proceeding to physical first attempt today:
 
-1. **Confirmar y registrar estado UNLOCKED/OEM unlock**, incluyendo advertencia visible y acceso a Download Mode.
-2. **Resolver mecanismo de consola temprana**: validar sintaxis exacta de `earlycon` en el driver U11 y decidir si existe alternativa Samsung útil.
-3. **Definir composición completa de tres piezas**: kernel/config final, vendor_boot propio con DT stock y `init_boot` propio. No usar el vendor_ramdisk stock U12 con kernel U11.
-4. **Auditoría de closures sec_debug/DSS**: incluir dependencias plataforma reales, resolver pinctrl y eliminar supuestos no verificados.
-5. **Medición real de tamaño LZ4** del perfil MINIMAL + sec_debug escalonado, sin generar imagen flasheable todavía.
-6. **Calibrar baseline stock** de consumo, USB y pantalla con método repetible y timestamps.
-7. **Validar política vbmeta tras unlock** en este modelo antes de asumir que `flags=2/3` es suficiente o permitido; `flags=1` sólo desactiva hashtree.
-8. **Preparar procedimiento seguro de recuperación** desde cualquier resultado: timeout, entrada a Download Mode y restauración stock verificada por hash.
-9. **Documentar plantilla de registro del experimento** con hipótesis, variables, observaciones y conclusión separadas.
+1. **Confirm and record UNLOCKED/OEM unlock state**, including visible warning and Download Mode access.
+2. **Resolve early console mechanism**: validate exact `earlycon` syntax in U11 driver and determine whether useful Samsung alternative exists.
+3. **Define full three-piece composition**: final kernel/config, custom vendor_boot with stock DT, and custom `init_boot`. Do not use stock U12 vendor_ramdisk with U11 kernel.
+4. **sec_debug/DSS closure audit**: include actual platform dependencies, resolve pinctrl, and eliminate unverified assumptions.
+5. **Actual LZ4 size measurement** of MINIMAL + staged sec_debug profile, without generating flashable image yet.
+6. **Calibrate stock baseline** for power draw, USB, and screen with repeatable method and timestamps.
+7. **Validate vbmeta policy post-unlock** on this model before assuming `flags=2/3` is sufficient or allowed; `flags=1` only disables hashtree.
+8. **Prepare safe recovery procedure** for any outcome: timeout, Download Mode entry, and hash-verified stock restore.
+9. **Document experiment log template** with separated hypotheses, variables, observations, and conclusion.
 
-## Referencias
+## References
 
-- [`docs/debugging/sec-debug-analysis.md`](debugging/sec-debug-analysis.md) — auditoría sec_debug, DSS, DT y recuperación.
-- [`reports/2026-08-24-crash-logging-audit-u11.md`](../reports/2026-08-24-crash-logging-audit-u11.md) — auditoría previa de logging y crash recovery.
-- [`docs/hardware-observation-plan.md`](hardware-observation-plan.md) — plan anterior de observación hardware.
+- [`docs/debugging/sec-debug-analysis.md`](debugging/sec-debug-analysis.md) — sec_debug, DSS, DT, and recovery audit.
+- [`reports/2026-08-24-crash-logging-audit-u11.md`](../reports/2026-08-24-crash-logging-audit-u11.md) — prior logging and crash recovery audit.
+- [`docs/hardware-observation-plan.md`](hardware-observation-plan.md) — prior hardware observation plan.
 
-Informes verbales consolidados de esta sesión:
+Consolidated session verbal reports:
 
-- Agente 2 — cadena AVB/boot y matriz de diagnóstico USB.
-- Agente 3 — ABI U11/U12, módulos críticos y firma.
-- Agente 4 — reserved-memory, PSCI, GIC, timers, clocks y diffs DT.
-- Agente 5 — perfiles initramfs MINIMAL, DEBUG/USB y SEC_DEBUG.
-- Agente 6/9 — revisión independiente y correcciones críticas C1/C2 e I1–I5.
+- Agent 2 — AVB/boot chain and USB diagnostic matrix.
+- Agent 3 — U11/U12 ABI, critical modules, and signature.
+- Agent 4 — reserved-memory, PSCI, GIC, timers, clocks, and DT diffs.
+- Agent 5 — MINIMAL, DEBUG/USB, and SEC_DEBUG initramfs profiles.
+- Agent 6/9 — independent review and critical C1/C2 and I1–I5 corrections.

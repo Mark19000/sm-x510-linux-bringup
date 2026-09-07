@@ -1,32 +1,32 @@
-# Auditoría de módulos U11 ↔ vendor_boot EZE4
+# U11 Modules Audit ↔ EZE4 vendor_boot
 
-## Resultado
+## Result
 
-- módulos U11: `282` (`5.15.180`)
-- módulos stock EZE4 en dlkm: `281`
-- módulos comunes: `280`, mismo orden relativo: `true`
-- sólo stock: `sec_debug_test.ko`
-- sólo U11: `a96t396.ko, input_booster_lkm.ko`
-- puerta física: `NO-GO`
+- U11 modules: `282` (`5.15.180`)
+- stock EZE4 modules in dlkm: `281`
+- common modules: `280`, same relative order: `true`
+- stock only: `sec_debug_test.ko`
+- U11 only: `a96t396.ko, input_booster_lkm.ko`
+- physical gate: `NO-GO`
 
-## Comprobaciones
+## Checks
 
-| estado | comprobación | detalle |
+| status | check | detail |
 |---|---|---|
-| `PASS` | `stock_provenance` | vendor_boot EZE4 v4: fragmentos generic + dlkm, 281 módulos; 6 ficheros verificados |
-| `PASS` | `u11_module_metadata` | 282/282 módulos con vermagic 5.15.180 y firma añadida |
-| `PASS` | `u11_hard_dependency_graph` | 282 entradas modules.dep; todas las dependencias duras están presentes |
-| `WARN` | `softdep_stale_names` | referencias no resolubles ['exynos_thermal', 'memory_group_manager', 'pcie_exynos_rc', 's2dos05_regulator']; coinciden con vendor_boot EZE4=True |
-| `PASS` | `stock_u11_load_order` | 280 comunes en igual orden; sólo stock=['sec_debug_test.ko']; sólo U11=['a96t396.ko', 'input_booster_lkm.ko'] |
-| `PASS` | `ufs_closure` | 28 módulos U11; dependencias ausentes=0 |
-| `PASS` | `usb_closure` | 45 módulos U11; dependencias ausentes=0 |
-| `WARN` | `usb_role_scope` | perfil orientado a gadget/ACM; xhci-exynos no incluido |
-| `WARN` | `scsc_firmware` | Wi-Fi/BT no se incluye para M2/M3; falta extraer /vendor/firmware/wifi y calibración EFS |
-| `WARN` | `physical_write_gate` | NO-GO: auditoría de módulos no autoriza empaquetar ni flashear |
+| `PASS` | `stock_provenance` | vendor_boot EZE4 v4: generic + dlkm fragments, 281 modules; 6 verified files |
+| `PASS` | `u11_module_metadata` | 282/282 modules with vermagic 5.15.180 and appended signature |
+| `PASS` | `u11_hard_dependency_graph` | 282 modules.dep entries; all hard dependencies are present |
+| `WARN` | `softdep_stale_names` | unresolvable references ['exynos_thermal', 'memory_group_manager', 'pcie_exynos_rc', 's2dos05_regulator']; matches EZE4 vendor_boot=True |
+| `PASS` | `stock_u11_load_order` | 280 common in same order; stock only=['sec_debug_test.ko']; U11 only=['a96t396.ko', 'input_booster_lkm.ko'] |
+| `PASS` | `ufs_closure` | 28 U11 modules; missing dependencies=0 |
+| `PASS` | `usb_closure` | 45 U11 modules; missing dependencies=0 |
+| `WARN` | `usb_role_scope` | profile gadget/ACM-oriented; xhci-exynos not included |
+| `WARN` | `scsc_firmware` | Wi-Fi/BT is not included for M2/M3; /vendor/firmware/wifi and EFS calibration still need extraction |
+| `WARN` | `physical_write_gate` | NO-GO: module audit does not authorize packaging or flashing |
 
-## Interpretación
+## Interpretation
 
-La igualdad de orden relativo reduce el riesgo de inicialización temprana, pero no
-demuestra ABI binaria U11↔EZE4. Nunca se cargan módulos stock con el kernel U11
-ni módulos U11 con el kernel stock. UFS y USB sólo tienen cierre estático probado;
-DT, clocks, PHY, reguladores y Type-C aún requieren observación en hardware.
+Equal relative order reduces early initialization risk, but does not prove
+U11↔EZE4 binary ABI. Stock modules are never loaded with the U11 kernel, nor U11
+modules with the stock kernel. UFS and USB only have static closure proven;
+DT, clocks, PHY, regulators, and Type-C still require hardware observation.

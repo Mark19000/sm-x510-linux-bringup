@@ -1,63 +1,54 @@
-# 7. Roadmap hacia mainline
+# 7. Mainline Linux Roadmap
 
-## Por qué no crear primero el DTS final
+## Why Not Write the Final DTS First
 
-Mainline no tiene `samsung,s5e8835-*`. Un DTS enorme con cientos de nodos
-desconocidos genera ruido y no puede revisarse. El upstreaming debe aportar una
-cadena útil de dependencias, con bindings y drivers antes que consumidores.
+Upstream mainline contains no `samsung,s5e8835-*` support. Submitting a monolithic DTS with hundreds of unknown nodes creates review churn and cannot be reviewed effectively. Upstreaming must follow a clean dependency hierarchy, introducing YAML bindings and drivers before DT consumer nodes.
 
-## Serie 1: arranque mínimo
+## Series 1: Minimal Console Boot
 
-1. binding de SoC/placa;
-2. IDs de clock y driver de CMU mínimo;
-3. pinctrl/GPIO y EINT;
-4. PMU/reset necesarios;
-5. UART/earlycon;
-6. `s5e8835.dtsi` mínimo con CPU, memory, GIC, timer y UART;
-7. DTS de Tab S9 FE con `chosen` y consola.
+1. SoC and board compatible bindings;
+2. Clock IDs and minimal CMU driver;
+3. Pinctrl / GPIO and EINT interrupt controllers;
+4. Required PMU / reset lines;
+5. UART / earlycon drivers;
+6. Minimal `s5e8835.dtsi` defining CPU nodes, memory map, GIC, timer, and UART;
+7. Minimal Galaxy Tab S9 FE DTS specifying `/chosen` and serial console.
 
-Meta: texto mainline en UART, aunque no haya almacenamiento ni pantalla.
+Goal: Native mainline output on serial UART, even without storage or display drivers.
 
-## Serie 2: almacenamiento y USB
+## Series 2: Storage and USB
 
-1. power domain y CMU de UFS;
-2. PHY/calibración UFS S5E8835;
-3. glue del host UFS;
-4. UFS en modo conservador y sólo lectura;
-5. PHY/glue USB2 y DWC3;
-6. role switch/Type-C cuando el controlador de puerto esté soportado.
+1. UFS power domains and clock branches;
+2. S5E8835 UFS PHY and calibration data;
+3. UFS host controller glue layer;
+4. UFS initialization in conservative, read-only mode;
+5. USB2/3 PHY glue and DWC3 core integration;
+6. Type-C role switching once the port controller is supported.
 
-Meta: raíz externa o initramfs con acceso fiable a UFS/USB.
+Goal: Booting a persistent external root filesystem or initramfs with reliable UFS/USB access.
 
-## Serie 3: interfaz de usuario
+## Series 3: Graphical User Interface
 
-1. SysMMU v8;
-2. CMU/power domain de display;
-3. DPU/DECON y DPP;
-4. DSIM + PHY MIPI;
-5. drivers de ambos paneles y backlight;
-6. táctil y Wacom.
+1. SysMMU v8 driver;
+2. Display CMU clocks and power domains;
+3. DPU / DECON display controller and DPP;
+4. DSIM controller and MIPI D-PHY;
+5. Panel drivers for both display variants and backlight control;
+6. Touchscreen and Wacom digitizer drivers.
 
-## Serie 4: operación diaria
+## Series 4: Daily Operation
 
-GPU, Wi-Fi/BT, audio, suspensión, sensores y energía. Carga y gestión térmica
-deben llegar después de tener telemetría fiable; un fallo ahí puede dañar
-hardware, no sólo colgar el kernel.
+GPU acceleration, Wi-Fi/BT, audio, system suspend/resume, sensors, and power management. Battery charging and thermal regulation must only be ported once reliable telemetry is proven; bugs in power subsystems can cause physical hardware damage rather than merely kernel crashes.
 
-## Criterios para cada parche upstream
+## Upstream Patch Acceptance Criteria
 
-- una sola idea por parche;
-- binding YAML antes o junto al driver;
-- `make dt_binding_check` y `make dtbs_check` limpios;
-- `sources/wifi-kernel/scripts/checkpatch.pl` sin errores relevantes durante la
-  fase downstream; para upstream, materializa y usa el script del snapshot
-  mainline correspondiente;
-- sin propiedades Android de política si existe una abstracción estándar;
-- explicación de registros basada en documentación o comportamiento verificable;
-- prueba en hardware descrita en el commit;
-- compatibles minúsculos y específicos, por ejemplo
-  `samsung,exynos1380-...`, sujetos a discusión con mantenedores.
+- One distinct concept per patch;
+- Devicetree YAML binding documentation precedes or accompanies the driver;
+- `make dt_binding_check` and `make dtbs_check` complete cleanly;
+- `checkpatch.pl` reports zero material errors; during downstream work, use the vendor script, while for upstreaming, use the mainline kernel's script;
+- Avoid Android-specific policy properties where standard Linux abstractions exist;
+- Hardware register behaviors documented from datasheets or empirically verified traces;
+- Real hardware boot test described in the commit message;
+- Specific, lowercase compatible strings (e.g. `samsung,exynos1380-...`), subject to upstream maintainer convention.
 
-La referencia de estilo más útil no es el driver vendor más parecido, sino el
-SoC Exynos reciente mejor aceptado en mainline. Usa Exynos850/990/2200/AutoV9
-para aprender estructura; verifica cada valor contra S5E8835.
+The most useful style reference is not the vendor code, but the most recently merged Exynos SoC in upstream Linux. Study Exynos850/990/2200/AutoV9 for driver structure; verify every register address against S5E8835.

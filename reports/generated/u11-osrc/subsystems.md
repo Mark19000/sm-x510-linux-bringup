@@ -1,9 +1,9 @@
-# Resumen de cambios U3 → U11 por subsistema
+# U3 → U11 Changes Summary by Subsystem
 
-Los números cuentan rutas cuyo contenido/presencia cambia. No prueban por sí
-solos compatibilidad de hardware; deben leerse junto al diff semántico DTS.
+The numbers count paths whose content/presence changes. They do not prove
+hardware compatibility on their own; they must be read alongside the DTS semantic diff.
 
-| subsistema | cambiados | sólo U3 | sólo U11 | ejemplos |
+| subsystem | changed | U3 only | U11 only | examples |
 |---|---:|---:|---:|---|
 | `device_tree_s5e8835_x510` | 3 | 0 | 0 | `arch/arm64/boot/dts/samsung/gts9fewifi/gts9fewifi_eur_open_w00_r00.dts`<br>`arch/arm64/boot/dts/samsung/gts9fewifi/gts9fewifi_eur_open_w00_r01.dts`<br>`arch/arm64/boot/dts/samsung/gts9fewifi/gts9fewifi_eur_open_w00_r04.dts` |
 | `psci_gic_timers` | 28 | 0 | 0 | `drivers/clocksource/Kconfig`<br>`drivers/clocksource/arm_global_timer.c`<br>`drivers/clocksource/exynos_mct.c` |

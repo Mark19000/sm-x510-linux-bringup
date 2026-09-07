@@ -1,79 +1,79 @@
-# Recuperación fixed8/fixed9 y demostración de reproducibilidad U11
+# fixed8/fixed9 Recovery and Demonstration of U11 Reproducibility
 
-Fecha: 2026-08-23 · Alcance: sólo laboratorio offline, sin escritura física.
+Date: 2026-08-23 · Scope: offline laboratory only, no physical write.
 
-## Resultado final
+## Final Result
 
-`fixed8` y `fixed9` terminaron con `status=0`. La comparación con `tools/u11_repro_compare.py` produce **PASS**: los 19 ficheros del dist, incluyendo Image, DTB, DTBOs y el tar de 282 módulos, son **idénticos byte a byte** entre dos árboles limpios independientes.
+`fixed8` and `fixed9` completed with `status=0`. Comparison with `tools/u11_repro_compare.py` produces **PASS**: all 19 files in the dist, including Image, DTB, DTBOs, and the 282-module tar, are **byte-for-byte identical** between two independent clean trees.
 
-Este resultado confirma que el parche 0011 (build IDs reproducibles) resuelve la única divergencia que impedía el PASS en `fixed6/fixed7`.
+This result confirms that patch 0011 (reproducible build IDs) resolves the single divergence preventing PASS in `fixed6/fixed7`.
 
-## Fallos encontrados durante la recuperación
+## Failures Encountered During Recovery
 
-Cada fallo se documenta con: qué ocurrió, por qué ocurrió, cómo se detectó, cómo se solucionó y qué conocimiento aporta.
+Each failure is documented with: what occurred, why it occurred, how it was detected, how it was resolved, and what knowledge it contributes.
 
-### 1. Espacio insuficiente en disco (causa raíz de los fallos originales)
+### 1. Insufficient Disk Space (root cause of original failures)
 
-- **Qué ocurrió:** `fixed8` y `fixed9` fallaron con `Errno 28 No space left on device`.
-- **Por qué:** La VM Lima tenía 33 GB llenos al 98% (852 MB libres). Cada build genera ~6 GB entre fuentes extraídas, objetos intermedios y dist.
-- **Cómo se detectó:** `df -h /` mostró 852 MB libres; los STATUS de ambos runs mostraban `status=1`.
-- **Solución:** Se liberaron ~17 GB eliminando únicamente directorios regenerables dentro de `~/osrc-u11-work`: runs fallidos (`fixed8/fixed9` previos), subdirectorios voluminosos de `fixed7` (cuyo dist completo ya estaba copiado al host) y staging-only de `inspect4`. No se tocaron `artifacts/`, `sources/` ni `configs/` del host.
-- **Conocimiento:** Un build kernel LTO/BTF necesita mínimo ~8 GB libres en el guest. Antes de cada run, verificar `df -h` es tan crítico como verificar hashes de receta.
+- **What occurred:** `fixed8` and `fixed9` failed with `Errno 28 No space left on device`.
+- **Why:** The Lima VM had 33 GB at 98% capacity (852 MB free). Each build generates ~6 GB across extracted sources, intermediate objects, and dist.
+- **How it was detected:** `df -h /` showed 852 MB free; STATUS in both runs showed `status=1`.
+- **Solution:** ~17 GB were freed by removing exclusively regenerable directories inside `~/osrc-u11-work`: failed runs (prior `fixed8/fixed9`), bulky subdirectories of `fixed7` (whose complete dist was already copied to host), and staging-only from `inspect4`. Host `artifacts/`, `sources/`, and `configs/` were not touched.
+- **Knowledge:** A kernel LTO/BTF build requires a minimum of ~8 GB free in the guest. Before each run, checking `df -h` is as critical as verifying recipe hashes.
 
-### 2. Estructura incorrecta del árbol fuente (tar sin subdirectorio Kernel/)
+### 2. Incorrect Source Tree Structure (tar without Kernel/ subdirectory)
 
-- **Qué ocurrió:** El primer intento manual asumió que el tar extraía a un subdirectorio `Kernel/`, pero lo hizo directamente en `build-source/`.
-- **Por qué:** El tar de Samsung no tiene un directorio raíz explícito.
-- **Cómo se detectó:** `test -f Makefile` falló; `git apply --check` reportó archivos inexistentes.
-- **Solución:** Extraer directamente en `build-source/` y aplicar el overlay ahí, no en un subdirectorio inexistente.
-- **Conocimiento:** Siempre verificar la estructura real post-extracción antes de asumir rutas.
+- **What occurred:** The first manual attempt assumed the tar extracted to a `Kernel/` subdirectory, but it did so directly in `build-source/`.
+- **Why:** The Samsung tar has no explicit root directory.
+- **How it was detected:** `test -f Makefile` failed; `git apply --check` reported nonexistent files.
+- **Solution:** Extract directly in `build-source/` and apply the overlay there, not in a nonexistent subdirectory.
+- **Knowledge:** Always verify actual post-extraction structure before assuming paths.
 
-### 3. Guardia `OUT ya existe`
+### 3. Guard: `OUT already exists`
 
-- **Qué ocurrió:** Reintentar el build sin limpiar `out-u11` provocó rechazo inmediato.
-- **Por qué:** El script exige un run nuevo para evitar mezclar artefactos obsoletos.
-- **Cómo se detectó:** Mensaje `OUT ya existe; cada build U11 requiere un run nuevo`.
-- **Solución:** Eliminar `out-u11`, revertir patches aplicados (`git apply -R`) y relanzar.
-- **Conocimiento:** Las guardias anti-reutilización son intencionales; nunca forzar su bypass.
+- **What occurred:** Retrying the build without cleaning `out-u11` caused immediate rejection.
+- **Why:** The script requires a fresh run to avoid mixing stale artifacts.
+- **How it was detected:** Message `OUT ya existe; cada build U11 requiere un run nuevo`.
+- **Solution:** Remove `out-u11`, revert applied patches (`git apply -R`), and relaunch.
+- **Knowledge:** Anti-reuse guards are intentional; never force their bypass.
 
-### 4. Guardia `modules-stage ya existe`
+### 4. Guard: `modules-stage already exists`
 
-- **Qué ocurrió:** Tras un intento parcial, el re-run falló porque `build-output/modules-stage` ya existía.
-- **Por qué:** Misma política anti-mezcla que OUT/DIST.
-- **Cómo se detectó:** Mensaje `modules-stage ya existe`.
-- **Solución:** Eliminar el directorio antes de reintentar.
-- **Conocimiento:** Cada intento debe partir de cero en todos los outputs, no sólo en uno.
+- **What occurred:** After a partial attempt, the re-run failed because `build-output/modules-stage` already existed.
+- **Why:** Same anti-mixing policy as OUT/DIST.
+- **How it was detected:** Message `modules-stage ya existe`.
+- **Solution:** Remove the directory before retrying.
+- **Knowledge:** Each attempt must start from scratch across all outputs, not just one.
 
-### 5. Rutas físicas en módulos (guardia de reproducibilidad)
+### 5. Physical Paths in Modules (reproducibility guard)
 
-- **Qué ocurrió:** El primer build exitoso compilación-wise fue rechazado por contener rutas absolutas en `.rodata` de módulos.
-- **Por qué:** Usé `--out build-output` (hermano del source) en lugar de `out-u11` (hijo directo del source), causando que ThinLTO registrara la ruta absoluta del guest.
-- **Cómo se detectó:** `grep -a -F "$RUN_ROOT" ems.ko` encontró 7 coincidencias.
-- **Solución:** Cambiar `--out` a `$RUN/build-source/out-u11` para que Kbuild use `srctree=..` y las flags `-fdebug-prefix-map` normalicen correctamente.
-- **Conocimiento:** La posición de `O=` respecto al source tree determina si Kbuild pasa rutas relativas o absolutas a Clang. Es una restricción estructural de ThinLTO, no un bug.
+- **What occurred:** The first build successful compilation-wise was rejected for containing absolute paths in `.rodata` of modules.
+- **Why:** Used `--out build-output` (sibling of source) instead of `out-u11` (direct child of source), causing ThinLTO to record the guest absolute path.
+- **How it was detected:** `grep -a -F "$RUN_ROOT" ems.ko` found 7 matches.
+- **Solution:** Change `--out` to `$RUN/build-source/out-u11` so Kbuild uses `srctree=..` and `-fdebug-prefix-map` flags normalize correctly.
+- **Knowledge:** The position of `O=` relative to the source tree determines whether Kbuild passes relative or absolute paths to Clang. It is a structural ThinLTO constraint, not a bug.
 
-## Procedimiento correcto documentado
+## Documented Correct Procedure
 
-Para futuros builds manuales fuera del wrapper:
+For future manual builds outside the wrapper:
 
-1. Extraer Kernel.tar.gz directamente en `RUN/build-source/` (sin subdirectorio).
-2. Aplicar overlay X510XXSBDZB4 sobre ese mismo nivel.
-3. Verificar `git apply --check patches/*.patch`.
-4. Invocar `build-u11-kernel-guest.sh` con `--run-root RUN --kernel RUN/build-source --out RUN/build-source/out-u11 --dist RUN/dist`.
-5. Nunca precrear `out-u11` ni `build-output/modules-stage`; el script los crea él mismo.
-6. Si un intento parcial falla: revertir patches (`git apply -R`), eliminar `out-u11`, `dist` y `modules-stage`, luego relanzar.
+1. Extract Kernel.tar.gz directly into `RUN/build-source/` (no subdirectory).
+2. Apply overlay X510XXSBDZB4 onto that same level.
+3. Check `git apply --check patches/*.patch`.
+4. Invoke `build-u11-kernel-guest.sh` with `--run-root RUN --kernel RUN/build-source --out RUN/build-source/out-u11 --dist RUN/dist`.
+5. Never precreate `out-u11` or `build-output/modules-stage`; the script creates them itself.
+6. If a partial attempt fails: revert patches (`git apply -R`), delete `out-u11`, `dist`, and `modules-stage`, then relaunch.
 
-## Evidencia generada
+## Generated Evidence
 
-| Artefacto | Ubicación |
+| Artifact | Location |
 |---|---|
 | Dist fixed8 | `artifacts/u11/x510xxsbdzb4-u11-fixed8-20260823/dist/` |
 | Dist fixed9 | `artifacts/u11/x510xxsbdzb4-u11-fixed9-20260823/dist/` |
 | STATUS fixed8 | `artifacts/u11/x510xxsbdzb4-u11-fixed8-20260823/STATUS` |
 | STATUS fixed9 | `artifacts/u11/x510xxsbdzb4-u11-fixed9-20260823/STATUS` |
-| Log build fixed8 | `artifacts/u11/x510xxsbdzb4-u11-fixed8-20260823/u11-build.log` |
-| Log build fixed9 | `artifacts/u11/x510xxsbdzb4-u11-fixed9-20260823/u11-build.log` |
-| Informe reproducibilidad | `reports/generated/u11-repro/reproducibility.md` |
-| JSON reproducibilidad | `reports/generated/u11-repro/reproducibility.json` |
+| Build log fixed8 | `artifacts/u11/x510xxsbdzb4-u11-fixed8-20260823/u11-build.log` |
+| Build log fixed9 | `artifacts/u11/x510xxsbdzb4-u11-fixed9-20260823/u11-build.log` |
+| Reproducibility report | `reports/generated/u11-repro/reproducibility.md` |
+| Reproducibility JSON | `reports/generated/u11-repro/reproducibility.json` |
 
-Veredicto operativo: **NO-GO físico**. Escritura en hardware sigue bloqueada.
+Operational verdict: **Physical NO-GO**. Hardware write remains blocked.

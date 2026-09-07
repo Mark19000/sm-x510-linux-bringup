@@ -1,50 +1,50 @@
-# Estado de Parche de Kernel: CVE-2026-43499 (`rtmutex.c`)
+# Kernel Patch Status: CVE-2026-43499 (`rtmutex.c`)
 
-- **Objetivo**: Determinación estática de la presencia o ausencia de la corrección upstream para CVE-2026-43499 en el árbol de código fuente Samsung EZE4 (`5.15.189-android13-3-33478785`).
-- **Archivo Auditado**: `audit/eze4-source-intake/extracted/kernel/kernel/locking/rtmutex.c`
-- **Función Clave**: `remove_waiter(struct rt_mutex_base *lock, struct rt_mutex_waiter *waiter)`
-- **Fecha de Auditoría**: 2026-09-06
-- **Clasificación Estricta**: **`PATCH ABSENT`**
-
----
-
-## 1. Veredicto y Clasificación
-
-```
-================================================================================
-VEREDICTO: PATCH ABSENT
-Clasificación de Seguridad: Árbol Local No Parcheado
-Impacto: La implementación local de remove_waiter() mantiene la suposición
-         heredada de que el waiter pertenece exclusivamente a "current",
-         omitiendo la sincronización y limpieza del "waiter->task" real.
-================================================================================
-```
+- **Objective**: Static determination of the presence or absence of the upstream fix for CVE-2026-43499 in the Samsung EZE4 source code tree (`5.15.189-android13-3-33478785`).
+- **Audited File**: `audit/eze4-source-intake/extracted/kernel/kernel/locking/rtmutex.c`
+- **Key Function**: `remove_waiter(struct rt_mutex_base *lock, struct rt_mutex_waiter *waiter)`
+- **Audit Date**: 2026-09-06
+- **Strict Classification**: **`PATCH ABSENT`**
 
 ---
 
-## 2. Contexto Técnico del Problema (CVE-2026-43499)
+## 1. Verdict and Classification
 
-El subsistema de exclusión mutua en tiempo real (`rtmutex`) proporciona soporte para herencia de prioridad (Priority Inheritance, PI). En escenarios normales de contención de cerrojos directos, un hilo (`current`) que se bloquea al intentar adquirir un `rt_mutex` registra su propio `rt_mutex_waiter` en la estructura del cerrojo y se pone a dormir.
+```
+================================================================================
+VERDICT: PATCH ABSENT
+Security Classification: Local Tree Unpatched
+Impact: The local implementation of remove_waiter() retains the legacy
+         assumption that the waiter belongs exclusively to "current",
+         omitting synchronization and cleanup of the actual "waiter->task".
+================================================================================
+```
 
-Sin embargo, en el contexto de **futex proxy locking** (principalmente utilizado en operaciones `futex_requeue` con cerrojos PI mediante `rt_mutex_start_proxy_lock()`), un hilo invocador actúa como proxy configurando la adquisición de un cerrojo en nombre de **otro hilo**. En esta ruta de ejecución:
+---
+
+## 2. Technical Context of the Issue (CVE-2026-43499)
+
+The real-time mutual exclusion (`rtmutex`) subsystem provides Priority Inheritance (PI) support. In normal direct-lock contention scenarios, a thread (`current`) that blocks attempting to acquire an `rt_mutex` registers its own `rt_mutex_waiter` on the lock structure and goes to sleep.
+
+However, in the context of **futex proxy locking** (primarily used in `futex_requeue` operations with PI locks via `rt_mutex_start_proxy_lock()`), a calling thread acts as a proxy setting up lock acquisition on behalf of **another thread**. On this execution path:
 $$\text{waiter}\to\text{task} \neq \text{current}$$
 
-Cuando el cerrojo no puede adquirirse o el proceso de espera falla prematuramente, la función `remove_waiter()` es invocada para retirar el registro del hilo en espera.
+When the lock cannot be acquired or the wait process fails prematurely, the `remove_waiter()` function is called to withdraw the waiting thread's registration.
 
-### Defecto Estructural en Árboles No Parcheados:
-En las versiones previas a la corrección, la función `remove_waiter()` asumía incondicionalmente que el hilo en espera era el hilo que ejecutaba la llamada (`current`):
-1. Adquiría `current->pi_lock` en lugar de `waiter->task->pi_lock`.
-2. Asignaba `current->pi_blocked_on = NULL`, dejando intacto el puntero `waiter->task->pi_blocked_on` en el hilo objetivo.
-3. El hilo real retenía una referencia colgante (dangling pointer) hacia una estructura `rt_mutex_waiter` asignada típicamente en la pila de un hilo cuyo marco de llamada podía ser liberado.
+### Structural Flaw in Unpatched Trees:
+In versions prior to the fix, `remove_waiter()` unconditionally assumed that the waiting thread was the thread executing the call (`current`):
+1. Acquired `current->pi_lock` instead of `waiter->task->pi_lock`.
+2. Set `current->pi_blocked_on = NULL`, leaving the `waiter->task->pi_blocked_on` pointer intact on the target thread.
+3. The actual thread retained a dangling pointer to an `rt_mutex_waiter` structure typically allocated on the stack of a thread whose call frame could be freed.
 
 ---
 
-## 3. Evidencia en el Árbol Local EZE4
+## 3. Evidence in Local EZE4 Tree
 
-En el código fuente exacto de Samsung EZE4 (`kernel/locking/rtmutex.c`, líneas 1459–1510), la función `remove_waiter` se encuentra implementada de la siguiente manera:
+In the exact Samsung EZE4 source code (`kernel/locking/rtmutex.c`, lines 1459–1510), the `remove_waiter` function is implemented as follows:
 
 ```c
-/* Líneas 1459-1472 en kernel/locking/rtmutex.c (EZE4) */
+/* Lines 1459-1472 in kernel/locking/rtmutex.c (EZE4) */
 
 static void __sched remove_waiter(struct rt_mutex_base *lock,
 				  struct rt_mutex_waiter *waiter)
@@ -69,18 +69,18 @@ static void __sched remove_waiter(struct rt_mutex_base *lock,
 ...
 ```
 
-### Observaciones Directas del Código Local:
-1. **Línea 1468**: Se ejecuta `raw_spin_lock(&current->pi_lock);` vinculando el cerrojo del hilo invocador, sin evaluar `waiter->task`.
-2. **Línea 1470**: Se limpia únicamente `current->pi_blocked_on = NULL;`.
-3. **Ausencia de comprobación de puntero**: No existe ninguna guardia `if (!waiter->task)` ni referencia a `waiter->task->pi_lock`.
+### Direct Observations of Local Code:
+1. **Line 1468**: Executes `raw_spin_lock(&current->pi_lock);` locking the calling thread's lock, without evaluating `waiter->task`.
+2. **Line 1470**: Only clears `current->pi_blocked_on = NULL;`.
+3. **Absence of pointer check**: There is no `if (!waiter->task)` guard or reference to `waiter->task->pi_lock`.
 
 ---
 
-## 4. Comparación con la Corrección Upstream
+## 4. Comparison with Upstream Fix
 
-La corrección oficial upstream (asociada a la resolución de CVE-2026-43499 y relacionada con el commit `3bfdc63936dd` y derivados) introduce una gestión explícita de `waiter->task` y documenta explícitamente la discrepancia entre el invocador proxy y el hilo en espera:
+The official upstream fix (associated with CVE-2026-43499 resolution and related to commit `3bfdc63936dd` and derivatives) introduces explicit handling of `waiter->task` and explicitly documents the discrepancy between the proxy caller and the waiting thread:
 
-### Diff Mínimo Conceptual (Upstream vs EZE4 Local):
+### Conceptual Minimal Diff (Upstream vs Local EZE4):
 
 ```diff
 --- kernel/locking/rtmutex.c (Local EZE4 5.15.189)
@@ -94,36 +94,36 @@ La corrección oficial upstream (asociada a la resolución de CVE-2026-43499 y r
 + * When invoked from rt_mutex_start_proxy_lock() waiter::task != current !
   */
  static void __sched remove_waiter(struct rt_mutex_base *lock,
-				  struct rt_mutex_waiter *waiter)
-+	__must_hold(&lock->wait_lock)
+                   struct rt_mutex_waiter *waiter)
++    __must_hold(&lock->wait_lock)
  {
-	bool is_top_waiter = (waiter == rt_mutex_top_waiter(lock));
-	struct task_struct *owner = rt_mutex_owner(lock);
-+	struct task_struct *waiter_task = waiter->task;
-	struct rt_mutex_base *next_lock;
+     bool is_top_waiter = (waiter == rt_mutex_top_waiter(lock));
+     struct task_struct *owner = rt_mutex_owner(lock);
++    struct task_struct *waiter_task = waiter->task;
+     struct rt_mutex_base *next_lock;
 
-	lockdep_assert_held(&lock->wait_lock);
+     lockdep_assert_held(&lock->wait_lock);
 
--	raw_spin_lock(&current->pi_lock);
--	rt_mutex_dequeue(lock, waiter);
--	current->pi_blocked_on = NULL;
--	raw_spin_unlock(&current->pi_lock);
-+	if (!waiter_task) /* never enqueued */
-+		return;
+-    raw_spin_lock(&current->pi_lock);
+-    rt_mutex_dequeue(lock, waiter);
+-    current->pi_blocked_on = NULL;
+-    raw_spin_unlock(&current->pi_lock);
++    if (!waiter_task) /* never enqueued */
++        return;
 +
-+	scoped_guard(raw_spinlock, &waiter_task->pi_lock) {
-+		rt_mutex_dequeue(lock, waiter);
-+		waiter_task->pi_blocked_on = NULL;
-+	}
++    scoped_guard(raw_spinlock, &waiter_task->pi_lock) {
++        rt_mutex_dequeue(lock, waiter);
++        waiter_task->pi_blocked_on = NULL;
++    }
 
-	/*
-	 * Only update priority if the waiter was the highest priority
+     /*
+      * Only update priority if the waiter was the highest priority
 ```
 
 ---
 
-## 5. Razonamiento Técnico Conclusivo
+## 5. Conclusive Technical Reasoning
 
-1. **Paridad con ZG3**: El firmware `X510XXSEEZG3` (compilado en julio de 2026 sobre la base 5.15.189) demostró en el repositorio de referencia ser susceptible al mecanismo de explotación basado en la corrupción de punteros de `remove_waiter()`.
-2. **Cronología de Versiones**: El firmware local `X510XXUCEZE4` corresponde a la compilación de mayo de 2026 (dos meses anterior a ZG3). Dado que la corrección no fue incorporada en el árbol de soporte a largo plazo (LTS) de Samsung hasta compilaciones posteriores al ciclo de parches de agosto de 2026, el código fuente local preserva la lógica vulnerable intacta.
-3. **Conclusión**: El árbol fuente del kernel `X510XXUCEZE4` clasifica sin ambigüedad como **`PATCH ABSENT`**.
+1. **Parity with ZG3**: Firmware `X510XXSEEZG3` (compiled in July 2026 on the 5.15.189 base) was shown in the reference repository to be susceptible to the exploitation mechanism based on `remove_waiter()` pointer corruption.
+2. **Version Chronology**: Local firmware `X510XXUCEZE4` corresponds to the May 2026 build (two months prior to ZG3). Since the fix was not incorporated into Samsung's long-term support (LTS) tree until builds subsequent to the August 2026 patch cycle, the local source code preserves the vulnerable logic intact.
+3. **Conclusion**: The `X510XXUCEZE4` kernel source tree unambiguously classifies as **`PATCH ABSENT`**.

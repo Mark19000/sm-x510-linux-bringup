@@ -201,7 +201,7 @@ def run(root: Path) -> dict[str, object]:
         and only_u11 == ["a96t396.ko", "input_booster_lkm.ko"]
     )
     add(checks, "stock_u11_load_order", "PASS" if order_ok else "FAIL",
-        f"280 comunes en igual orden; sólo stock={only_stock}; sólo U11={only_u11}")
+        f"280 common in same order; stock only={only_stock}; U11 only={only_u11}")
 
     profile_details: dict[str, object] = {}
     for profile, expected, required in (
@@ -214,17 +214,17 @@ def run(root: Path) -> dict[str, object]:
         wrong_release = [path.name for path in profile_modules if not module_metadata(path, "5.15.180")[0]]
         ok = len(profile_modules) == expected and required <= included and not closure_missing and not wrong_release
         add(checks, f"{profile}_closure", "PASS" if ok else "FAIL",
-            f"{len(profile_modules)} módulos U11; dependencias ausentes={len(closure_missing)}")
+            f"{len(profile_modules)} U11 modules; missing dependencies={len(closure_missing)}")
         profile_details[profile] = {"modules": len(profile_modules), "required": sorted(required),
                                     "missing_dependencies": closure_missing, "wrong_release": wrong_release}
 
     usb_ids = {module_id(path.name) for path in (initramfs / "usb/rootfs/lib/modules/5.15.180").rglob("*.ko")}
     host_mode_present = "xhci_exynos" in usb_ids
     add(checks, "usb_role_scope", "WARN",
-        "perfil orientado a gadget/ACM; xhci-exynos no incluido" if not host_mode_present else "xhci-exynos incluido; auditar host/dual-role")
+        "profile gadget/ACM-oriented; xhci-exynos not included" if not host_mode_present else "xhci-exynos included; audit host/dual-role")
     add(checks, "scsc_firmware", "WARN",
-        "Wi-Fi/BT no se incluye para M2/M3; falta extraer /vendor/firmware/wifi y calibración EFS")
-    add(checks, "physical_write_gate", "WARN", "NO-GO: auditoría de módulos no autoriza empaquetar ni flashear")
+        "Wi-Fi/BT is not included for M2/M3; /vendor/firmware/wifi and EFS calibration still need extraction")
+    add(checks, "physical_write_gate", "WARN", "NO-GO: module audit does not authorize packaging or flashing")
 
     return {
         "schema": 1,
@@ -241,30 +241,31 @@ def run(root: Path) -> dict[str, object]:
 def render(result: dict[str, object]) -> str:
     order = result["load_order"]
     lines_out = [
-        "# Auditoría de módulos U11 ↔ vendor_boot EZE4",
+        "# U11 Modules Audit ↔ EZE4 vendor_boot",
         "",
-        "## Resultado",
+        "## Result",
         "",
-        f"- módulos U11: `{result['u11']['modules']}` (`{result['u11']['release']}`)",
-        f"- módulos stock EZE4 en dlkm: `{result['stock_eze4']['modules']}`",
-        f"- módulos comunes: `{order['common']}`, mismo orden relativo: `{str(order['common_relative_order_equal']).lower()}`",
-        f"- sólo stock: `{', '.join(order['only_stock'])}`",
-        f"- sólo U11: `{', '.join(order['only_u11'])}`",
-        f"- puerta física: `{result['physical_write_gate']}`",
+        f"- U11 modules: `{result['u11']['modules']}` (`{result['u11']['release']}`)",
+        f"- stock EZE4 modules in dlkm: `{result['stock_eze4']['modules']}`",
+        f"- common modules: `{order['common']}`, same relative order: `{str(order['common_relative_order_equal']).lower()}`",
+        f"- stock only: `{', '.join(order['only_stock'])}`",
+        f"- U11 only: `{', '.join(order['only_u11'])}`",
+        f"- physical gate: `{result['physical_write_gate']}`",
         "",
-        "## Comprobaciones",
+        "## Checks",
         "",
-        "| estado | comprobación | detalle |",
+        "| status | check | detail |",
         "|---|---|---|",
     ]
     for item in result["checks"]:
         lines_out.append(f"| `{item['status']}` | `{item['id']}` | {item['detail']} |")
     lines_out.extend((
-        "", "## Interpretación", "",
-        "La igualdad de orden relativo reduce el riesgo de inicialización temprana, pero no",
-        "demuestra ABI binaria U11↔EZE4. Nunca se cargan módulos stock con el kernel U11",
-        "ni módulos U11 con el kernel stock. UFS y USB sólo tienen cierre estático probado;",
-        "DT, clocks, PHY, reguladores y Type-C aún requieren observación en hardware.", "",
+        "", "## Interpretation", "",
+        "Equal relative order reduces early initialization risk, but does not prove",
+        "U11↔EZE4 binary ABI. Stock modules are never loaded with the U11 kernel, nor U11",
+        "modules with the stock kernel. UFS and USB only have static closure proven;",
+        "DT, clocks, PHY, regulators, and Type-C still require hardware observation.",
+        "",
     ))
     return "\n".join(lines_out)
 

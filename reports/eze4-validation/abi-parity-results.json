@@ -1,0 +1,2058 @@
+{
+  "summary": {
+    "total_stock_modules": 281,
+    "modules_perfect_match": 281,
+    "modules_with_crc_mismatches": 0,
+    "modules_with_missing_symbols": 0,
+    "total_symbols_referenced": 15123,
+    "total_symbols_matched": 15123,
+    "total_symbols_mismatched": 0,
+    "total_symbols_missing": 0
+  },
+  "early_boot": {
+    "clk_exynos.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 31,
+      "matched": 31,
+      "mismatched": [],
+      "missing": []
+    },
+    "dwc3-exynos-usb.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 118,
+      "matched": 118,
+      "mismatched": [],
+      "missing": []
+    },
+    "ems.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 249,
+      "matched": 249,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-chipid_v2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 25,
+      "matched": 25,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_mct_v3.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "mali_kbase.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 351,
+      "matched": 351,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_mfd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu16_mfd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 44,
+      "matched": 44,
+      "mismatched": [],
+      "missing": []
+    },
+    "zram.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 159,
+      "matched": 159,
+      "mismatched": [],
+      "missing": []
+    }
+  },
+  "mismatched_symbols_frequency": {},
+  "missing_symbols_frequency": {},
+  "per_module": {
+    "acecad.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "acpm-mfd-bus.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "aiptek.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "blk-sec-common.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 8,
+      "matched": 8,
+      "mismatched": [],
+      "missing": []
+    },
+    "blk-sec-stats.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 51,
+      "matched": 51,
+      "mismatched": [],
+      "missing": []
+    },
+    "blk-sec-wb.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 31,
+      "matched": 31,
+      "mismatched": [],
+      "missing": []
+    },
+    "cdc-wdm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 56,
+      "matched": 56,
+      "mismatched": [],
+      "missing": []
+    },
+    "cdc_mbim.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "cdc_subset.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 8,
+      "matched": 8,
+      "mismatched": [],
+      "missing": []
+    },
+    "cfg80211.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 191,
+      "matched": 191,
+      "mismatched": [],
+      "missing": []
+    },
+    "clk_exynos.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 31,
+      "matched": 31,
+      "mismatched": [],
+      "missing": []
+    },
+    "cmupmucal.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 91,
+      "matched": 91,
+      "mismatched": [],
+      "missing": []
+    },
+    "common_muic.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 32,
+      "matched": 32,
+      "mismatched": [],
+      "missing": []
+    },
+    "cpif.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 197,
+      "matched": 197,
+      "mismatched": [],
+      "missing": []
+    },
+    "cpif_memlogger.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 11,
+      "matched": 11,
+      "mismatched": [],
+      "missing": []
+    },
+    "cpif_page.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 14,
+      "matched": 14,
+      "mismatched": [],
+      "missing": []
+    },
+    "dbmdx_codec.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 156,
+      "matched": 156,
+      "mismatched": [],
+      "missing": []
+    },
+    "debug-snapshot-debug-kinfo.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 14,
+      "matched": 14,
+      "mismatched": [],
+      "missing": []
+    },
+    "dev_ril_bridge.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "dma-buf-container.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 21,
+      "matched": 21,
+      "mismatched": [],
+      "missing": []
+    },
+    "dss.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 138,
+      "matched": 138,
+      "mismatched": [],
+      "missing": []
+    },
+    "dw_mmc-exynos-sec.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 68,
+      "matched": 68,
+      "mismatched": [],
+      "missing": []
+    },
+    "dw_mmc-pltfm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 15,
+      "matched": 15,
+      "mismatched": [],
+      "missing": []
+    },
+    "dw_mmc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 113,
+      "matched": 113,
+      "mismatched": [],
+      "missing": []
+    },
+    "dwc3-exynos-usb.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 118,
+      "matched": 118,
+      "mismatched": [],
+      "missing": []
+    },
+    "ect_parser.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 26,
+      "matched": 26,
+      "mismatched": [],
+      "missing": []
+    },
+    "ehld.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 48,
+      "matched": 48,
+      "mismatched": [],
+      "missing": []
+    },
+    "ems.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 249,
+      "matched": 249,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-acme.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 112,
+      "matched": 112,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-adv-tracer-s2d.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-adv-tracer.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-afm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 59,
+      "matched": 59,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-bcm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 64,
+      "matched": 64,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-bts.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 49,
+      "matched": 49,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-btsops8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-chipid_v2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 25,
+      "matched": 25,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-cm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 28,
+      "matched": 28,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-coresight.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 31,
+      "matched": 31,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-cpuhp.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 27,
+      "matched": 27,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-cpupm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 92,
+      "matched": 92,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-dm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 55,
+      "matched": 55,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-drm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 412,
+      "matched": 412,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-dsufreq.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 46,
+      "matched": 46,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-ecc-handler.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 40,
+      "matched": 40,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-el2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 29,
+      "matched": 29,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-getcpustate.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 17,
+      "matched": 17,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-itmon-v2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 59,
+      "matched": 59,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-mcinfo.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 22,
+      "matched": 22,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-pd-dbg.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 28,
+      "matched": 28,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-pd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 38,
+      "matched": 38,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-pd_el3.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-pm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 46,
+      "matched": 46,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-pmu-if.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-reboot.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 17,
+      "matched": 17,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-s2mpu.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 34,
+      "matched": 34,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-sdm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 8,
+      "matched": 8,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-seclog.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 26,
+      "matched": 26,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-seh.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 14,
+      "matched": 14,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-ssld.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 33,
+      "matched": 33,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-tzasc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-ufcc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-usi_v2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 17,
+      "matched": 17,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos-wow.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 32,
+      "matched": 32,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos8835_audio.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 61,
+      "matched": 61,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_acpm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 77,
+      "matched": 77,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_devfreq.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 131,
+      "matched": 131,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_mct_v3.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_mfc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 203,
+      "matched": 203,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_pm_qos.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 48,
+      "matched": 48,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_thermal_v2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 154,
+      "matched": 154,
+      "mismatched": [],
+      "missing": []
+    },
+    "exynos_tty.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 115,
+      "matched": 115,
+      "mismatched": [],
+      "missing": []
+    },
+    "exyswd-rng.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 17,
+      "matched": 17,
+      "mismatched": [],
+      "missing": []
+    },
+    "fimc-is.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 391,
+      "matched": 391,
+      "mismatched": [],
+      "missing": []
+    },
+    "fingerprint.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 94,
+      "matched": 94,
+      "mismatched": [],
+      "missing": []
+    },
+    "fingerprint_sysfs.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 8,
+      "matched": 8,
+      "mismatched": [],
+      "missing": []
+    },
+    "flexpmu_dbg.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 27,
+      "matched": 27,
+      "mismatched": [],
+      "missing": []
+    },
+    "freq-qos-tracer.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 22,
+      "matched": 22,
+      "mismatched": [],
+      "missing": []
+    },
+    "gdc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 130,
+      "matched": 130,
+      "mismatched": [],
+      "missing": []
+    },
+    "gnss_mbox.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 26,
+      "matched": 26,
+      "mismatched": [],
+      "missing": []
+    },
+    "gnssif.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 106,
+      "matched": 106,
+      "mismatched": [],
+      "missing": []
+    },
+    "gpu_cooling.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 48,
+      "matched": 48,
+      "mismatched": [],
+      "missing": []
+    },
+    "hall_ic.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "hall_ic_notifier.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "hanwang.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "hardlockup-watchdog.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 33,
+      "matched": 33,
+      "mismatched": [],
+      "missing": []
+    },
+    "hdm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 12,
+      "matched": 12,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-a4tech.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 11,
+      "matched": 11,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-axff.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 22,
+      "matched": 22,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-belkin.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-cherry.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-chicony.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 13,
+      "matched": 13,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-cypress.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 11,
+      "matched": 11,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-dr.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 20,
+      "matched": 20,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-emsff.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 19,
+      "matched": 19,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-ezkey.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-gaff.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 18,
+      "matched": 18,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-gyration.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-holtek-kbd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 10,
+      "matched": 10,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-holtek-mouse.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-holtekff.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-kensington.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 4,
+      "matched": 4,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-keytouch.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-kye.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 13,
+      "matched": 13,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-monterey.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-ntrig.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 27,
+      "matched": 27,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-ortek.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-petalynx.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 10,
+      "matched": 10,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-primax.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-saitek.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 10,
+      "matched": 10,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-sjoy.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-speedlink.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 4,
+      "matched": 4,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-sunplus.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-thrustmaster.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 21,
+      "matched": 21,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-tivo.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-tmff.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-topseed.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-twinhan.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-waltop.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 4,
+      "matched": 4,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-zpff.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "hid-zydacron.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 14,
+      "matched": 14,
+      "mismatched": [],
+      "missing": []
+    },
+    "himax_ts_83xxx_spi.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 145,
+      "matched": 145,
+      "mismatched": [],
+      "missing": []
+    },
+    "i2c-exynos5.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 68,
+      "matched": 68,
+      "mismatched": [],
+      "missing": []
+    },
+    "if_cb_manager.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "imgloader.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "irq-gic-vh.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 15,
+      "matched": 15,
+      "mismatched": [],
+      "missing": []
+    },
+    "is-actuator-dw9808.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "is-cis-hi1337.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "is-cis-imx355.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 33,
+      "matched": 33,
+      "mismatched": [],
+      "missing": []
+    },
+    "is-device-eeprom.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 12,
+      "matched": 12,
+      "mismatched": [],
+      "missing": []
+    },
+    "is-device-otprom.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 13,
+      "matched": 13,
+      "mismatched": [],
+      "missing": []
+    },
+    "kbtab.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "kperfmon.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 38,
+      "matched": 38,
+      "mismatched": [],
+      "missing": []
+    },
+    "lvstest.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 30,
+      "matched": 30,
+      "mismatched": [],
+      "missing": []
+    },
+    "mali_kbase.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 351,
+      "matched": 351,
+      "mismatched": [],
+      "missing": []
+    },
+    "matrix-keymap.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "mcd-panel-hx83102j_gts9fe_boe.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "mcd-panel-nt36523n_gts9fe_csot.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "mcd-panel-samsung-drv.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 96,
+      "matched": 96,
+      "mismatched": [],
+      "missing": []
+    },
+    "mcd-panel-samsung-helper.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 20,
+      "matched": 20,
+      "mismatched": [],
+      "missing": []
+    },
+    "mcd-panel.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 170,
+      "matched": 170,
+      "mismatched": [],
+      "missing": []
+    },
+    "mcu_ipc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 33,
+      "matched": 33,
+      "mismatched": [],
+      "missing": []
+    },
+    "memlogger.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 72,
+      "matched": 72,
+      "mismatched": [],
+      "missing": []
+    },
+    "mfd_sm5714.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 56,
+      "matched": 56,
+      "mismatched": [],
+      "missing": []
+    },
+    "muic_sm5714.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 63,
+      "matched": 63,
+      "mismatched": [],
+      "missing": []
+    },
+    "mx_client_test.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 39,
+      "matched": 39,
+      "mismatched": [],
+      "missing": []
+    },
+    "nanohub.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 172,
+      "matched": 172,
+      "mismatched": [],
+      "missing": []
+    },
+    "net1080.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 21,
+      "matched": 21,
+      "mismatched": [],
+      "missing": []
+    },
+    "novatek_ts_nt36523.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 130,
+      "matched": 130,
+      "mismatched": [],
+      "missing": []
+    },
+    "npu.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 218,
+      "matched": 218,
+      "mismatched": [],
+      "missing": []
+    },
+    "pablo-hws.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 67,
+      "matched": 67,
+      "mismatched": [],
+      "missing": []
+    },
+    "pablo-icpu.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 121,
+      "matched": 121,
+      "mismatched": [],
+      "missing": []
+    },
+    "pablo-libs.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 158,
+      "matched": 158,
+      "mismatched": [],
+      "missing": []
+    },
+    "pablo-self-tests.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "pablo-smc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 4,
+      "matched": 4,
+      "mismatched": [],
+      "missing": []
+    },
+    "pdic_notifier_module.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 41,
+      "matched": 41,
+      "mismatched": [],
+      "missing": []
+    },
+    "pdic_sm5714.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 105,
+      "matched": 105,
+      "mismatched": [],
+      "missing": []
+    },
+    "phy-exynos-mipi-dsim.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "phy-exynos-mipi.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 38,
+      "matched": 38,
+      "mismatched": [],
+      "missing": []
+    },
+    "phy-exynos-usbdrd-super.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 76,
+      "matched": 76,
+      "mismatched": [],
+      "missing": []
+    },
+    "pinctrl-samsung-core.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 73,
+      "matched": 73,
+      "mismatched": [],
+      "missing": []
+    },
+    "pl330.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 77,
+      "matched": 77,
+      "mismatched": [],
+      "missing": []
+    },
+    "pmic_class.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 8,
+      "matched": 8,
+      "mismatched": [],
+      "missing": []
+    },
+    "pwm-samsung.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_adc_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 19,
+      "matched": 19,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_key_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 34,
+      "matched": 34,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_mfd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_pinctrl_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 28,
+      "matched": 28,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_regulator_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 45,
+      "matched": 45,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu15_rtc_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu16_mfd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu16_pinctrl_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 34,
+      "matched": 34,
+      "mismatched": [],
+      "missing": []
+    },
+    "s2mpu16_regulator_8835.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 39,
+      "matched": 39,
+      "mismatched": [],
+      "missing": []
+    },
+    "s3c2410_wdt.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 58,
+      "matched": 58,
+      "mismatched": [],
+      "missing": []
+    },
+    "samsung-dma.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 15,
+      "matched": 15,
+      "mismatched": [],
+      "missing": []
+    },
+    "samsung-iommu-group.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 8,
+      "matched": 8,
+      "mismatched": [],
+      "missing": []
+    },
+    "samsung-secure-iova.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 18,
+      "matched": 18,
+      "mismatched": [],
+      "missing": []
+    },
+    "samsung_dma_heap.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 186,
+      "matched": 186,
+      "mismatched": [],
+      "missing": []
+    },
+    "samsung_iommu.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 90,
+      "matched": 90,
+      "mismatched": [],
+      "missing": []
+    },
+    "sb-core.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "sb_wireless.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "scaler.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 184,
+      "matched": 184,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_bt.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 110,
+      "matched": 110,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_log_collection.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 51,
+      "matched": 51,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_logring.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 65,
+      "matched": 65,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_mmap.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 44,
+      "matched": 44,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_mx.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 158,
+      "matched": 158,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_mx250_fm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 48,
+      "matched": 48,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_platform_mif.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 73,
+      "matched": 73,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_wifilogger.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 44,
+      "matched": 44,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsc_wlan.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 365,
+      "matched": 365,
+      "mismatched": [],
+      "missing": []
+    },
+    "scsi_srpmb.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 43,
+      "matched": 43,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec-battery.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 137,
+      "matched": 137,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec-direct-charger.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 52,
+      "matched": 52,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_argos.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 52,
+      "matched": 52,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_audio_debug.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 52,
+      "matched": 52,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_audio_sysfs.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 22,
+      "matched": 22,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_bootstat.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 43,
+      "matched": 43,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_class.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 10,
+      "matched": 10,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_cmd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 44,
+      "matched": 44,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_common_fn.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 69,
+      "matched": 69,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_crash_key_user.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 44,
+      "matched": 44,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_base_early.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 54,
+      "matched": 54,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_dprm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 13,
+      "matched": 13,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_dprt.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 29,
+      "matched": 29,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_dtask.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_extra_info.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 52,
+      "matched": 52,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_hardlockup_info.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 41,
+      "matched": 41,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_hw_param.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_mode.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_reset_reason.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 19,
+      "matched": 19,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_sched_info.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_sched_report.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 35,
+      "matched": 35,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_slab_info.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 14,
+      "matched": 14,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_softdog.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 7,
+      "matched": 7,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_stacktrace.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_test.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 97,
+      "matched": 97,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_debug_wdd_info.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_hard_reset_hook.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 12,
+      "matched": 12,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_input_notifier.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_key_notifier.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 19,
+      "matched": 19,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_nfc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 47,
+      "matched": 47,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_panel_notifier_v2.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 6,
+      "matched": 6,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_pd.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 4,
+      "matched": 4,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_pm_debug.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 25,
+      "matched": 25,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_pm_qos_monitor.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 29,
+      "matched": 29,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_reboot.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 36,
+      "matched": 36,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_thermistor.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 23,
+      "matched": 23,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_tsp_dumpkey.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 18,
+      "matched": 18,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_tsp_log.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 26,
+      "matched": 26,
+      "mismatched": [],
+      "missing": []
+    },
+    "sec_wakeup_cpu_allocator.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "secmem.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 37,
+      "matched": 37,
+      "mismatched": [],
+      "missing": []
+    },
+    "sensor_core.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 24,
+      "matched": 24,
+      "mismatched": [],
+      "missing": []
+    },
+    "shm_ipc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 29,
+      "matched": 29,
+      "mismatched": [],
+      "missing": []
+    },
+    "shub.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 131,
+      "matched": 131,
+      "mismatched": [],
+      "missing": []
+    },
+    "sm5440-charger.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 71,
+      "matched": 71,
+      "mismatched": [],
+      "missing": []
+    },
+    "sm5714-charger.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 60,
+      "matched": 60,
+      "mismatched": [],
+      "missing": []
+    },
+    "sm5714_fuelgauge.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 64,
+      "matched": 64,
+      "mismatched": [],
+      "missing": []
+    },
+    "smfc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 114,
+      "matched": 114,
+      "mismatched": [],
+      "missing": []
+    },
+    "smsc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 25,
+      "matched": 25,
+      "mismatched": [],
+      "missing": []
+    },
+    "smsc75xx.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 65,
+      "matched": 65,
+      "mismatched": [],
+      "missing": []
+    },
+    "smsc95xx.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 82,
+      "matched": 82,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-cirrus-amp.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 64,
+      "matched": 64,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-cs35l45-i2c.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 114,
+      "matched": 114,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-s3c-dma.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 5,
+      "matched": 5,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-samsung-abox-gic.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 39,
+      "matched": 39,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-samsung-abox.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 342,
+      "matched": 342,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-samsung-slif.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 68,
+      "matched": 68,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-samsung-vts-mailbox.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 40,
+      "matched": 40,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-samsung-vts.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 160,
+      "matched": 160,
+      "mismatched": [],
+      "missing": []
+    },
+    "snd-soc-wm-adsp.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 80,
+      "matched": 80,
+      "mismatched": [],
+      "missing": []
+    },
+    "softdog.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 27,
+      "matched": 27,
+      "mismatched": [],
+      "missing": []
+    },
+    "spi-s3c64xx.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 87,
+      "matched": 87,
+      "mismatched": [],
+      "missing": []
+    },
+    "spidev.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 43,
+      "matched": 43,
+      "mismatched": [],
+      "missing": []
+    },
+    "ssg.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 81,
+      "matched": 81,
+      "mismatched": [],
+      "missing": []
+    },
+    "stm32_pogo_v3.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 106,
+      "matched": 106,
+      "mismatched": [],
+      "missing": []
+    },
+    "switch_class.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 19,
+      "matched": 19,
+      "mismatched": [],
+      "missing": []
+    },
+    "sysevent.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 77,
+      "matched": 77,
+      "mismatched": [],
+      "missing": []
+    },
+    "sysevent_notif.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "tuihw-inf.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 15,
+      "matched": 15,
+      "mismatched": [],
+      "missing": []
+    },
+    "tuihw.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 68,
+      "matched": 68,
+      "mismatched": [],
+      "missing": []
+    },
+    "tzdev.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 126,
+      "matched": 126,
+      "mismatched": [],
+      "missing": []
+    },
+    "ufs-exynos-core.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 183,
+      "matched": 183,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_f_conn_gadget.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 50,
+      "matched": 50,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_f_dm.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 30,
+      "matched": 30,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_f_dm1.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 21,
+      "matched": 21,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_f_ss_mon_gadget.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 45,
+      "matched": 45,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_notifier.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 42,
+      "matched": 42,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_notify_layer.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 112,
+      "matched": 112,
+      "mismatched": [],
+      "missing": []
+    },
+    "usb_typec_manager.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 48,
+      "matched": 48,
+      "mismatched": [],
+      "missing": []
+    },
+    "usblp.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 58,
+      "matched": 58,
+      "mismatched": [],
+      "missing": []
+    },
+    "usbserial.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 110,
+      "matched": 110,
+      "mismatched": [],
+      "missing": []
+    },
+    "usdm-panel-tft-common.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 14,
+      "matched": 14,
+      "mismatched": [],
+      "missing": []
+    },
+    "vbus_notifier.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 9,
+      "matched": 9,
+      "mismatched": [],
+      "missing": []
+    },
+    "votf.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 34,
+      "matched": 34,
+      "mismatched": [],
+      "missing": []
+    },
+    "wez01.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 105,
+      "matched": 105,
+      "mismatched": [],
+      "missing": []
+    },
+    "xhci-exynos.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 80,
+      "matched": 80,
+      "mismatched": [],
+      "missing": []
+    },
+    "xperf.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 88,
+      "matched": 88,
+      "mismatched": [],
+      "missing": []
+    },
+    "zaurus.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 16,
+      "matched": 16,
+      "mismatched": [],
+      "missing": []
+    },
+    "zram.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 159,
+      "matched": 159,
+      "mismatched": [],
+      "missing": []
+    },
+    "zsmalloc.ko": {
+      "vermagic": "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64",
+      "total_needed": 58,
+      "matched": 58,
+      "mismatched": [],
+      "missing": []
+    }
+  },
+  "vermagic_distinct": [
+    "5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64"
+  ]
+}

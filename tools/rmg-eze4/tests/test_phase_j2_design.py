@@ -1,4 +1,5 @@
 import ast
+import copy
 import json
 from pathlib import Path
 import sys
@@ -32,12 +33,11 @@ class PhaseJ2CanonicalDesignTests(unittest.TestCase):
                 expected_verdict = scenario["expected"]
                 expected_reason_substr = scenario.get("expected_reason_substr")
 
-                # Verify Schema v2.2.1 validity for non-invalid records
+                # Every record, including a trial classified INVALID, must be a
+                # structurally and semantically valid observation record.
                 for r in records:
-                    validity = r.get("classification", {}).get("trial_validity")
-                    if validity != "INVALID":
-                        valid, errors = validate_observation_record(r)
-                        self.assertTrue(valid, f"Scenario {scn_id} record invalid: {errors}")
+                    valid, errors = validate_observation_record(r)
+                    self.assertTrue(valid, f"Scenario {scn_id} record invalid: {errors}")
 
                 result = aggregate_campaign(records)
 
@@ -110,6 +110,22 @@ class PhaseJ2CanonicalDesignTests(unittest.TestCase):
         self.assertEqual(res6["verdict"], "INCONCLUSIVE")
         self.assertNotEqual(res6["verdict"], "INCOMPATIBLE")
 
+        # Threshold + 1 (4) remains INCOMPATIBLE. Build this mutation without
+        # consulting aggregator constants so a changed production threshold is killed.
+        four = copy.deepcopy(scenarios["three_timeouts_same_condition_two_boots"]["records"])
+        timeout_template = next(
+            r for r in four
+            if r["classification"]["trial_terminal_class"] == "SUPERVISOR_OVERALL_TIMEOUT"
+        )
+        fourth = next(
+            r for r in four
+            if r["condition_vector"]["condition_class"] == "SETTLED_NOMINAL"
+            and r["classification"]["trial_terminal_class"] == "QUALIFYING_COMPLETION"
+        )
+        fourth["timing_metrics"] = copy.deepcopy(timeout_template["timing_metrics"])
+        fourth["classification"] = copy.deepcopy(timeout_template["classification"])
+        self.assertEqual(aggregate_campaign(four)["verdict"], "INCOMPATIBLE")
+
     def test_isolated_cell_deficit_requires_two_trials_per_cell(self):
         """CRITICAL: Every boot x condition cell requires >= 2 valid trials (E4 invariant).
 
@@ -159,8 +175,10 @@ class PhaseJ2CanonicalDesignTests(unittest.TestCase):
     def test_no_engine_import_in_j2(self):
         """Regression guard: ensure canonical J2 code does not import legacy engine.py."""
         j2_files = [
-            ROOT / "tools/rmg-eze4/analysis/aggregator.py",
-            ROOT / "tools/rmg-eze4/analysis/validator.py",
+            *(
+                path for path in (ROOT / "tools/rmg-eze4/analysis").glob("*.py")
+                if path.name != "engine.py"
+            ),
             ROOT / "tools/rmg-eze4/tests/test_phase_j2_design.py",
             ROOT / "tools/rmg-eze4/tests/test_phase_j2_1_r1_replay.py",
             ROOT / "tools/rmg-eze4/tests/test_phase_j2_1_r1_schema.py",
@@ -182,6 +200,46 @@ class PhaseJ2CanonicalDesignTests(unittest.TestCase):
                             node.module, "engine",
                             f"{filepath.name} imports from legacy 'engine'"
                         )
+
+    def test_aggregator_rejects_malformed_missing_and_unsupported_schema(self):
+        scenarios = {s["id"]: s for s in json.loads(FIXTURES.read_text())}
+        clean = scenarios["clean_compatible"]["records"]
+
+        malformed = copy.deepcopy(clean)
+        malformed[0] = "not-an-observation"
+        self.assertEqual(aggregate_campaign(malformed)["verdict"], "INVALID_EXPERIMENT")
+
+        missing = copy.deepcopy(clean)
+        del missing[0]["classification"]
+        self.assertEqual(aggregate_campaign(missing)["verdict"], "INVALID_EXPERIMENT")
+
+        old_schema = copy.deepcopy(clean)
+        old_schema[0]["schema_version"] = "2.2.0"
+        result = aggregate_campaign(old_schema)
+        self.assertEqual(result["verdict"], "INVALID_EXPERIMENT")
+        self.assertTrue(any("INVALID_SCHEMA_VERSION_2.2.0" in r for r in result["reasons"]))
+
+    def test_duplicate_trial_and_hidden_extra_record_fail_closed(self):
+        scenarios = {s["id"]: s for s in json.loads(FIXTURES.read_text())}
+        clean = copy.deepcopy(scenarios["clean_compatible"]["records"])
+        clean.append(copy.deepcopy(clean[0]))
+        result = aggregate_campaign(clean)
+        self.assertEqual(result["verdict"], "INVALID_EXPERIMENT")
+        self.assertTrue(any("DUPLICATE_TRIAL_RECORD" in r for r in result["reasons"]))
+
+    def test_reordered_and_duplicate_events_fail_closed(self):
+        scenarios = {s["id"]: s for s in json.loads(FIXTURES.read_text())}
+        clean = scenarios["clean_compatible"]["records"]
+
+        reordered = copy.deepcopy(clean)
+        reordered[0]["state_transitions"] = list(reversed(reordered[0]["state_transitions"]))
+        self.assertEqual(aggregate_campaign(reordered)["verdict"], "INVALID_EXPERIMENT")
+
+        duplicate_event = copy.deepcopy(clean)
+        duplicate_event[0]["state_transitions"].append(
+            copy.deepcopy(duplicate_event[0]["state_transitions"][-1])
+        )
+        self.assertEqual(aggregate_campaign(duplicate_event)["verdict"], "INVALID_EXPERIMENT")
 
 
 if __name__ == "__main__":

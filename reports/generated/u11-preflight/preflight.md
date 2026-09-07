@@ -1,47 +1,47 @@
-# Preflight offline U11 para M2/M3
+# U11 Offline Preflight for M2/M3
 
-Este informe comprueba coherencia offline. **Nunca autoriza escribir en la tablet.**
+This report verifies offline consistency. **It never authorizes writing to the tablet.**
 
-## Veredicto
+## Verdict
 
-- análisis offline U11: `READY`
-- payload M3: `READY`
-- M2 observado en hardware: `false`
-- M3 observado en hardware: `false`
-- escritura física: `NO-GO`
+- U11 offline analysis: `READY`
+- M3 payload: `READY`
+- M2 observed on hardware: `false`
+- M3 observed on hardware: `false`
+- physical write: `NO-GO`
 
-## Initramfs frente a init_boot EZE4
+## Initramfs vs EZE4 init_boot
 
-| perfil | módulos | LZ4 (B) | margen (B) | cabe |
+| profile | modules | LZ4 (B) | margin (B) | fits |
 |---|---:|---:|---:|---|
-| `minimal` | 0 | 690128 | 1796674 | sí |
-| `ufs` | 28 | 2116711 | 370091 | sí |
+| `minimal` | 0 | 690128 | 1796674 | yes |
+| `ufs` | 28 | 2116711 | 370091 | yes |
 | `usb` | 45 | 3018036 | -531234 | no |
 
-## Comprobaciones
+## Checks
 
-| estado | comprobación | detalle |
+| status | check | detail |
 |---|---|---|
-| `PASS` | `identity_separation` | source U11/B11 y objetivo EZE4/U12 están registrados como identidades distintas |
-| `PASS` | `osrc_hashes` | hashes OSRC base, overlay y Kernel.tar.gz coinciden |
-| `PASS` | `build_hashes` | 15 artefactos de build verificados |
-| `PASS` | `build_identity` | BUILD_INFO enlaza source, kernel y 282 módulos |
-| `PASS` | `early_userspace_config` | config preparado para initramfs y consola temprana |
-| `PASS` | `installed_modules` | release=5.15.180, módulos=282, regulares verificados contra tar=296, symlinks=0 |
+| `PASS` | `identity_separation` | U11/B11 source and EZE4/U12 target are registered as distinct identities |
+| `PASS` | `osrc_hashes` | OSRC base, overlay, and Kernel.tar.gz hashes match |
+| `PASS` | `build_hashes` | 15 build artifacts verified |
+| `PASS` | `build_identity` | BUILD_INFO links source, kernel, and 282 modules |
+| `PASS` | `early_userspace_config` | config prepared for initramfs and early console |
+| `PASS` | `installed_modules` | release=5.15.180, modules=282, regular files verified against tar=296, symlinks=0 |
 | `PASS` | `module_order_consistency` | modules.order build/install: 282/282 |
-| `PASS` | `vendor_module_lists` | 7 módulos early + 2 módulos de producto presentes |
-| `PASS` | `module_vendor_boot_audit` | metadatos, dependencias, orden stock y cierres UFS/USB verificados |
-| `PASS` | `initramfs_minimal` | 0 módulos, LZ4=690128 B, margen=1796674 B |
-| `PASS` | `initramfs_ufs` | 28 módulos, LZ4=2116711 B, margen=370091 B |
-| `WARN` | `initramfs_usb` | 45 módulos, LZ4=3018036 B, margen=-531234 B; perfil diagnóstico sobredimensionado, no empaquetable |
-| `WARN` | `dt_observed_distance` | r04 material=0, unresolved=207; DTB base compilado material=4, unresolved=14. No demuestra equivalencia. |
-| `WARN` | `kernel_binary_reproducibility` | falta comparación válida de dos runs limpios del perfil fijo |
-| `WARN` | `exact_eze4_source` | la solicitud OSRC X510XXUCEZE4 está pendiente; U11 no es U12/EZE4 |
-| `WARN` | `hardware_observation` | sin consola ni prueba física; M2/M3 no observados |
-| `WARN` | `physical_write_gate` | NO-GO: este informe nunca autoriza flash, firma ni downgrade |
+| `PASS` | `vendor_module_lists` | 7 early modules + 2 product modules present |
+| `PASS` | `module_vendor_boot_audit` | metadata, dependencies, stock order, and UFS/USB closures verified |
+| `PASS` | `initramfs_minimal` | 0 modules, LZ4=690128 B, margin=1796674 B |
+| `PASS` | `initramfs_ufs` | 28 modules, LZ4=2116711 B, margin=370091 B |
+| `WARN` | `initramfs_usb` | 45 modules, LZ4=3018036 B, margin=-531234 B; oversized diagnostic profile, unpackable |
+| `WARN` | `dt_observed_distance` | r04 material=0, unresolved=207; compiled base DTB material=4, unresolved=14. Does not prove equivalence. |
+| `WARN` | `kernel_binary_reproducibility` | missing valid comparison of two clean runs of fixed profile |
+| `WARN` | `exact_eze4_source` | OSRC X510XXUCEZE4 request is pending; U11 is not U12/EZE4 |
+| `WARN` | `hardware_observation` | no console or physical testing; M2/M3 not observed |
+| `WARN` | `physical_write_gate` | NO-GO: this report never authorizes flashing, signing, or downgrade |
 
-## Cómo leer el resultado
+## How to Read the Result
 
-`READY` sólo significa que los insumos offline son coherentes entre sí. Los estados
-DTS incompletos, la falta de source EZE4 exacto y la
-ausencia de observación física mantienen la puerta de escritura en `NO-GO`.
+`READY` only means that offline inputs are consistent with each other. Incomplete
+DTS states, lack of exact EZE4 source, and the
+absence of physical observation keep the write gate at `NO-GO`.

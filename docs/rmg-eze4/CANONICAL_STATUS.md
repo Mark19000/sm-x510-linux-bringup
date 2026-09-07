@@ -1,6 +1,13 @@
 # Canonical EZE4 Project Status
 
-This file is the authoritative top-level project status document. It supersedes summary conclusions in earlier Phase reports where earlier errata, intermediate normalizations, or later audits disagree.
+This file is authoritative only for the RMG/EZE4/Phase J2 scope. It is not the
+top-level physical bring-up, recovery, unlock, or flashing status; that scope is
+owned by `PROJECT_STATUS.md`. It supersedes earlier J2 phase conclusions where
+errata, intermediate normalizations, or later audits disagree.
+
+**Closure verdict (2026-09-06): `J2 COMPLETE`.** The repository J2 gate is
+`make verify-j2`. This does not imply recovery, owner-unlock-decision, or first
+custom-flash readiness.
 
 ```text
 ================================================================================

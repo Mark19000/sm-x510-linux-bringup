@@ -14,7 +14,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools" / "rmg-eze4" / "analysis"))
 
-from aggregator import aggregate_campaign, COMPATIBLE, INCOMPATIBLE, INCONCLUSIVE, INVALID_EXPERIMENT  # noqa: E402
+from aggregator import aggregate_campaign  # noqa: E402
 from validator import validate_observation_record  # noqa: E402
 
 
@@ -323,7 +323,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
             valid, errors = validate_observation_record(r)
             self.assertTrue(valid, f"Record failed: {errors}")
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], COMPATIBLE)
+        self.assertEqual(result["verdict"], "COMPATIBLE")
 
     def test_scn_02_single_attributable_timeout_is_inconclusive(self):
         records = make_clean_e4_campaign()
@@ -338,7 +338,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
         records[11] = to_record
         # Canonical J2 rule: exactly 1 timeout -> INCONCLUSIVE
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], INCONCLUSIVE)
+        self.assertEqual(result["verdict"], "INCONCLUSIVE")
 
     def test_scn_03_incompatibility_threshold_3_same_condition_2_boots(self):
         records = make_clean_e4_campaign()
@@ -350,7 +350,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
         records[1] = t2
         records[4] = t3
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], INCOMPATIBLE)
+        self.assertEqual(result["verdict"], "INCOMPATIBLE")
 
     def test_scn_04_isolated_boot_timeouts_are_inconclusive(self):
         records = make_clean_e4_campaign()
@@ -360,7 +360,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
         records[0] = t1
         records[1] = t2
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], INCONCLUSIVE)
+        self.assertEqual(result["verdict"], "INCONCLUSIVE")
 
     def test_scn_05_cross_condition_timeouts_are_inconclusive(self):
         records = make_clean_e4_campaign()
@@ -370,7 +370,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
         records[0] = t1
         records[6] = t2
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], INCONCLUSIVE)
+        self.assertEqual(result["verdict"], "INCONCLUSIVE")
 
     def test_scn_06_boundary_2195_exact(self):
         r = generate_trial_record(1, "SETTLED_NOMINAL", 1, duration_sec=2195.0, vote="COMPATIBLE_VOTE")
@@ -391,7 +391,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
         records[0]["classification"]["trial_validity"] = "INVALID"
         records[1]["classification"]["trial_validity"] = "INVALID"
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], INVALID_EXPERIMENT)
+        self.assertEqual(result["verdict"], "INVALID_EXPERIMENT")
 
     def test_scn_09_invalid_cap_exceeded_total(self):
         records = make_clean_e4_campaign()
@@ -400,7 +400,7 @@ class PhaseJ21R1ReplayPipelineTests(unittest.TestCase):
         records[4]["classification"]["trial_validity"] = "INVALID"
         records[8]["classification"]["trial_validity"] = "INVALID"
         result = aggregate_campaign(records)
-        self.assertEqual(result["verdict"], INVALID_EXPERIMENT)
+        self.assertEqual(result["verdict"], "INVALID_EXPERIMENT")
 
     def test_scn_10_child_exit_nonzero_with_intact_telemetry(self):
         r = generate_trial_record(1, "SETTLED_NOMINAL", 1, duration_sec=50.0,

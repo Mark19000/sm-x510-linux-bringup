@@ -1,64 +1,59 @@
-# 10. Cuaderno de la unidad SM-X510 / EZE4
+# 10. SM-X510 / EZE4 Target Unit Logbook
 
-Este capítulo traduce los identificadores de la tablet a decisiones concretas.
-La regla principal es sencilla: **modelo, AP, CSC y revisión de bootloader son
-datos distintos**. No basta con que un archivo diga “Tab S9 FE”.
+This chapter translates device identifiers into concrete technical decisions. The primary principle is straightforward: **model, AP version, CSC, and bootloader binary generation are distinct data points**. It is not sufficient that a file simply says "Tab S9 FE".
 
-## Lo que ya sabemos
+## What Is Confirmed
 
-La pantalla de Android mostró:
+The physical Android UI displayed:
 
 ```text
 BP4A.251205.006.x510xxuceze4
 ```
 
-Se separa en:
+This decomposes into:
 
-- `BP4A.251205.006`: compilación base de la plataforma Android;
-- `X510XXUCEZE4`: versión AP/PDA de Samsung, normalizada a mayúsculas;
-- `X510`: familia SM-X510, la variante Wi-Fi;
-- `C`: binario de bootloader U12;
-- sistema publicado: Android 16 / One UI 8.5.
+- `BP4A.251205.006`: Android platform baseline build;
+- `X510XXUCEZE4`: Samsung AP/PDA release version, normalized to uppercase;
+- `X510`: SM-X510 model family (Wi-Fi variant);
+- `C`: U12 bootloader binary generation counter;
+- Shipping operating system: Android 16 / One UI 8.5.
 
-La ficha reproducible está en `configs/target-sm-x510.env`. Compruébala con:
+The reproducible specification resides in `configs/target-sm-x510.env`. Verify it via:
 
 ```sh
 make target
 ```
 
-## CSC confirmado
+## Confirmed CSC
 
-La tablet muestra:
+The tablet displays:
 
 ```text
 SAOMC_SM-x510_oxm_eux_16_0001EUX/EUX/
 ```
 
-Se conserva con mayúsculas/minúsculas y sin insertar espacios. Su lectura para
-este proyecto es:
+Preserve exact case and whitespace. The technical interpretation for this project is:
 
-- `EUX`: CSC activo para la Unión Europea;
-- `OXM`: familia multi-CSC que contiene EUX;
-- `16`: versión mayor de Android;
-- `EUX/EUX/`: los slots regionales visibles coinciden en EUX.
+- `EUX`: Active European Union CSC;
+- `OXM`: Multi-CSC package family containing EUX;
+- `16`: Android major version;
+- `EUX/EUX/`: All active regional slots match EUX.
 
-La pareja completa que debemos conservar es:
+The complete software release pair to maintain is:
 
 ```text
 AP/PDA: X510XXUCEZE4
 CSC:    X510OXMCEZE4
 ```
 
-El CSC identifica la región/canal de distribución y no se podía reconstruir a
-partir del AP por sí solo. Como método de comprobación futura, en la tablet se
-encuentra en:
+CSC identifies the distribution region/channel and cannot be inferred from AP alone. To verify in the on-device UI:
 
 ```text
-Ajustes → Acerca de la tableta → Información de software
-→ Versión de software del proveedor de servicio
+Settings -> About tablet -> Software information
+-> Service provider software version
 ```
 
-Con ADB también se puede intentar, sin root:
+Via ADB (without root):
 
 ```sh
 adb shell getprop ro.boot.sales_code
@@ -66,32 +61,20 @@ adb shell getprop ro.csc.sales_code
 adb shell getprop ro.bootloader
 ```
 
-Los comandos ADB pueden devolver alguna propiedad vacía; la cadena SAOMC de la
-interfaz de Android es suficiente en este caso.
+ADB queries may return empty properties on production builds; the SAOMC string from the Android UI is authoritative here.
 
-## Estado de los dos insumos
+## Status of the Two Input Materials
 
-El port necesita dos cosas diferentes:
+The port requires two distinct deliverables:
 
-1. El paquete `SM-X510 / EUX / X510XXUCEZE4`, CSC `X510OXMCEZE4`. **Ya está
-   obtenido y extraído**.
-2. El código fuente GPL publicado por Samsung para SM-X510/Android 16. Se busca
-   en Samsung Open Source Release Center por `SM-X510` y por
-   `X510XXUCEZE4`. Si no aparece, usa “Inquiry → Request for source codes” e
-   incluye modelo, versión AP, Android 16 y región/CSC.
+1. The exact stock firmware package `SM-X510 / EUX / X510XXUCEZE4`, CSC `X510OXMCEZE4`. **Acquired and extracted**.
+2. Official GPL source code published by Samsung for SM-X510 / Android 16. Searched on Samsung Open Source Release Center under `SM-X510` and `X510XXUCEZE4`. If absent, submit an "Inquiry -> Request for source codes" specifying model, AP version, Android 16, and region/CSC.
 
-El firmware aporta las imágenes binarias reales; OSRC aporta código que podemos
-compilar y auditar. Uno no sustituye al otro. A fecha de este cuaderno tenemos
-el primero y seguimos buscando/solicitando el segundo.
+Firmware supplies real binary images; OSRC supplies source code that can be compiled and audited. One does not replace the other. As of this logbook entry, the former is secured, while the latter is actively tracked and requested.
 
-La búsqueda pública se repitió el 23 de agosto de 2026 sin localizar una
-entrada exacta EZE4. El propietario envió manualmente la consulta oficial para
-SM-X510/X510XXUCEZE4/Android 16 y Samsung confirmó que la remitió al departamento
-correspondiente. Si no responde en 24 horas, se reenviará desde la misma cuenta.
-El proyecto no integra nada hasta recibir y conservar la respuesta o archivo
-íntegro con fecha, nombre y SHA-256.
+Public searches on August 23, 2026 did not yield an exact EZE4 entry. The owner submitted an official inquiry for SM-X510 / X510XXUCEZE4 / Android 16, which Samsung confirmed was escalated to the responsible department. The project integrates incoming source code only upon receiving and archiving complete materials with timestamp, filename, and SHA-256.
 
-Texto sugerido para “Request for source codes”:
+Suggested text for "Request for source codes":
 
 ```text
 Subject: Complete corresponding source request for SM-X510 / X510XXUCEZE4
@@ -113,18 +96,13 @@ for Samsung signing keys or proprietary firmware.
 Thank you.
 ```
 
-Cuando llegue una respuesta, conserva el mensaje original, nombre del archivo,
-fecha, URL y SHA-256. No sustituyas todavía `sources/wifi-kernel`: extrae la
-nueva entrega en otra ruta y compara primero commit, versión, defconfig, DTS y
-scripts de build.
+When a response arrives, retain the original email, archive filename, timestamp, URL, and SHA-256. Do not overwrite `sources/wifi-kernel`: extract the delivery to an isolated path and compare commit, kernel release, defconfig, DTS, and build scripts first.
 
-No descargues ni uses paquetes “root”, `vbmeta` desactivados o kernels
-preparados por terceros para esta fase. Queremos conservar un original limpio y
-calcular su hash.
+Do not use third-party "root" packages, patched `vbmeta`, or prebuilt kernels for this phase. Maintain a clean, verified original.
 
-## Firmware exacto validado y extraído
+## Exact Firmware Validated and Extracted
 
-El archivo conservado es:
+The retained archive is:
 
 ```text
 SAMFW.COM_SM-X510_EUX_X510XXUCEZE4_fac.zip
@@ -133,77 +111,59 @@ SHA256: 45a450875ce753e74d8183aa085837ada91cabe2832d9725a1567aa29b01d375
 AP:     AP_X510XXUCEZE4_X510XXUCEZE4_MQB109790656_REV00_user_low_ship_MULTI_CERT_meta_OS16.tar.md5
 ```
 
-Las imágenes relevantes ya están bajo `artifacts/stock/images/`; los hashes y
-la procedencia quedan en `artifacts/stock/SHA256SUMS`,
-`FIRMWARE_SHA256SUM` y `firmware-metadata.txt`.
+Extracted images reside under `artifacts/stock/images/`; hashes and provenance are stored in `artifacts/stock/SHA256SUMS`, `FIRMWARE_SHA256SUM`, and `firmware-metadata.txt`.
 
-Para reproducir la extracción desde el archivo descargado:
+To reproduce extraction from the downloaded archive:
 
 ```sh
-make stock FIRMWARE=/ruta/SAMFW.COM_SM-X510_EUX_X510XXUCEZE4_....zip
+make stock FIRMWARE=/path/to/SAMFW.COM_SM-X510_EUX_X510XXUCEZE4_....zip
 ```
 
-Esto ahorra más de 11 GB al transmitir el AP directamente hacia `tar` y extraer
-únicamente las particiones de arranque. El `super.img` grande no se copia.
+This saves over 11 GB by streaming AP contents directly into `tar` to extract only boot-chain partitions. The monolithic `super.img` is not copied.
 
-La primera comprobación sólo valida el identificador del nombre; el hash y la
-procedencia validan el contenido. `extract-stock.sh` trabaja sobre el fichero
-local y no escribe nada en la tablet.
+Name checks only validate the file string; cryptographic hashes validate content integrity. `extract-stock.sh` operates entirely locally and performs no writes to the tablet.
 
-## Arquitectura de las imágenes EZE4 observada
+## Observed EZE4 Image Layout
 
-`tools/bootimg_info.py` registró los valores exactos en
-`artifacts/stock/boot-layout.json`:
+`tools/bootimg_info.py` recorded exact layout values in `artifacts/stock/boot-layout.json`:
 
-| Imagen | Cabecera | Contenido relevante |
+| Image | Header | Content Breakdown |
 |---|---:|---|
-| `boot.img` | Android v4 | kernel 39 356 928 B, ramdisk 0 B |
-| `init_boot.img` | Android v4 | ramdisk LZ4 legacy 2 486 802 B |
-| `vendor_boot.img` | Android v4 | ramdisk 18 077 432 B, DTB 239 652 B, dos fragmentos |
-| `dtbo.img` | tabla DTBO | tres overlays, después padding/pie AVB hasta 8 MiB |
+| `boot.img` | Android v4 | Kernel 39,356,928 B, ramdisk 0 B |
+| `init_boot.img` | Android v4 | Legacy LZ4 ramdisk 2,486,802 B |
+| `vendor_boot.img` | Android v4 | Vendor ramdisk 18,077,432 B, DTB 239,652 B, two fragments |
+| `dtbo.img` | DTBO Table | Three overlays, followed by AVB footer/padding up to 8 MiB |
 
-El campo `os_version` de la cabecera de arranque indica 13.0.0 aunque Android
-userspace sea 16; es un campo del kernel/GKI heredado y no contradice la versión
-de la tablet.
+The `os_version` field in the boot header reports 13.0.0 even though Android userspace is 16; this is inherited GKI header metadata and does not contradict the tablet's OS version.
 
-El `Image` de referencia mide 995 328 bytes menos que el kernel stock. Tanto el
-initramfs mínimo como el perfil UFS comprimido caben por tamaño de payload, pero
-esto sólo elimina un error mecánico: no resuelve compatibilidad, AVB ni rollback.
+The reference `Image` measures 995,328 bytes smaller than stock. Both the minimal initramfs and compressed UFS profile fit within partition capacity, but this addresses only mechanical sizing: it does not resolve ABI compatibility, AVB enforcement, or anti-rollback counters.
 
-## Por qué la fuente U3 sigue siendo útil
+## Why U3 Source Remains Valuable
 
-`X510XXU3BXDG` permite aprender la jerarquía DTS/DTSI, los nombres de placa y
-los drivers S5E8835. También sirve para automatizar informes y practicar la
-compilación. Pero entre U3/Android 14 y U12/Android 16 pueden haber cambiado
-Kconfig, ABI de módulos, DTBO, cabeceras de boot y políticas AVB.
+`X510XXU3BXDG` teaches Device Tree hierarchy, board identifiers, and S5E8835 peripheral drivers. It also automates reports and exercises build pipelines. However, between U3 / Android 14 and U12 / Android 16, Kconfig flags, module ABI symbols, DTBOs, boot headers, and AVB policies may have shifted.
 
-Por eso hay dos operaciones distintas:
+Therefore two distinct workflows exist:
 
 ```sh
 make report VARIANT=wifi
 
-# Sólo ensayo de compilación; salida no destinada a la tablet:
+# Compilation dry run only; output not targeted at the device:
 ./scripts/build-reference-in-lima.sh
 ```
 
-En un host Linux nativo puedes usar
-`ALLOW_REFERENCE_BUILD=1 make build VARIANT=wifi`; en macOS usa el wrapper de
-Lima mostrado arriba.
+On native Linux: `ALLOW_REFERENCE_BUILD=1 make build VARIANT=wifi`; on macOS use the Lima wrapper above.
 
-El build normal seguirá bloqueado hasta registrar una fuente compatible. Nunca
-intentes bajar el bootloader de U12 a U3.
+Standard builds remain locked until a compatible source release is validated. Never attempt to downgrade the bootloader from U12 to U3.
 
-## Puerta de entrada al bring-up
+## Bring-up Gate Criteria
 
-Antes de M2 deben existir y quedar anotados:
+Before milestone M2, the following must be documented:
 
-- CSC `EUX` / multi-CSC `OXM` confirmado;
-- hash del paquete de firmware exacto e imágenes extraídas (completado);
-- DTB/DTBO extraídos (completado) y revisión de hardware identificada
-  (pendiente en la unidad física);
-- fuente kernel compatible o diferencias justificadas una por una;
-- copia restaurable del firmware oficial;
-- método de observación (UART o USB) y estado real del desbloqueo OEM.
+- CSC `EUX` / multi-CSC `OXM` confirmed;
+- SHA-256 hashes of exact firmware package and extracted images (complete);
+- Extracted DTB/DTBO (complete) and identified hardware revision (pending on physical device);
+- Compatible kernel source or documented, justified diffs;
+- Restorable official firmware copy;
+- Observation interface (UART or USB) and actual OEM unlock state.
 
-Hasta entonces el trabajo seguro es análisis, build de referencia, initramfs y
-reempaquetado offline marcado `UNSIGNED`; no flasheo.
+Until then, safe work consists of static analysis, reference compilation, initramfs design, and offline candidate repacking labeled `UNSIGNED`; never flashing.

@@ -1,96 +1,97 @@
-# 14. Resultado U3 → U11 → EZE4 y decisión para M2/M3
+# 14. U3 → U11 → EZE4 Results and Decision for M2/M3
 
-Este capítulo es el corte auditable del 23 de agosto de 2026. Se analizaron
-los paquetes descargados, se compuso el source U11 en ext4, se comparó con U3
-y con los árboles de dispositivo extraídos de EZE4, y se compiló un kernel U11
-completo. No se escribió nada en la tableta y U3 sigue siendo la fuente
-canónica del pipeline existente.
+This chapter provides the auditable cutoff as of August 23, 2026. Downloaded
+packages were analyzed, the U11 source was composed on ext4, compared with U3
+and with device trees extracted from EZE4, and a full U11 kernel was built.
+Nothing was written to the tablet, and U3 remains the canonical source for the
+existing pipeline.
 
-## Inventario exacto de entregas
+## Exact Delivery Inventory
 
-Se ignoraron `.part`, ficheros vacíos y placeholders. Los tres ZIP completos
-relacionados con SM-X510 encontrados en `Downloads` fueron:
+Files matching `.part`, empty files, and placeholders were ignored. The three
+complete ZIPs related to SM-X510 found in `Downloads` were:
 
-| fichero | bytes | SHA-256 | identidad |
+| file | bytes | SHA-256 | identity |
 |---|---:|---|---|
-| `SM-X510.zip` | 285055969 | `3320da592f76b703531eee8c04ef9d872f7254cd906127dd2feda79c310e9928` | wrapper OSRC Android 16 |
-| `SM-X510_EUR_16_Opensource.zip` | 284751324 | `18596f241925b729f48638a1750d3d71e3370d9056b2c9c4373a7cc04c1d9791` | base OSRC; copia idéntica a la incluida en el wrapper |
-| `SAMFW.COM_SM-X510_EUX_X510XXUCEZE4_fac.zip` | 10717872605 | `45a450875ce753e74d8183aa085837ada91cabe2832d9725a1567aa29b01d375` | firmware stock EZE4, Android 16, U12/EUX |
+| `SM-X510.zip` | 285055969 | `3320da592f76b703531eee8c04ef9d872f7254cd906127dd2feda79c310e9928` | Android 16 OSRC wrapper |
+| `SM-X510_EUR_16_Opensource.zip` | 284751324 | `18596f241925b729f48638a1750d3d71e3370d9056b2c9c4373a7cc04c1d9791` | OSRC base; identical copy to the one included in wrapper |
+| `SAMFW.COM_SM-X510_EUX_X510XXUCEZE4_fac.zip` | 10717872605 | `45a450875ce753e74d8183aa085837ada91cabe2832d9725a1567aa29b01d375` | EZE4 stock firmware, Android 16, U12/EUX |
 
-El wrapper contiene además estas dos entregas independientes:
+The wrapper also contains these two independent deliveries:
 
-| miembro | bytes | SHA-256 | función |
+| member | bytes | SHA-256 | function |
 |---|---:|---|---|
-| `SM-X510_EUR_16_Opensource.zip` | 284751324 | `18596f241925b729f48638a1750d3d71e3370d9056b2c9c4373a7cc04c1d9791` | base `X510XXU8DYJ4` |
-| `SM-X510_EUR_16_Opensource_X510XXSBDZB4.zip` | 237796 | `c0e3fb5bdbd6447669dd57e43d9817838c24ce0f08e6f0293f3cc98e1cefc5ad` | suplemento exacto `X510XXSBDZB4` |
+| `SM-X510_EUR_16_Opensource.zip` | 284751324 | `18596f241925b729f48638a1750d3d71e3370d9056b2c9c4373a7cc04c1d9791` | `X510XXU8DYJ4` base |
+| `SM-X510_EUR_16_Opensource_X510XXSBDZB4.zip` | 237796 | `c0e3fb5bdbd6447669dd57e43d9817838c24ce0f08e6f0293f3cc98e1cefc5ad` | `X510XXSBDZB4` exact supplement |
 
-La base contiene `Kernel.tar.gz` (254699729 bytes, SHA-256
+The base contains `Kernel.tar.gz` (254699729 bytes, SHA-256
 `064746422c2c1ba83f3c245e137f6c0a105a19280d10ece48987cac5e9d26983`)
-y `Platform.tar.gz` (37445621 bytes, SHA-256
+and `Platform.tar.gz` (37445621 bytes, SHA-256
 `68929260cd0f996dc59121186ea4c87fe6ca762e849c661dce2eacfd3184d567`).
-El tar del kernel tiene 80777 ficheros regulares y 39 symlinks internos seguros;
-el de Platform, 13275 ficheros regulares. Platform no participa en el build
-del kernel.
+The kernel tar has 80,777 regular files and 39 safe internal symlinks;
+the Platform tar has 13,275 regular files. Platform does not participate in
+the kernel build.
 
-## Por qué sí es el corresponding source U11
+## Why This Is Indeed the Corresponding U11 Source
 
-La identificación no depende del nombre externo:
+Identification does not depend on the external filename:
 
-1. El README del suplemento dice expresamente descargar primero
-   `X510XXU8DYJ4` y actualizarlo después con `X510XXSBDZB4`.
-2. La raíz interna se llama `SM-X510_EUR_16_XX_X510XXSBDZB4/Kernel`.
-3. El README de Platform declara Android 16.0.
-4. El Makefile compuesto declara Linux 5.15.180.
-5. La receta selecciona `s5e8835-gts9fewifixx_defconfig`, `TARGET_SOC=s5e8835`,
-   `PLATFORM_VERSION=13`, `LLVM=1` y Clang `r450784d`.
-6. `B` en `X510XXSBDZB4` es la revisión binaria U11.
+1. The supplement README explicitly instructs downloading `X510XXU8DYJ4`
+   first and then updating it with `X510XXSBDZB4`.
+2. The internal root is named `SM-X510_EUR_16_XX_X510XXSBDZB4/Kernel`.
+3. The Platform README declares Android 16.0.
+4. The composite Makefile declares Linux 5.15.180.
+5. The recipe selects `s5e8835-gts9fewifixx_defconfig`, `TARGET_SOC=s5e8835`,
+   `PLATFORM_VERSION=13`, `LLVM=1`, and Clang `r450784d`.
+6. `B` in `X510XXSBDZB4` is binary revision U11.
 
-El suplemento contiene 13 ficheros de kernel; tres DTSI de batería son
-idénticos a la base y diez cambian realmente. Sus cambios se concentran en
-defconfig, HID/accesorios, restricciones USB, F2FS, integridad de `/proc` y
-limpieza DDAR. No incluye DTS/DTSI de placa o SoC: esos provienen de la base U8,
-un detalle importante al atribuir la proximidad de DT a “U11”.
+The supplement contains 13 kernel files; three battery DTSIs are identical
+to the base and ten actually change. Changes are concentrated in defconfig,
+HID/accessories, USB restrictions, F2FS, `/proc` integrity, and DDAR cleanup.
+It does not include board or SoC DTS/DTSI: those come from the U8 base,
+an important detail when attributing DT proximity to "U11".
 
-Por tanto, **sí tenemos el source correspondiente a X510XXSBDZB4/U11/Android
-16**, compuesto como base U8 más suplemento U11. Samsung no incluyó `.git`,
-un hash de commit ni una etiqueta upstream; ese dato es realmente no disponible
-y no debe inventarse.
+Therefore, **we do have the source corresponding to X510XXSBDZB4/U11/Android 16**,
+composed as U8 base plus U11 supplement. Samsung did not include `.git`,
+a commit hash, or an upstream tag; that information is genuinely unavailable
+and must not be invented.
 
-En APFS no se extrae el kernel completo porque el tar tiene nombres que
-colisionan en un filesystem no sensible a mayúsculas. La copia íntegra vive en
-ext4 en la VM. En el host sólo se guardan paquetes, manifiestos e informes bajo
-`sources/osrc-releases/x510xxsbdzb4-u11-android16` y `artifacts/u11`; U3,
-`sources/wifi-kernel` y `artifacts/stock` permanecen intactos.
+On APFS, the full kernel is not extracted because the tar contains names that
+collide on a case-insensitive filesystem. The full copy lives on ext4 in
+the VM. On the host, only packages, manifests, and reports under
+`sources/osrc-releases/x510xxsbdzb4-u11-android16` and `artifacts/u11` are
+kept; U3, `sources/wifi-kernel`, and `artifacts/stock` remain untouched.
 
-## Distancia de kernel y configuración
+## Kernel and Configuration Distance
 
-| etapa | kernel | base/commit demostrable | Android / binario |
+| stage | kernel | demonstrable base/commit | Android / binary |
 |---|---|---|---|
 | U3 `X510XXU3BXDG` | 5.15.123 | commit `9a752a83347461b3785711760ba925fcabea3071` | Android 14 / U3 |
-| U11 `X510XXSBDZB4` | 5.15.180 | archivo OSRC sin Git; base de entrega `X510XXU8DYJ4` | Android 16 / U11 |
-| stock `X510XXUCEZE4` | 5.15.189-android13-3-33478785 | cadena Kbuild stock; source exacto solicitado y pendiente | Android 16 / U12 |
+| U11 `X510XXSBDZB4` | 5.15.180 | OSRC archive without Git; delivery base `X510XXU8DYJ4` | Android 16 / U11 |
+| stock `X510XXUCEZE4` | 5.15.189-android13-3-33478785 | stock Kbuild string; exact source requested and pending | Android 16 / U12 |
 
-U11 reduce el salto conocido de 66 revisiones de kernel a sólo 9. Entre los
-cambios de defconfig U3→U11 destacan SCMI virtio, RCU lazy, una mitigación
-ARM64 adicional, CUBIC en lugar de BIC, NTFS3, el shim ashmem/memfd, HDM como
-módulo y el cambio de firmware SCSC de `/vendor/etc/wifi` a
-`/vendor/firmware/wifi`. `PABLO_OBTE_SUPPORT` pasa de módulo a desactivado.
+U11 reduces the known jump from 66 kernel revisions to just 9. Among the
+defconfig changes U3→U11, notable items are SCMI virtio, lazy RCU, an
+additional ARM64 mitigation, CUBIC instead of BIC, NTFS3, the ashmem/memfd
+shim, HDM as a module, and the change of SCSC firmware path from
+`/vendor/etc/wifi` to `/vendor/firmware/wifi`. `PABLO_OBTE_SUPPORT` changes
+from module to disabled.
 
-El defconfig U11 de Samsung continúa sin `CONFIG_FHANDLE`, devtmpfs, VT y los
-ACL/xattrs de tmpfs que necesita nuestro early userspace. El parche 0001 sigue
-siendo necesario para M3. El config final contiene 312 símbolos `=m`; se
-construyeron e instalaron 282 `.ko`, igual que en el ensayo U3, aunque la
-composición no es idéntica (`PABLO_OBTE_SUPPORT` desaparece, entre otros cambios).
+Samsung's U11 defconfig still lacks `CONFIG_FHANDLE`, devtmpfs, VT, and the
+tmpfs ACL/xattrs required by our early userspace. Patch 0001 remains necessary
+for M3. The final config contains 312 `=m` symbols; 282 `.ko` modules were built
+and installed, identical to the U3 trial, although composition is not identical
+(`PABLO_OBTE_SUPPORT` disappears, among other changes).
 
-## DTS/DTSI y drivers
+## DTS/DTSI and Drivers
 
-El inventario bruto cuenta 3200 DTS/DTSI en U3 y 3217 en U11; 228 rutas cambian.
-En drivers hay 37094 rutas en U3 y 37155 en U11: 3721 cambian, 18 sólo existen
-en U3 y 79 sólo en U11. Son métricas de rutas, no 3721 incompatibilidades de la
-tablet. El desglose reproducible por subsistema está en
+The raw inventory counts 3,200 DTS/DTSI files in U3 and 3,217 in U11; 228 paths
+change. In drivers, there are 37,094 paths in U3 and 37,155 in U11: 3,721 change,
+18 exist only in U3, and 79 exist only in U11. These are path metrics, not 3,721
+tablet incompatibilities. The reproducible breakdown by subsystem is in
 `reports/generated/u11-osrc/subsystems.md`.
 
-| subsistema | rutas cambiadas | sólo U3 | sólo U11 |
+| subsystem | changed paths | only U3 | only U11 |
 |---|---:|---:|---:|
 | DT S5E8835/X510 | 3 | 0 | 0 |
 | PSCI/GIC/timers | 28 | 0 | 0 |
@@ -104,132 +105,130 @@ tablet. El desglose reproducible por subsistema está en
 | touchscreen/Wacom/pogo | 14 | 0 | 0 |
 | GPU/Mali | 11 | 0 | 0 |
 | Wi-Fi/BT SCSC | 45 | 0 | 0 |
-| batería/PMIC/carga | 29 | 0 | 0 |
+| battery/PMIC/charging | 29 | 0 | 0 |
 | thermal | 0 | 0 | 0 |
 | build/toolchain | 7 | 0 | 0 |
 
-Estas cifras clasifican rutas por nombre y presencia. Por ejemplo, “164 USB”
-incluye backports generales bajo `drivers/usb`; no significa que existan 164
-cambios específicos del controlador USB de la tablet.
+These figures classify paths by name and presence. For example, "164 USB"
+includes generic backports under `drivers/usb`; it does not mean there are
+164 changes specific to the tablet's USB controller.
 
-Los cambios materiales U3→U11 del DT base que más importan al arranque son:
+The material base DT changes U3→U11 most relevant to boot are:
 
-- una reserva `wdtmsg` en `0x08adb11000`, tamaño `0x1000`;
-- banco GPIO/EINT `gph1` y sus interrupciones 0x4f–0x52;
-- `snps,usb2-lpm-disable` en DWC3;
-- `dsim,disable-shdw-vss-updt = <1>` en DSIM;
-- reloj y `clock-names = "gpu_clock"` en Mali.
+- a `wdtmsg` reservation at `0x08adb11000`, size `0x1000`;
+- GPIO/EINT bank `gph1` and its interrupts 0x4f–0x52;
+- `snps,usb2-lpm-disable` in DWC3;
+- `dsim,disable-shdw-vss-updt = <1>` in DSIM;
+- clock and `clock-names = "gpu_clock"` in Mali.
 
-En el overlay r04 hay 17 diferencias semánticas materiales: nuevos teclados y
-touchpad, pinning/preload de IMX355, nombres de zonas térmicas, política
-`pktproc` y capacidad de batería 10090→8000. Son periféricos y política de
-producto; no parecen por sí solos bloqueadores del primer mensaje del kernel.
+In the r04 overlay, there are 17 material semantic differences: new keyboards and
+touchpad, IMX355 pinning/preload, thermal zone names, `pktproc` policy, and battery
+capacity 10090→8000. These are peripherals and product policy; they do not appear
+on their own to block the first kernel message.
 
-Para PSCI/GIC/timers, CMU, pinctrl, UFS/PHY/FMP, USB/Type-C, display/panel,
-entrada/Wacom, GPU, SCSC, batería/PMIC/carga y thermal, el informe separa rutas
-modificadas y permite auditarlas sin confundir un backport general de Linux con
-un cambio específico de X510. No aparecieron cambios de ruta bajo los patrones
-específicos de PMU/ACPM/power domains, SysMMU/IOMMU ni thermal; eso no demuestra
-identidad interna de todos sus includes.
+For PSCI/GIC/timers, CMU, pinctrl, UFS/PHY/FMP, USB/Type-C, display/panel,
+input/Wacom, GPU, SCSC, battery/PMIC/charging, and thermal, the report separates
+modified paths and enables auditing them without mistaking a generic Linux
+backport for an X510-specific change. No path changes appeared under the specific
+patterns for PMU/ACPM/power domains, SysMMU/IOMMU, or thermal; this does not prove
+internal identity across all their includes.
 
-## Qué parte de U3→EZE4 ya estaba en U11
+## What Portion of U3→EZE4 Was Already Present in U11
 
-La correspondencia stock es r00→overlay-00, r01→overlay-01 y r04→overlay-02.
-La comparación semántica r04 U11→EZE4 encuentra **cero diferencias materiales**
-en 1215 nodos, pero quedan 207 referencias externas sin resolver: su estado
-correcto es `INCONCLUSIVE`, no “idéntico”. En el DT base U11→EZE4 ambos tienen
-1493 nodos. Comparar sólo el DTS fuente mostraba una diferencia (`/mfc
-debug_mode`, de 1 a 0), pero era insuficiente: al comparar los **DTB ya
-compilados** aparecen cuatro y quedan 14 referencias sin resolver:
+Stock mapping is r00→overlay-00, r01→overlay-01, and r04→overlay-02.
+Semantic comparison of r04 U11→EZE4 finds **zero material differences** across
+1,215 nodes, but leaves 207 external references unresolved: its correct status
+is `INCONCLUSIVE`, not "identical". In the base DT U11→EZE4, both have 1,493 nodes.
+Comparing only source DTS showed one difference (`/mfc debug_mode`, from 1 to 0),
+but that was insufficient: comparing the **already compiled DTBs** reveals four
+differences and leaves 14 unresolved references:
 
-- dos string-lists `cpus` de `/ems/pe-list` se codifican de manera distinta;
-- `/mfc debug_mode` cambia de 1 a 0;
-- `cpu_table_rps` de SCSC cambia de dos strings a cuatro.
+- two `cpus` string-lists in `/ems/pe-list` are encoded differently;
+- `/mfc debug_mode` changes from 1 to 0;
+- SCSC `cpu_table_rps` changes from two strings to four.
 
-Los escapes octales del DTS Samsung explican por qué el diff del source no veía
-los tres cambios de strings. La receta reproducible es `make u11-dtb-audit` y
-la evidencia vive en `reports/generated/u11-dtb-binary/`.
+Octal escapes in Samsung's DTS explain why the source diff missed the three
+string changes. The reproducible recipe is `make u11-dtb-audit` and the evidence
+resides in `reports/generated/u11-dtb-binary/`.
 
-Conclusión limitada pero útil: todos los cambios materiales que veíamos en el
-overlay U3→EZE4 ya están en U11, y el DT base U11 sigue muy cerca del binario
-EZE4. Las cuatro diferencias compiladas afectan EMS, MFC y SCSC y no forman el
-camino mínimo hacia `/init`, pero pueden importar después del arranque. Las
-renumeraciones masivas de phandle U3→U11 no son por sí mismas cambios de
-hardware. No podemos concluir equivalencia completa hasta resolver referencias
-o recibir el source EZE4 exacto.
+Limited but useful conclusion: all material changes observed in the overlay
+U3→EZE4 are already present in U11, and the U11 base DT remains very close to
+the EZE4 binary. The four compiled differences affect EMS, MFC, and SCSC and do
+not lie on the minimal path to `/init`, but they may matter after boot. Massive
+phandle renumbering U3→U11 is not in itself a hardware change. We cannot conclude
+complete equivalence until references are resolved or the exact EZE4 source is received.
 
-## Compilación y errores provocados
+## Compilation and Provoked Errors
 
-Se aplicaron por separado los nueve parches actuales al composite U11. Los nueve
-aplican textualmente. El build limpio con Clang 21 descubrió primero dos errores
-de declaraciones en scheduler EMS y KVM, cubiertos por 0002. Después se retiró
-cada parche relevante y se recompiló la unidad afectada:
+The nine current patches were applied individually to the U11 composite. All nine
+apply textually. A clean build with Clang 21 first uncovered two declaration
+errors in the EMS scheduler and KVM, covered by 0002. Each relevant patch was
+then removed and the affected unit recompiled:
 
-| sin parche | fallo reproducido en U11 + Clang 21 |
+| without patch | reproduced failure on U11 + Clang 21 |
 |---|---|
-| 0002 | implicit-int en EMS y puntero `clidr` sin inicializar en KVM |
-| 0003 | implicit-int en `exynos-devfreq.h` |
-| 0004 | nombre sin inicializar en exynos-cpupm |
-| 0005 | implicit-int en QoS Mali |
-| 0006 | buffer sin inicializar en exynos-devfreq |
-| 0008 | valor sin inicializar en cargador y FPSIMD prohibido en `sec_debug_test` |
-| 0009 | conversión de enum inválida a `irqreturn_t` |
-| 0010 | comparación entre enums distintos en Type-C |
+| 0002 | implicit-int in EMS and uninitialized `clidr` pointer in KVM |
+| 0003 | implicit-int in `exynos-devfreq.h` |
+| 0004 | uninitialized name in exynos-cpupm |
+| 0005 | implicit-int in Mali QoS |
+| 0006 | uninitialized buffer in exynos-devfreq |
+| 0008 | uninitialized value in charger and forbidden FPSIMD in `sec_debug_test` |
+| 0009 | invalid enum conversion to `irqreturn_t` |
+| 0010 | comparison between distinct enums in Type-C |
 
-0001 se justificó por el defconfig, no por un error del compilador. Con los nueve
-parches, `Image`, DTB, r00/r01/r04, LTO/BTF, módulos y `modules_install`
-terminaron con código 0 en 58:08, usando como máximo 6661420 KiB. La build usó
-Clang 21.1.8 ARM64 porque el binario oficial r450784d es x86-64 y no corre de
-forma nativa en esta VM ARM64. Es una prueba fuerte de compilabilidad, no una
-reproducción binaria de Samsung.
+0001 was justified by defconfig, not by a compiler error. With all nine patches,
+`Image`, DTB, r00/r01/r04, LTO/BTF, modules, and `modules_install` finished with
+exit code 0 in 58:08, using a maximum of 6,661,420 KiB. The build used
+Clang 21.1.8 ARM64 because the official r450784d binary is x86-64 and does not
+run natively in this ARM64 VM. This is a strong proof of compilability, not a
+binary reproduction of Samsung.
 
-Quedan diagnósticos no fatales que conviene no ocultar: cinco warnings de LLD
-por frames de pila grandes en nanohub/sec_debug y mensajes de kperfmon porque el
-árbol OSRC aislado no trae `aprotoc` de la plataforma Android; su regla genera
-el sustituto dummy y el build continúa. No hubo líneas `error:` en el build
-completo parcheado.
+Non-fatal diagnostics remain that should not be obscured: five LLD warnings
+for large stack frames in nanohub/sec_debug, and messages from kperfmon because
+the isolated OSRC tree does not include `aprotoc` from the Android platform;
+its rule generates the dummy replacement and the build proceeds. There were no
+`error:` lines in the full patched build.
 
-Los binarios y logs están en
-`artifacts/u11/x510xxsbdzb4-u11-clang21-20260823`. Dos enlaces LTO sucesivos
-produjeron `Image` con distinto SHA-256, aunque DTB y DTBO permanecieron
-estables; falta fijar la causa de no-reproducibilidad antes de exigir hashes
-binarios idénticos.
+Binaries and logs are in `artifacts/u11/x510xxsbdzb4-u11-clang21-20260823`.
+Two successive LTO link runs produced `Image` with differing SHA-256 hashes,
+although DTB and DTBO remained stable; the cause of non-reproducibility must be
+pinned down before demanding identical binary hashes.
 
-## Plan de migración U3→U11
+## U3→U11 Migration Plan
 
-U11 es claramente una base de ingeniería superior, pero no se convierte aún en
-canónica. La migración debe hacerse como una variante nueva:
+U11 is clearly a superior engineering baseline, but it does not yet become
+canonical. Migration should proceed as a new variant:
 
-1. Mantener U3, el composite U11, el stock U12 y el futuro source EZE4 en cuatro
-   rutas y namespaces de artefactos distintos.
-2. Reaplicar los nueve parches. Ninguno desaparece en el pipeline Clang 21;
-   0001 es funcional y 0008 también reduce superficie de crash. Reescribir la
-   descripción “Android 14” de 0002 y revisar los parches de compatibilidad con
-   r450784d antes de declararlos universales.
-3. Reutilizar sin cambios la extracción segura, Lima, inventarios, análisis DT,
-   constructor DTBO e initramfs. Adaptar `build-downstream.sh` para aceptar
-   procedencia de archivo sin commit Git y para publicar sólo bajo `u11/`; hoy
-   está deliberadamente anclado a U3/EZE4 y debe seguir bloqueando.
-4. Comparar el orden de módulos de `vendor_boot`, firmware SCSC y dependencias
-   del initramfs antes de empaquetar; no mezclar módulos U3 con kernel U11.
-5. Cuando llegue OSRC EZE4, repetir composición, diff semántico, config, build y
-   pruebas negativas; no aplicar el overlay U11 encima de EZE4.
+1. Maintain U3, the U11 composite, stock U12, and future EZE4 source across
+   four distinct paths and artifact namespaces.
+2. Reapply all nine patches. None disappear in the Clang 21 pipeline;
+   0001 is functional and 0008 also reduces crash surface. Rewrite the
+   "Android 14" description in 0002 and review compatibility patches with
+   r450784d before declaring them universal.
+3. Reuse safe extraction, Lima, inventories, DT analysis, DTBO builder, and
+   initramfs without changes. Adapt `build-downstream.sh` to accept archive
+   provenance without a Git commit and to publish only under `u11/`; today
+   it is deliberately anchored to U3/EZE4 and must continue blocking.
+4. Compare `vendor_boot` module order, SCSC firmware, and initramfs dependencies
+   before packaging; do not mix U3 modules with a U11 kernel.
+5. When EZE4 OSRC arrives, repeat composition, semantic diff, config, build,
+   and negative tests; do not apply the U11 overlay on top of EZE4.
 
-## Efecto sobre M2 y M3
+## Effect on M2 and M3
 
-Para **M2, primer mensaje del kernel**, la confianza técnica sube de baja a
-moderada-alta: tenemos una base Android 16 compilable, sólo nueve revisiones por
-debajo de stock y un DT casi coincidente en lo observable. No sube a “listo para
-flashear”: aún faltan fuente EZE4 exacta, ruta de consola observable, revisión
-física elegida, desbloqueo/AVB y comprobación anti-rollback.
+For **M2, first kernel message**, technical confidence rises from low to
+moderate-high: we have a buildable Android 16 base, only nine revisions below
+stock, and a DT almost matching in what is observable. It does not rise to
+"ready to flash": exact EZE4 source, observable console path, selected physical
+revision, unlock/AVB, and anti-rollback verification are still missing.
 
-Para **M3, `/init` como PID 1**, la confianza sube a moderada. El kernel U11
-parcheado tiene initrd/devtmpfs/VT/FHANDLE/tmpfs y nuestro initramfs ya es
-reproducible. Siguen dependiendo de M2, del layout y tamaño final de boot,
-DTBO correcto, AVB y del conjunto/orden de módulos y firmware. La conclusión
-es que U11 elimina gran parte de la incertidumbre de source/DT; no elimina la
-incertidumbre del contrato de arranque del dispositivo.
+For **M3, `/init` as PID 1**, confidence rises to moderate. The patched U11
+kernel provides initrd/devtmpfs/VT/FHANDLE/tmpfs, and our initramfs is already
+reproducible. These remain dependent on M2, final boot layout and size, correct
+DTBO, AVB, and the module and firmware set/ordering. The conclusion is that U11
+eliminates much of the source/DT uncertainty; it does not eliminate device boot
+contract uncertainty.
 
-Por tanto, el siguiente paso sigue siendo offline: integrar U11 como variante
-no canónica y esperar la respuesta OSRC EZE4. No se desmonta, no se flashea y no
-se hace downgrade U12→U11.
+Therefore, the next step remains offline: integrate U11 as a non-canonical
+variant and await the EZE4 OSRC response. Do not disassemble, do not flash,
+and do not downgrade U12→U11.

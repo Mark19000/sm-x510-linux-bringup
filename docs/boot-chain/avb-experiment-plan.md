@@ -1,192 +1,192 @@
 # AVB Experiment Plan — SM-X510 U12/EZE4
 
-> **SUPERSEDED — NO EJECUTAR.** Conservado como diseño histórico. La propuesta `vbmeta-only` no es la primera escritura canónica: altera la raíz completa y no prueba una política Samsung segura. El plan vigente condiciona un candidato `boot-only` a unlock y recovery previamente validados. USB/corriente/backlight nunca constituyen por sí solos prueba de ejecución.
+> **SUPERSEDED — DO NOT EXECUTE.** Preserved as historical design. The `vbmeta-only` proposal is not the canonical first write: it alters the entire root and does not test a safe Samsung policy. The current plan conditions a `boot-only` candidate on previously validated unlock and recovery. USB/current/backlight never constitute proof of execution on their own.
 
-Fecha: 2026-08-24
-Modo: diseño de experimento. Este documento **no autoriza flasheo**, no genera imágenes y no sustituye la confirmación de precondiciones físicas.
-Alcance: distinguir de forma reproducible un rechazo de Android Verified Boot de una entrega de control al kernel seguida de crash temprano.
+Date: 2026-08-24
+Mode: experiment design. This document **does not authorize flashing**, does not generate images, and does not replace the confirmation of physical preconditions.
+Scope: reproducibly distinguish an Android Verified Boot rejection from a control handoff to the kernel followed by an early crash.
 
-## 1. Resumen ejecutivo
+## 1. Executive Summary
 
-El vbmeta raíz stock usa `SHA256_RSA4096`, `Rollback Index = 0`, `Flags = 0`, y ancla por hash directo `boot`, `init_boot`, `vendor_boot`, `recovery`, `bootloader` y particiones firmware críticas (`ldfw`, `tzsw`, entre otras). `dtbo` no es un hash directo del root: es una chain partition (RIL 1) cuyo vbmeta embebido contiene el hash de `dtbo`. También encadena `prism` (RIL 2) y `optics` (RIL 3), con la misma clave pública (`sha1 b6924fd4...4029`).
+The stock root vbmeta uses `SHA256_RSA4096`, `Rollback Index = 0`, `Flags = 0`, and anchors via direct hash `boot`, `init_boot`, `vendor_boot`, `recovery`, `bootloader`, and critical firmware partitions (`ldfw`, `tzsw`, among others). `dtbo` is not a direct hash of root: it is a chain partition (RIL 1) whose embedded vbmeta contains the hash of `dtbo`. It also chains `prism` (RIL 2) and `optics` (RIL 3), with the same public key (`sha1 b6924fd4...4029`).
 
-Bajo bootloader LOCKED, cualquier modificación de una partición cubierta invalida la cadena. El kernel propio no debería ejecutarse en ese estado. Bajo UNLOCKED, AOSP permite verificación tolerante u omitida, pero el comportamiento exacto del bootloader Samsung de este modelo —aceptación de vbmeta con `VERIFICATION_DISABLED` (`flags=2`), advertencias visibles, límites de rollback o comprobaciones Knox adicionales— es todavía **hipótesis**.
+Under a LOCKED bootloader, any modification to a covered partition invalidates the chain. A custom kernel should not execute in that state. Under UNLOCKED, AOSP permits tolerant or omitted verification, but the exact behavior of this model's Samsung bootloader — acceptance of vbmeta with `VERIFICATION_DISABLED` (`flags=2`), visible warnings, rollback limits, or additional Knox checks — remains a **hypothesis**.
 
-El protocolo propuesto es incremental:
+The proposed protocol is incremental:
 
-0. Calibrar señales con firmware 100% stock (baseline).
-1. Escribir solo un vbmeta de prueba bajo UNLOCKED, sin tocar boot ni ramdisks, para observar la política AVB del bootloader.
-2. Solo si la Fase 1 demuestra handoff tolerante, escribir kernel + vbmeta coherentes como segunda sonda.
+0. Calibrate signals with 100% stock firmware (baseline).
+1. Write only a test vbmeta under UNLOCKED, without touching boot or ramdisks, to observe bootloader AVB policy.
+2. Only if Phase 1 demonstrates tolerant handoff, write coherent kernel + vbmeta as a second probe.
 
-Cada fase tiene criterios de éxito, fallo y aborto. La recuperación se basa en Download Mode accesible y restauración desde copias stock verificadas por hash.
+Each phase has success, failure, and abort criteria. Recovery relies on accessible Download Mode and restoration from hash-verified stock copies.
 
-## 2. Evidencia encontrada
+## 2. Discovered Evidence
 
-### HECHOS verificados localmente
+### Locally verified FACTS
 
-| Ítem | Valor observado |
+| Item | Observed value |
 |---|---|
-| Algoritmo vbmeta raíz | `SHA256_RSA4096` |
-| Clave pública (SHA-1) | `b6924fd490355eca36e5a5cd9c4d2b4bd6434029` |
-| Rollback Index global | `0` |
-| Rollback Index Location raíz | `0` |
-| Flags | `0` en descriptor raíz y en chains observados |
+| Root vbmeta algorithm | `SHA256_RSA4096` |
+| Public key (SHA-1) | `b6924fd490355eca36e5a5cd9c4d2b4bd6434029` |
+| Global Rollback Index | `0` |
+| Root Rollback Index Location | `0` |
+| Flags | `0` in root descriptor and in observed chains |
 | Release string | `avbtool 1.3.0` |
 
-Descriptores relevantes del vbmeta raíz (`avbtool info_image --image artifacts/stock/images/vbmeta.img`):
+Relevant descriptors of root vbmeta (`avbtool info_image --image artifacts/stock/images/vbmeta.img`):
 
 - Chain partitions: `dtbo → RIL 1`, `prism → RIL 2`, `optics → RIL 3`.
-- Hash descriptors directos que incluyen: `boot` (39,363,360 bytes; digest `3f28d10f...31a420c`), `init_boot` (digest `4f514634...f32efc`), `vendor_boot` (18,334,480 bytes; digest `7c5898f8...050da7`), `recovery`, `bootloader`, `fld`, `harx`, `keystorage`, `ldfw`, `tzsw`. `dtbo` aparece sólo mediante CHAIN en el root.
-- Hashtree descriptors dm-verity: `system`, `vendor`, `product`, `odm`, `system_dlkm`, `vendor_dlkm`.
+- Direct hash descriptors including: `boot` (39,363,360 bytes; digest `3f28d10f...31a420c`), `init_boot` (digest `4f514634...f32efc`), `vendor_boot` (18,334,480 bytes; digest `7c5898f8...050da7`), `recovery`, `bootloader`, `fld`, `harx`, `keystorage`, `ldfw`, `tzsw`. `dtbo` appears only via CHAIN in root.
+- dm-verity hashtree descriptors: `system`, `vendor`, `product`, `odm`, `system_dlkm`, `vendor_dlkm`.
 - Props: `com.android.build.boot.os_version=13`; `com.android.build.system.os_version=16`; security patch `2026-05-05`.
 
-Implicación estructural directa: cambiar el contenido de `boot`, `init_boot`, `vendor_boot` o `dtbo` rompe su hash firmado aunque el tamaño de partición sea igual. No existe camino seguro LOCKED para un kernel propio manteniendo este vbmeta stock.
+Direct structural implication: changing the content of `boot`, `init_boot`, `vendor_boot`, or `dtbo` breaks its signed hash even if the partition size is unchanged. No safe LOCKED path exists for a custom kernel while retaining this stock vbmeta.
 
-### HIPÓTESIS no confirmadas en este dispositivo
+### HYPOTHESES unconfirmed on this device
 
-| ID | Hipótesis | Consecuencia si es falsa |
+| ID | Hypothesis | Consequence if false |
 |---|---|---|
-| H-AVB-1 | El estado UNLOCKED hace que el bootloader Samsung tolere un vbmeta alternativo con `VERIFICATION_DISABLED` (`flags=2`). | La Fase 1 puede terminar en rechazo persistente, advertencia roja o reboot loop. |
-| H-AVB-2 | No hay rollback protection efectiva adicional por RIL/RPMB que rechace índices inferiores o iguales tras cambios locales. | Un vbmeta de test podría quedar bloqueado por política Samsung incluso restaurando imágenes stock. |
-| H-AVB-3 | Download Mode permanece siempre accesible mediante combinación física, incluso tras fallo AVB o kernel panic. | El procedimiento de recuperación puede necesitar otra vía (carga de batería, timing distinto, herramienta Samsung). |
-| H-SIG-1 | Las pantallas de advertencia siguen la semántica estándar YELLOW/ORANGE/RED. | La clasificación visual puede ser ambigua y requerir apoyo de USB/consumo/tiempos. |
-| H-KRN-1 | Tras handoff, el kernel U11 puede fallar antes de inicializar USB/console, produciendo apariencia externa similar a un rechazo AVB. | Se necesita baseline temporal y post-mortem sec_debug/DSS para separar ambos casos. |
+| H-AVB-1 | UNLOCKED state causes Samsung bootloader to tolerate an alternative vbmeta with `VERIFICATION_DISABLED` (`flags=2`). | Phase 1 may end in persistent rejection, red warning, or reboot loop. |
+| H-AVB-2 | There is no additional effective rollback protection via RIL/RPMB that rejects lower or equal indexes after local changes. | A test vbmeta could remain blocked by Samsung policy even when restoring stock images. |
+| H-AVB-3 | Download Mode always remains accessible via physical key combination, even after AVB failure or kernel panic. | Recovery procedure may require another path (battery charging, different timing, Samsung tool). |
+| H-SIG-1 | Warning screens follow standard YELLOW/ORANGE/RED semantics. | Visual classification may be ambiguous and require support from USB/current/timings. |
+| H-KRN-1 | After handoff, U11 kernel may fail before initializing USB/console, producing external appearance similar to AVB rejection. | Temporal baseline and post-mortem sec_debug/DSS are needed to separate both cases. |
 
-## 3. Qué significa
+## 3. What This Means
 
-1. **AVB es un punto de corte anterior al kernel.** Si falla, ninguna instrucción del kernel U11 llega a ejecutarse: no hay dmesg, no hay gadget kernel, no hay sec_debug nuevo generado por esta sesión de boot.
-2. **El primer objetivo físico debe ser medir la política del bootloader**, no probar ya el kernel completo. Un vbmeta-only probe aísla la pregunta "¿el bootloader acepta una cadena de confianza alternativa?" sin introducir simultáneamente incompatibilidades ABI ni DT.
-3. **Las señales sin UART son probabilísticas hasta calibrarlas.** Enumeración USB, consumo, backlight y tiempos son útiles solo cuando se comparan contra un baseline stock registrado en el mismo cable, host y condiciones.
-4. **El riesgo mayor no es el kernel sino quedar fuera de una política Samsung no documentada** (rollback/Knox/unlock). Por eso la primera escritura experimental es mínima y reversible, y cada fase exige reconfirmar acceso a Download Mode antes de continuar.
+1. **AVB is a cutoff point prior to kernel.** If it fails, not a single instruction of the U11 kernel ever executes: there is no dmesg, no kernel gadget, no new sec_debug generated by this boot session.
+2. **The first physical objective must be measuring bootloader policy**, not testing the complete kernel yet. A vbmeta-only probe isolates the question "does the bootloader accept an alternative trust chain?" without simultaneously introducing ABI or DT incompatibilities.
+3. **Signals without UART are probabilistic until calibrated.** USB enumeration, power consumption, backlight, and timings are useful only when compared against a stock baseline recorded on the same cable, host, and conditions.
+4. **The greater risk is not the kernel but falling outside undocumented Samsung policy** (rollback/Knox/unlock). Therefore the first experimental write is minimal and reversible, and each phase requires reconfirming Download Mode access before proceeding.
 
-## 4. Matriz de señales AVB vs kernel
+## 4. Signal Matrix: AVB vs Kernel
 
-Nivel de confianza indicado tras cada fila: **C** = confirmado estructuralmente o en literatura AOSP; **H** = hipótesis a calibrar en este hardware.
+Confidence level indicated after each row: **C** = structurally confirmed or in AOSP literature; **H** = hypothesis to calibrate on this hardware.
 
-| Señal | Apunta a fallo AVB | Apunta a kernel alcanzado | Confianza |
+| Signal | Points to AVB failure | Points to kernel reached | Confidence |
 |---|---|---|---|
-| Warning screen naranja/roja persistente en arranque normal | Sí | No | C (semántica AOSP) / H (Samsung exacto) |
-| Dispositivo USB del bootloader visible (Samsung VID `04E8`) en Download Mode | Compatible con rechazo; también presente en baseline | Compatible con cualquier estado | C |
-| Nuevo dispositivo USB con VID Linux `1d6b` (gadget kernel) | Nunca debería aparecer | Indicio fuerte de driver USB operativo | C (semántica USB) / H (config gadget real) |
-| Consumo plano tipo bootloader durante todo el intento | Probable | No probable | H — requiere baseline |
-| Cambio brusco de consumo tras fase bootloader (spike/valle) | No esperado | Posible (kernel ejecutándose o reset) | H — requiere baseline |
-| Backlight se enciende brevemente y desaparece / reset loop corto | Menos probable | Posible crash temprano + reinicio | H |
-| Tiempo hasta reset idéntico al baseline stock de fallo forzado (si existiera) | Más compatible | Menos compatible | H |
-| `/proc/last_kmsg` o regiones DSS actualizadas tras el intento (leídas desde contexto posterior) | No (kernel nunca corrió) | Sí, si drivers debug llegaron a activarse | C (lógica) / H (activación real) |
+| Persistent orange/red warning screen during normal boot | Yes | No | C (AOSP semantics) / H (exact Samsung) |
+| Bootloader USB device visible (Samsung VID `04E8`) in Download Mode | Compatible with rejection; also present in baseline | Compatible with any state | C |
+| New USB device with Linux VID `1d6b` (kernel gadget) | Should never appear | Strong indicator of operative USB driver | C (USB semantics) / H (actual gadget config) |
+| Flat bootloader-style power consumption throughout attempt | Probable | Unlikely | H — requires baseline |
+| Abrupt change in consumption after bootloader phase (spike/dip) | Not expected | Possible (kernel executing or reset) | H — requires baseline |
+| Backlight illuminates briefly and disappears / short reset loop | Less likely | Possible early crash + reboot | H |
+| Time until reset identical to stock forced failure baseline (if one existed) | More compatible | Less compatible | H |
+| `/proc/last_kmsg` or DSS regions updated after attempt (read from subsequent context) | No (kernel never ran) | Yes, if debug drivers managed to activate | C (logic) / H (actual activation) |
 
-Regla operativa: **ninguna señal aislada es diagnóstica la primera vez**. Se registra el vector completo (pantalla, USB, corriente vs tiempo, tiempo hasta reset, resultado post-mortem).
+Operational rule: **no single signal is diagnostic on the first run**. The full vector is recorded (screen, USB, current vs time, time until reset, post-mortem outcome).
 
-## 5. Precondiciones obligatorias antes de cualquier fase de escritura
+## 5. Mandatory Preconditions Before Any Write Phase
 
-1. Copias intactas de `boot.img`, `init_boot.img`, `vendor_boot.img`, `dtbo.img`, `vbmeta.img` stock con SHA-256 registrados y verificados.
-2. Estado del bootloader documentado: OEM unlocking habilitado, dispositivo UNLOCKED confirmado por advertencia visible. **Si no hay evidencia de UNLOCKED, no ejecutar Fase 1.**
-3. Baseline stock completado (Fase 0) con capturas timestamped.
-4. Procedimiento probado de entrada a Download Mode con firmware stock, incluyendo tiempo máximo de espera y comportamiento de desconexión USB.
-5. Host de observación preparado: log continuo de eventos USB (`lsusb`, `dmesg -w`, udev monitor), grabación de vídeo de pantalla, medidor de corriente USB con logging temporal.
-6. Herramientas y archivos de restauración listos, pero **sin flashear nada** hasta que la fase correspondiente esté autorizada explícitamente.
+1. Intact copies of stock `boot.img`, `init_boot.img`, `vendor_boot.img`, `dtbo.img`, `vbmeta.img` with recorded and verified SHA-256 digests.
+2. Documented bootloader state: OEM unlocking enabled, device UNLOCKED confirmed by visible warning. **If there is no evidence of UNLOCKED, do not execute Phase 1.**
+3. Completed stock baseline (Phase 0) with timestamped captures.
+4. Tested procedure for entering Download Mode with stock firmware, including maximum wait time and USB disconnect behavior.
+5. Prepared observation host: continuous log of USB events (`lsusb`, `dmesg -w`, udev monitor), screen video recording, USB power meter with temporal logging.
+6. Restoration tools and files ready, but **without flashing anything** until the corresponding phase is explicitly authorized.
 
-Criterio de aborto global: pérdida de acceso a Download Mode, comportamiento térmico/electrico anómalo, advertencia de integridad inesperada en modo recovery, o cualquier estado donde la restauración stock no sea verificable.
+Global abort criterion: loss of Download Mode access, anomalous thermal/electrical behavior, unexpected integrity warning in recovery mode, or any state where stock restoration is not verifiable.
 
-## 6. Protocolo por fases
+## 6. Phased Protocol
 
-### Fase 0 — Baseline stock (solo lectura)
+### Phase 0 — Stock Baseline (Read-Only)
 
-Objetivo: calibrar el vector de señales sin modificar nada.
+Objective: calibrate the signal vector without modifying anything.
 
-Pasos recomendados:
+Recommended steps:
 
-1. Arrancar 3 veces con firmware stock completo, cronometrando desde inserción de cable/pulsación hasta Android.
-2. Registrar por corrida: timeline de enumeración USB (VID/PID y timestamps), curva de corriente exportada, eventos de pantalla/backlight, tiempo total.
-3. Entrar en Download Mode 2 veces y registrar enumeración USB y consumo estacionario.
-4. Opcional avanzado (requiere contexto secundario funcional): leer `reset_reason` / DSS tras reinicios normales para conocer el formato "sano".
+1. Boot 3 times with complete stock firmware, timing from cable insertion / key press until Android.
+2. Record per run: USB enumeration timeline (VID/PID and timestamps), exported current curve, screen/backlight events, total time.
+3. Enter Download Mode 2 times and record USB enumeration and steady-state power consumption.
+4. Optional advanced (requires functional secondary context): read `reset_reason` / DSS after normal reboots to understand the "healthy" format.
 
-Éxito: tres timelines consistentes y reproducibles; patrón Download Mode conocido.
-Fallo del baseline: variabilidad impide definir umbrales → repetir con mejor instrumentación antes de continuar.
-Aborto: cualquier anomalía de carga/temperatura o imposibilidad de volver a Android stock.
+Success: three consistent, reproducible timelines; known Download Mode pattern.
+Baseline failure: variability prevents defining thresholds → repeat with better instrumentation before continuing.
+Abort: any charging/temperature anomaly or inability to return to stock Android.
 
-### Fase 1 — Sonda AVB: solo vbmeta modificado
+### Phase 1 — AVB Probe: Modified vbmeta Only
 
-Estado requerido: UNLOCKED confirmado + Fase 0 completa.
+Required state: UNLOCKED confirmed + Phase 0 complete.
 
-Contenido lógico de la sonda (definición, **no fabricar en esta tarea**):
+Logical probe content (definition, **do not craft in this task**):
 
-- Hipótesis de laboratorio: `vbmeta.img` con `VERIFICATION_DISABLED` (`flags=2`), o firma de test válida según política confirmada, conservando la estructura de chain partitions. `flags=1` es exclusivamente `HASHTREE_DISABLED`; `flags=3` combina ambos bits. Ninguna variante está autorizada ni demostrada en Samsung.
-- Todas las demás particiones permanecen stock: `boot`, `init_boot`, `vendor_boot`, `dtbo`, system, vendor, etc.
+- Laboratory hypothesis: `vbmeta.img` with `VERIFICATION_DISABLED` (`flags=2`), or valid test signature according to confirmed policy, preserving chain partitions structure. `flags=1` is exclusively `HASHTREE_DISABLED`; `flags=3` combines both bits. Neither variant is authorized or demonstrated on Samsung.
+- All other partitions remain stock: `boot`, `init_boot`, `vendor_boot`, `dtbo`, system, vendor, etc.
 
-Interpretación de resultados:
+Interpretation of results:
 
-| Observación dominante | Lectura más plausible | Acción siguiente |
+| Dominant observation | Most plausible reading | Next action |
 |---|---|---|
-| Boot normal hasta Android (posible warning) | Bootloader tolera vbmeta alterado bajo UNLOCKED | Continuar a Fase 2 |
-| Warning roja/naranja persistente y no continúa | Rechazo de política AVB/Samsung | No flashear kernel; auditar unlock/rollback/política; probar firma de test conocida |
-| Reboot loop inmediato antes de Android | Rechazo activo o política no tolerante | Recuperar a Download Mode; documentar timing; no interpretar como fallo kernel |
-| Ningún cambio visible respecto a stock y Android arranca | Flags ignorados o política permisiva silenciosa | Documentar; repetir con marcador observable antes de asumir éxito |
+| Normal boot to Android (possible warning) | Bootloader tolerates altered vbmeta under UNLOCKED | Proceed to Phase 2 |
+| Persistent red/orange warning and does not continue | AVB / Samsung policy rejection | Do not flash kernel; audit unlock/rollback/policy; test known test signature |
+| Immediate reboot loop before Android | Active rejection or intolerant policy | Recover to Download Mode; document timing; do not interpret as kernel failure |
+| No visible change vs stock and Android boots | Flags ignored or silent permissive policy | Document; repeat with observable marker before assuming success |
 
-Éxito: el bootloader acepta o tolera claramente la sonda y el sistema vuelve a estado recuperable.
-Fallo: rechazo consistente → detener escalado, investigar política Samsung/rollback.
-Aborto: pérdida de Download Mode o comportamiento no recuperable con el procedimiento ensayado.
+Success: bootloader clearly accepts or tolerates the probe and system returns to recoverable state.
+Failure: consistent rejection → halt escalation, investigate Samsung policy / rollback.
+Abort: loss of Download Mode or non-recoverable behavior with rehearsed procedure.
 
-Recuperación: restaurar `vbmeta.img` stock y verificar hash; confirmar arranque Android normal antes de cerrar la fase.
+Recovery: restore stock `vbmeta.img` and verify hash; confirm normal Android boot before closing phase.
 
-### Fase 2 — Kernel marker: boot + vbmeta
+### Phase 2 — Kernel Marker: boot + vbmeta
 
-Solo se autoriza si Fase 1 fue exitosa y documentada.
+Authorized only if Phase 1 was successful and documented.
 
-Contenido lógico:
+Logical content:
 
-- `boot.img` con kernel U11 de auditoría, preferiblemente con drivers tempranos críticos integrados (chipid/clocks/MCT/pinctrl/PMU) según el plan general.
-- `vbmeta.img` coherente con ese contenido (regenerado/firmado según la política validada en Fase 1).
-- `init_boot` y `vendor_boot` **stock en esta fase deliberadamente**: el objetivo aquí es solo observar si ocurre handoff y qué señal produce un kernel distinto, no conseguir userspace. Los fallos ABI del vendor_ramdisk stock se asumen y se documentan como variable contaminante conocida.
+- `boot.img` with audit U11 kernel, preferably with critical early drivers integrated (chipid/clocks/MCT/pinctrl/PMU) per general plan.
+- `vbmeta.img` consistent with that content (regenerated/signed according to policy validated in Phase 1).
+- `init_boot` and `vendor_boot` **deliberately stock in this phase**: the goal here is only to observe whether handoff occurs and what signal a different kernel produces, not to achieve userspace. Stock vendor_ramdisk ABI failures are assumed and documented as a known confounding variable.
 
-Nota crítica: esta fase **no** pretende boot útil. Pretende responder: ¿la transición post-bootloader cambia respecto al baseline? Cualquier señal nueva (consumo, backlight, enumeración efímera) indica que el kernel recibió control aunque luego muera.
+Critical note: this phase does **not** intend a useful boot. It intends to answer: does the post-bootloader transition change relative to baseline? Any new signal (power consumption, backlight, ephemeral enumeration) indicates that the kernel received control even if it dies subsequently.
 
-Interpretación:
+Interpretation:
 
-| Resultado | Significado probable |
+| Result | Probable meaning |
 |---|---|
-| Mismo patrón exacto que rechazo AVB de Fase 1 | Handoff no ocurrió o kernel murió instantáneamente; priorizar AVB |
-| Nueva fase eléctrica/backlight breve + reset | Kernel ejecutó y falló temprano; priorizar earlycon/sec_debug |
-| Gadget USB efímero o estable aparece | Kernel llegó a init USB; éxito parcial alto |
-| Sin ninguna diferencia mensurable | Ambiguo; repetir con instrumentación mejorada y post-mortem DSS |
+| Exact same pattern as Phase 1 AVB rejection | Handoff did not occur or kernel died instantly; prioritize AVB |
+| New brief electrical/backlight phase + reset | Kernel executed and failed early; prioritize earlycon/sec_debug |
+| Ephemeral or stable USB gadget appears | Kernel reached USB init; high partial success |
+| Without any measurable difference | Ambiguous; repeat with improved instrumentation and post-mortem DSS |
 
-Éxito: obtención de un vector de señales diferenciable, aunque el kernel no sobreviva.
-Fallo: ambigüedad total → no escalar imágenes; mejorar observabilidad primero.
-Aborto: idéntico criterio global.
+Success: obtaining a differentiable signal vector, even if the kernel does not survive.
+Failure: complete ambiguity → do not escalate images; improve observability first.
+Abort: identical global criterion.
 
-### Fases posteriores (fuera de alcance inmediato)
+### Subsequent Phases (Outside Immediate Scope)
 
-La sustitución coordinada de `init_boot`/`vendor_boot` con perfiles MINIMAL/sec_debug pertenece al experimento completo de first boot descrito en `docs/first-boot-experiment-plan.md`. Este documento solo valida la frontera AVB→kernel.
+The coordinated replacement of `init_boot`/`vendor_boot` with MINIMAL/sec_debug profiles belongs to the complete first boot experiment described in `docs/first-boot-experiment-plan.md`. This document only validates the AVB→kernel boundary.
 
-## 7. Riesgos específicos
+## 7. Specific Risks
 
-| Severidad | Riesgo | Mitigación |
+| Severity | Risk | Mitigation |
 |---|---|---|
-| Crítico | Política Samsung desconocida convierte la Fase 1 en un estado difícil de revertir (rollback/Knox). | Sonda mínima, UNLOCKED previo, copias stock verificadas, Download Mode ensayado, aborto inmediato ante anomalía. |
-| Crítico | Confundir "AVB rechazó" con "kernel crashea en <50 ms". | Fase 0 obligatoria, comparación de timelines y post-mortem DSS/reset_reason cuando sea accesible. |
-| Alto | Señales USB/consumo mal calibradas inducen conclusión falsa. | Mismo cable/host/instrumento, 3 repeticiones, exportar logs timestamped. |
-| Alto | Escribir vbmeta-only cambia también expectativas de hashtree/dm-verity en runtime Android. | Interpretar cualquier comportamiento Android anómalo como parte del experimento; restaurar vbmeta stock al cerrar fase. |
-| Medio | Warning screens de Samsung difieren de la semántica AOSP documentada. | Tratar color/texto como dato, no como diagnóstico definitivo; apoyarse en USB/tiempo/post-mortem. |
-| Medio | Batería baja impide entrar a recovery/download durante recuperación. | Cargar por encima de umbral cómodo antes de empezar; documentar comportamiento con batería baja en Fase 0. |
+| Critical | Unknown Samsung policy turns Phase 1 into a difficult-to-revert state (rollback/Knox). | Minimal probe, prior UNLOCKED, verified stock copies, rehearsed Download Mode, immediate abort on anomaly. |
+| Critical | Confusing "AVB rejected" with "kernel crashes in <50 ms". | Mandatory Phase 0, timeline comparison, and post-mortem DSS/reset_reason when accessible. |
+| High | Poorly calibrated USB/consumption signals induce false conclusion. | Same cable/host/instrument, 3 repetitions, export timestamped logs. |
+| High | Writing vbmeta-only also alters hashtree/dm-verity expectations in Android runtime. | Interpret any anomalous Android behavior as part of the experiment; restore stock vbmeta when closing phase. |
+| Medium | Samsung warning screens differ from documented AOSP semantics. | Treat color/text as data, not definitive diagnosis; rely on USB/time/post-mortem. |
+| Medium | Low battery prevents entering recovery/download during recovery. | Charge above comfortable threshold before starting; document low-battery behavior in Phase 0. |
 
-## 8. Registro mínimo por corrida
+## 8. Minimum Record per Run
 
-Cada intento debe dejar un registro con:
+Each attempt must leave a log with:
 
-1. Fecha/hora, fase, hash de cada imagen implicada.
-2. Estado bootloader declarado y evidencia de ese estado.
-3. Timeline: t=0 referencia, eventos USB (attach/detach, VID/PID), picos de corriente, eventos de pantalla.
-4. Duración total hasta estado final (Android / warning persistente / reset / timeout).
-5. Método y resultado de recuperación (incluyendo hashes tras restaurar).
-6. Conclusión separada en: **observaciones**, **interpretación provisional**, **hipótesis descartadas/no descartadas**, **siguiente paso**.
+1. Date/time, phase, hash of each involved image.
+2. Declared bootloader state and evidence of that state.
+3. Timeline: t=0 reference, USB events (attach/detach, VID/PID), current peaks, screen events.
+4. Total duration until final state (Android / persistent warning / reset / timeout).
+5. Recovery method and outcome (including hashes after restore).
+6. Conclusion separated into: **observations**, **provisional interpretation**, **ruled out / unruled out hypotheses**, **next step**.
 
-## 9. Respuestas directas a las preguntas del encargo
+## 9. Direct Answers to Commission Questions
 
-- **¿Cómo sabemos que AVB falló?** Combinación de: advertencia de verified boot persistente o reboot pre-kernel consistente, ausencia total de cualquier fase nueva post-bootloader frente a baseline, y (si se accede después) falta de evidencia nueva en mecanismos que solo el kernel puede escribir. En estado UNLOCKED, la Fase 1 con vbmeta-only es la sonda diseñada para provocar y clasificar exactamente esto.
-- **¿Cómo sabemos que el kernel llegó?** Solo con evidencia de efectos que ocurren después del handoff: nueva fase de consumo/backlight, enumeración de un gadget kernel, o datos nuevos en sec_debug/DSS/last_kmsg recuperados desde otro contexto. La presencia continua del dispositivo del bootloader no cuenta como evidencia de kernel.
-- **¿Cómo recuperar si AVB rechaza?** Vía primaria hipotética-pero-ensayable: mantener acceso a Download Mode, restaurar `vbmeta.img` stock desde copia verificada y revalidar boot Android. Si Download Mode no responde con el procedimiento estándar, detener todo escalado y tratar el caso como bloqueante de seguridad, no como dato del kernel.
+- **How do we know AVB failed?** Combination of: persistent verified boot warning or consistent pre-kernel reboot, total absence of any new post-bootloader phase compared to baseline, and (if accessed afterward) lack of new evidence in mechanisms only the kernel can write. In the UNLOCKED state, Phase 1 with vbmeta-only is the probe designed to provoke and classify precisely this.
+- **How do we know the kernel was reached?** Only with evidence of effects occurring after handoff: new power consumption / backlight phase, enumeration of a kernel gadget, or new data in sec_debug/DSS/last_kmsg recovered from another context. Continued presence of the bootloader device does not count as kernel evidence.
+- **How to recover if AVB rejects?** Hypothetical-but-rehearsable primary path: maintain Download Mode access, restore stock `vbmeta.img` from verified copy, and revalidate Android boot. If Download Mode does not respond via standard procedure, stop all escalation and treat the case as a safety blocker, not kernel data.
 
-## 10. Documentación propuesta
+## 10. Proposed Documentation
 
-- Actualizar `docs/first-boot-experiment-plan.md` tras ejecutar Fase 0/1 para sustituir hipótesis H-AVB-1..3 por observaciones fechadas.
-- Crear un archivo de corridas (por ejemplo `reports/first-boot-runlog.md`) usando la plantilla de §8; un registro por intento, sin mezclar conclusiones.
-- Referencias cruzadas: `docs/debugging/sec-debug-analysis.md` (recuperación post-mortem), informe ABI U11/U12 (por qué Fase 2 no busca userspace), y `docs/boot-chain/minimal-modification-set.md` cuando exista (para las fases posteriores).
+- Update `docs/first-boot-experiment-plan.md` after executing Phase 0/1 to replace hypotheses H-AVB-1..3 with dated observations.
+- Create a run log file (for example `reports/first-boot-runlog.md`) using the template from §8; one entry per attempt, without conflating conclusions.
+- Cross references: `docs/debugging/sec-debug-analysis.md` (post-mortem recovery), U11/U12 ABI report (why Phase 2 does not seek userspace), and `docs/boot-chain/minimal-modification-set.md` (for subsequent phases).

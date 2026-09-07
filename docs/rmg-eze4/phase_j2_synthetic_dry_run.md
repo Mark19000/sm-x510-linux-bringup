@@ -1,3 +1,8 @@
+# HISTORICAL / SUPERSEDED — DO NOT USE FOR CURRENT J2 DECISIONS
+
+This report used the Phase-I engine. Current J2 evaluation uses `aggregator.py`,
+`validator.py`, Schema v2.2.1, and `make verify-j2`.
+
 # J2 synthetic dry-run report
 
 The fixtures in `tools/rmg-eze4/tests/fixtures/phase_j2_timeout_scenarios.json` were run through the existing Phase I `engine.analyze_observations()` interface by `test_phase_j2_design.py`. The complete Phase I and J0 test modules were run in the same invocation. No device, payload, build, or network interface was used.

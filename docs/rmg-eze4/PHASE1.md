@@ -1,133 +1,133 @@
-# Reporte de Fase 1 — Reconocimiento y Auditoría Estática (EZE4 vs ZG3)
+# Phase 1 Report — Reconnaissance and Static Audit (EZE4 vs ZG3)
 
-- **Dispositivo**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
+- **Device**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
 - **SoC**: Samsung Exynos 1380 (`s5e8835`)
-- **Firmware Base Objetivo**: `X510XXUCEZE4` (Android 16 / One UI 8.5 / U12 Bootloader)
-- **Firmware de Referencia**: `X510XXSEEZG3` (Root-My-Galaxy target `gts9fewifi-X510XXSEEZG3`)
-- **Kernel Base**: Linux `5.15.189-android13-3-33478785`
-- **Estado de Ejecución**: **FASE 1 COMPLETADA**
-- **Fecha**: 2026-09-06
+- **Target Base Firmware**: `X510XXUCEZE4` (Android 16 / One UI 8.5 / U12 Bootloader)
+- **Reference Firmware**: `X510XXSEEZG3` (Root-My-Galaxy target `gts9fewifi-X510XXSEEZG3`)
+- **Base Kernel**: Linux `5.15.189-android13-3-33478785`
+- **Execution Status**: **PHASE 1 COMPLETED**
+- **Date**: 2026-09-06
 
 ---
 
-## 1. Resumen de Artefactos EZE4
+## 1. Summary of EZE4 Artifacts
 
-La inspección integral del repositorio `tab-s9-fe-linux` confirmó una base de artefactos sumamente madura, validada y con trazabilidad determinista:
+Comprehensive inspection of the `tab-s9-fe-linux` repository confirmed a highly mature, validated artifact base with deterministic traceability:
 
-### Artefactos Presentes y Validados
-1. **Código Fuente Oficial Samsung OSRC**:
-   - Paquete base `Kernel.tar.gz` (SHA-256: `2f3e186260...`, 254.8 MB) y envoltorio ZIP `SM-X510_EUR_16_Opensource.zip` (SHA-256: `72378f3b...`, 286.4 MB).
-   - Árbol de código fuente completamente extraído en `audit/eze4-source-intake/extracted/kernel/` (86,456 entradas).
-2. **Particiones Stock Extraídas de Firmware Oficial**:
-   - `boot.img` (67.1 MB, SHA-256: `c96c0eb0...`) con cabecera Android Boot v4 y kernel uncompressed aarch64 Image de fábrica (39.3 MB, SHA-256: `ca56baf4...`).
+### Present and Validated Artifacts
+1. **Official Samsung OSRC Source Code**:
+   - Base package `Kernel.tar.gz` (SHA-256: `2f3e186260...`, 254.8 MB) and wrapper ZIP `SM-X510_EUR_16_Opensource.zip` (SHA-256: `72378f3b...`, 286.4 MB).
+   - Source code tree fully extracted in `audit/eze4-source-intake/extracted/kernel/` (86,456 entries).
+2. **Stock Partitions Extracted from Official Firmware**:
+   - `boot.img` (67.1 MB, SHA-256: `c96c0eb0...`) with Android Boot v4 header and factory uncompressed aarch64 Image kernel (39.3 MB, SHA-256: `ca56baf4...`).
    - `init_boot.img` (16.8 MB, SHA-256: `9efb4169...`).
-   - `vendor_boot.img` (33.6 MB, SHA-256: `60e85ca0...`) con tablas de módulos y DTB base stock.
-   - `dtbo.img` (8.4 MB, SHA-256: `0dd2392e...`) con overlays r00, r01 y r04.
-   - `vbmeta.img` (10.1 KB, SHA-256: `bef09047...`) con estructura AVB 2.0.
-   - Flujos comprimidos originales `*.img.lz4` preservados en `artifacts/stock/raw/`.
-3. **Compilación Determinista EZE4 (Línea Base Validada)**:
-   - Kernel binario reconstruido `artifacts/eze4/x510xxuceze4-baseline-20260905/Image` (38.9 MB, SHA-256: `a6f5c4f1...`).
-   - `vmlinux` unstripped completo generado en Lima VM (`/home/markpi.guest/osrc-eze4-work/runs/eze4-fixed2/build-source/out-eze4/vmlinux`, 552 MB, SHA-256: `44fd5d2b...`).
-   - Sección de depuración de tipos `.BTF` (tamaño 6,000,722 bytes) y tablas DWARF completas en `vmlinux`.
-   - `System.map` completo con símbolos del kernel (5.7 MB, SHA-256: `ec6047c2...`).
-   - `Module.symvers` con 15,123 símbolos exportados (705.1 KB, SHA-256: `f57afda2...`).
-   - `.config` de producción generado por `s5e8835-gts9fewifixx_defconfig` (SHA-256: `f9bb6c47...`).
-   - Binarios DTB (`s5e8835.dtb`) y DTBOs (`r00.dtbo`, `r01.dtbo`, `r04.dtbo`) byte-idénticos a los de fábrica.
-   - 282 módulos de kernel (`modules-root.tar.gz`, 11.9 MB), demostrando 100.00% de paridad ABI (0 discrepancias de CRC en 15,123 símbolos) contra los 281 módulos DLKM stock.
-4. **Cadenas de Herramientas y Scripts**:
-   - VM Lima ARM64 (`Ubuntu 24.04`, Clang 21.1.8 / LLD 21.1.8) activa y funcional.
-   - `avbtool` de Android 16 (`sources/toolchain/avb-android16/`) y `magiskboot` v30.7.
-   - Herramientas de verificación automatizada: `scripts/verify-eze4-abi.py`, `tools/dts_semantic_diff.py`, `tools/bootimg_info.py`.
+   - `vendor_boot.img` (33.6 MB, SHA-256: `60e85ca0...`) with stock module tables and base DTB.
+   - `dtbo.img` (8.4 MB, SHA-256: `0dd2392e...`) with r00, r01, and r04 overlays.
+   - `vbmeta.img` (10.1 KB, SHA-256: `bef09047...`) with AVB 2.0 structure.
+   - Original compressed `*.img.lz4` streams preserved in `artifacts/stock/raw/`.
+3. **Deterministic EZE4 Build (Validated Baseline)**:
+   - Reconstructed binary kernel `artifacts/eze4/x510xxuceze4-baseline-20260905/Image` (38.9 MB, SHA-256: `a6f5c4f1...`).
+   - Full unstripped `vmlinux` generated in Lima VM (`/home/markpi.guest/osrc-eze4-work/runs/eze4-fixed2/build-source/out-eze4/vmlinux`, 552 MB, SHA-256: `44fd5d2b...`).
+   - Type debug section `.BTF` (size 6,000,722 bytes) and complete DWARF tables in `vmlinux`.
+   - Complete `System.map` with kernel symbols (5.7 MB, SHA-256: `ec6047c2...`).
+   - `Module.symvers` with 15,123 exported symbols (705.1 KB, SHA-256: `f57afda2...`).
+   - Production `.config` generated by `s5e8835-gts9fewifixx_defconfig` (SHA-256: `f9bb6c47...`).
+   - DTB (`s5e8835.dtb`) and DTBOs (`r00.dtbo`, `r01.dtbo`, `r04.dtbo`) binaries byte-identical to factory.
+   - 282 kernel modules (`modules-root.tar.gz`, 11.9 MB), demonstrating 100.00% ABI parity (0 CRC discrepancies across 15,123 symbols) against the 281 stock DLKM modules.
+4. **Toolchains and Scripts**:
+   - ARM64 Lima VM (`Ubuntu 24.04`, Clang 21.1.8 / LLD 21.1.8) active and functional.
+   - Android 16 `avbtool` (`sources/toolchain/avb-android16/`) and `magiskboot` v30.7.
+   - Automated verification tools: `scripts/verify-eze4-abi.py`, `tools/dts_semantic_diff.py`, `tools/bootimg_info.py`.
 
-### Artefactos Faltantes / No Presentes Localmente
-1. **Binario de Bootloader (`sboot.bin`)**: El paquete BL del firmware stock no fue extraído a disco para optimizar espacio (el archivo AP cubre todas las particiones del SO). Sin embargo, el estado físico del bootloader (revisión 12 / `SWREV B:12`, `WARRANTY VOID: 0x0000`, `KG STATE: Completed (00)`) está documentado con evidencia fotográfica en `docs/hardware/evidence/`.
-2. **Archivos de Target EZE4**: No existen todavía `target.h` ni `p0_fingerprint.h` adaptados para EZE4.
+### Missing / Non-Locally Present Artifacts
+1. **Bootloader Binary (`sboot.bin`)**: The stock firmware BL package was not extracted to disk to optimize space (the AP archive covers all OS partitions). However, the physical bootloader state (revision 12 / `SWREV B:12`, `WARRANTY VOID: 0x0000`, `KG STATE: Completed (00)`) is documented with photographic evidence in `docs/hardware/evidence/`.
+2. **EZE4 Target Files**: `target.h` and `p0_fingerprint.h` adapted for EZE4 do not yet exist.
 
 ---
 
-## 2. Anatomía del Target ZG3 (`gts9fewifi-X510XXSEEZG3`)
+## 2. Anatomy of ZG3 Target (`gts9fewifi-X510XXSEEZG3`)
 
-El análisis exhaustivo de `target.h` y `p0_fingerprint.h` arrojó un total de **180 constantes y macros** inventariadas en [`docs/rmg-eze4/zg3_target_inventory.csv`](file:///Users/markpi/tab-s9-fe-linux/docs/rmg-eze4/zg3_target_inventory.csv):
+Comprehensive analysis of `target.h` and `p0_fingerprint.h` yielded a total of **180 constants and macros** inventoried in [`docs/rmg-eze4/zg3_target_inventory.csv`](file:///Users/markpi/tab-s9-fe-linux/docs/rmg-eze4/zg3_target_inventory.csv):
 
-| Categoría | Cantidad | Descripción Principal |
+| Category | Quantity | Main Description |
 | :--- | :---: | :--- |
-| **STRUCT_LAYOUT** | **67** | Desplazamientos de miembros en `task_struct`, `rt_mutex_waiter`, `file_operations`, `work_struct`, `configfs_bin_buffer`, `struct page`. |
-| **KERNEL_SYMBOL** | **52** | Desplazamientos relativos al texto (`*_OFF`) y direcciones absolutas (`KIMAGE_TEXT_BASE + offset`) para símbolos clave. |
-| **RUNTIME_TUNING** | **42** | Intentos de carrera, retardos finos/gruesos, ranuras de oráculo P0, afinidad de hilos y umbrales. |
-| **MEMORY_LAYOUT** | **8** | Mapa de memoria virtual (`KIMAGE_TEXT_BASE`, direct map, vmemmap) y paso KASLR (`0x4000`). |
-| **FIRMWARE_BUILD** | **4** | Identificador de variante (`BUILD_VARIANT_LABEL`), fingerprint de Android 16 y tabla de 32 huellas P0. |
-| **UNKNOWN** | **4** | Guardas de inclusión de preprocesador (`OFFSET_H`, `P0_FINGERPRINT_H`). |
-| **SOC** | **2** | Dirección base física de carga de DRAM para Exynos 1380 (`0x80000000`). |
-| **KERNEL_VERSION** | **1** | Banderas de buffer de tubería (`PIPE_BUF_FLAG_CAN_MERGE`). |
-| **TOTAL** | **180** | **100% catalogado en CSV con valores, líneas, propósitos y dependencias.** |
+| **STRUCT_LAYOUT** | **67** | Member offsets in `task_struct`, `rt_mutex_waiter`, `file_operations`, `work_struct`, `configfs_bin_buffer`, `struct page`. |
+| **KERNEL_SYMBOL** | **52** | Text-relative offsets (`*_OFF`) and absolute addresses (`KIMAGE_TEXT_BASE + offset`) for key symbols. |
+| **RUNTIME_TUNING** | **42** | Race attempts, fine/coarse delays, P0 oracle slots, thread affinity, and thresholds. |
+| **MEMORY_LAYOUT** | **8** | Virtual memory map (`KIMAGE_TEXT_BASE`, direct map, vmemmap) and KASLR step (`0x4000`). |
+| **FIRMWARE_BUILD** | **4** | Variant identifier (`BUILD_VARIANT_LABEL`), Android 16 fingerprint, and 32-entry P0 fingerprint table. |
+| **UNKNOWN** | **4** | Preprocessor include guards (`OFFSET_H`, `P0_FINGERPRINT_H`). |
+| **SOC** | **2** | DRAM physical base load address for Exynos 1380 (`0x80000000`). |
+| **KERNEL_VERSION** | **1** | Pipe buffer flags (`PIPE_BUF_FLAG_CAN_MERGE`). |
+| **TOTAL** | **180** | **100% cataloged in CSV with values, lines, purposes, and dependencies.** |
 
 ---
 
-## 3. Estado de la Corrección CVE-2026-43499 (`rtmutex`)
+## 3. CVE-2026-43499 Fix Status (`rtmutex`)
 
-- **Veredicto Estricto**: **`PATCH ABSENT`** (Árbol local vulnerable a nivel de código fuente).
-- **Evidencia Técnica**:
-  - En `audit/eze4-source-intake/extracted/kernel/kernel/locking/rtmutex.c` (líneas 1468–1471), `remove_waiter()` ejecuta:
+- **Strict Verdict**: **`PATCH ABSENT`** (Local tree vulnerable at source code level).
+- **Technical Evidence**:
+  - In `audit/eze4-source-intake/extracted/kernel/kernel/locking/rtmutex.c` (lines 1468–1471), `remove_waiter()` executes:
     ```c
     raw_spin_lock(&current->pi_lock);
     rt_mutex_dequeue(lock, waiter);
     current->pi_blocked_on = NULL;
     raw_spin_unlock(&current->pi_lock);
     ```
-  - Asume erróneamente que `waiter->task == current`.
-  - En llamadas proxy (`rt_mutex_start_proxy_lock()`), `waiter->task != current`, por lo que el cerrojo adquirido es el incorrecto y `waiter->task->pi_blocked_on` nunca es anulado, reteniendo un puntero colgante.
-  - La corrección upstream (asociada al commit `3bfdc63936dd` y notas *"When invoked from rt_mutex_start_proxy_lock() waiter::task != current !"*) **no está presente** en el árbol EZE4 de Samsung.
-  - Documentación completa en [`docs/rmg-eze4/rtmutex_patch_status.md`](file:///Users/markpi/tab-s9-fe-linux/docs/rmg-eze4/rtmutex_patch_status.md).
+  - Erroneously assumes that `waiter->task == current`.
+  - In proxy calls (`rt_mutex_start_proxy_lock()`), `waiter->task != current`, so the acquired lock is incorrect and `waiter->task->pi_blocked_on` is never cleared, retaining a dangling pointer.
+  - The upstream fix (associated with commit `3bfdc63936dd` and notes *"When invoked from rt_mutex_start_proxy_lock() waiter::task != current !"*) **is not present** in Samsung's EZE4 tree.
+  - Full documentation in [`docs/rmg-eze4/rtmutex_patch_status.md`](file:///Users/markpi/tab-s9-fe-linux/docs/rmg-eze4/rtmutex_patch_status.md).
 
 ---
 
-## 4. Diferencias Preliminares ZG3 vs EZE4 (Matriz Semáforo)
+## 4. Preliminary Differences: ZG3 vs EZE4 (Traffic Light Matrix)
 
-| Dimensión / Vector | Clasificación | Hallazgos y Justificación Técnica |
+| Dimension / Vector | Classification | Findings and Technical Justification |
 | :--- | :---: | :--- |
-| **Versión de Kernel** | **GREEN** | Idéntica: Linux `5.15.189-android13-3-33478785` en ambos firmwares. |
-| **Configuración de Kernel** | **GREEN** | Idéntica: Misma base `s5e8835-gts9fewifixx_defconfig`. |
-| **SoC / Hardware Memory Map** | **GREEN** | Idéntico: Exynos 1380 (`s5e8835`), `P0_PHYS_OFFSET = 0x80000000`, KASLR step `0x4000` (16 KB). |
-| **Estado CVE-2026-43499** | **GREEN** | Idéntico: Ambos firmwares carecen del parche (`PATCH ABSENT`). |
-| **Mecanismo de Ruta (FPSIMD)** | **GREEN** | Compatible: Basado en ABI pública de señales ARM64 (`sigcontext`). |
-| **Tamaños de Estructuras (ABI)**| **YELLOW** | **Debe verificarse con BTF**: Aunque los módulos DLKM mantuvieron 100% de paridad CRC, structs internas no exportadas deben corroborarse contra `vmlinux`. |
-| **Símbolos del Kernel (Offsets)** | **RED** | **Completamente dependiente del firmware**: Se demostró desplazamiento de texto. `init_task` se movió de `0x239fd80` a `0x233f0c0`, `prepare_kernel_cred` de `0x113a88` a `0xfb360`, `commit_creds` de `0x113330` a `0xfac1c`. |
-| **Tabla de Huellas P0** | **RED** | **Completamente dependiente del firmware**: Muestrea bytes exactos de la imagen `Image`; los hashes de `Image` difieren (`ca56baf4...` en ZG3 vs `a6f5c4f1...` en EZE4). |
-| **Build Fingerprint** | **RED** | Cambia de `X510XXSEEZG3` a `X510XXUCEZE4`. |
+| **Kernel Version** | **GREEN** | Identical: Linux `5.15.189-android13-3-33478785` in both firmwares. |
+| **Kernel Configuration** | **GREEN** | Identical: Same `s5e8835-gts9fewifixx_defconfig` base. |
+| **SoC / Hardware Memory Map** | **GREEN** | Identical: Exynos 1380 (`s5e8835`), `P0_PHYS_OFFSET = 0x80000000`, KASLR step `0x4000` (16 KB). |
+| **CVE-2026-43499 Status** | **GREEN** | Identical: Both firmwares lack the patch (`PATCH ABSENT`). |
+| **Route Mechanism (FPSIMD)** | **GREEN** | Compatible: Based on ARM64 public signal ABI (`sigcontext`). |
+| **Structure Sizes (ABI)**| **YELLOW** | **Must be verified with BTF**: Although DLKM modules maintained 100% CRC parity, internal non-exported structs must be corroborated against `vmlinux`. |
+| **Kernel Symbols (Offsets)** | **RED** | **Completely firmware-dependent**: Text relocation demonstrated. `init_task` moved from `0x239fd80` to `0x233f0c0`, `prepare_kernel_cred` from `0x113a88` to `0xfb360`, `commit_creds` from `0x113330` to `0xfac1c`. |
+| **P0 Fingerprint Table** | **RED** | **Completely firmware-dependent**: Samples exact bytes of `Image`; `Image` hashes differ (`ca56baf4...` in ZG3 vs `a6f5c4f1...` in EZE4). |
+| **Build Fingerprint** | **RED** | Changes from `X510XXSEEZG3` to `X510XXUCEZE4`. |
 
 ---
 
-## 5. Hallazgos sobre Rutas FPSIMD y Tuning
+## 5. Findings on FPSIMD Routes and Tuning
 
 - **`SLIDE_ROUTE_FPSIMD`**:
-  - Utiliza el marco de señal `ucontext_t` y la estructura `struct fpsimd_context` (`FPSIMD_MAGIC` = `0x46508001`) guardada en el espacio de usuario al entregar `SIGUSR2`.
-  - Proporciona un búfer continuo de 512 bytes en `vregs[32]` para alojar el `fake_waiter`.
-  - Resuelve las restricciones de SELinux en Android que impiden el uso de sockets multicast (`SLIDE_ROUTE_MCAST`).
-  - Es independiente del build y completamente compatible con EZE4.
+  - Uses the `ucontext_t` signal frame and `struct fpsimd_context` (`FPSIMD_MAGIC` = `0x46508001`) saved in userspace upon `SIGUSR2` delivery.
+  - Provides a contiguous 512-byte buffer in `vregs[32]` to house `fake_waiter`.
+  - Solves Android SELinux restrictions preventing multicast socket usage (`SLIDE_ROUTE_MCAST`).
+  - Build-independent and fully compatible with EZE4.
 - **`PRODUCTION_STACK_PI_RIGHT_ONLY`**:
-  - Fijada en `0` para `gts9fewifi` (a diferencia de teléfonos Galaxy como el S24 que usan `1`).
-  - Controla la orientación de inserción en el árbol rojo-negro del cerrojo (`tree_left = slide_oracle_target` vs `tree_right`).
-  - Depende del orden relativo de direcciones virtuales entre el nodo padre y los gadgets de fops en el espacio de memoria.
-  - Documentación completa en [`docs/rmg-eze4/fpsimd_static_analysis.md`](file:///Users/markpi/tab-s9-fe-linux/docs/rmg-eze4/fpsimd_static_analysis.md).
+  - Fixed at `0` for `gts9fewifi` (unlike Galaxy phones such as the S24 which use `1`).
+  - Controls insertion orientation in the lock's red-black tree (`tree_left = slide_oracle_target` vs `tree_right`).
+  - Depends on relative virtual address order between parent node and fops gadgets in memory space.
+  - Full documentation in [`docs/rmg-eze4/fpsimd_static_analysis.md`](file:///Users/markpi/tab-s9-fe-linux/docs/rmg-eze4/fpsimd_static_analysis.md).
 
 ---
 
-## 6. Incógnitas y Factores a Resolver (Unknowns)
+## 6. Unknowns and Open Factors
 
-1. **Resolución de Símbolos Estáticos Ocultos**: Símbolos como `ashmem_misc_fops`, `configfs_read_iter`, `configfs_bin_write_iter` y `copy_splice_read` no aparecen listados en `System.map` de EZE4 bajo esos nombres directos (posiblemente estáticos o inlined en compilación ThinLTO). Deben localizarse mediante desensamblado o inspección DWARF en `vmlinux`.
-2. **Validación de Offsets Internos de `task_struct`**: Corroborar si `TASK_STRUCT_CRED_OFF` (`0x798`), `TASK_STRUCT_REAL_CRED_OFF` (`0x790`) y los desplazamientos de `pi_lock` (`0x884`) y `pi_blocked_on` (`0x8b0`) son idénticos entre ZG3 y EZE4 utilizando el volcado `.BTF` de `vmlinux`.
-3. **Página de Huellas P0 EZE4**: La tabla `p0_fingerprint.h` de ZG3 no puede ser utilizada para resolver KASLR en EZE4; debe sintetizarse una tabla específica para la `Image` stock de EZE4.
+1. **Hidden Static Symbol Resolution**: Symbols such as `ashmem_misc_fops`, `configfs_read_iter`, `configfs_bin_write_iter`, and `copy_splice_read` are not listed in EZE4 `System.map` under those direct names (possibly static or inlined under ThinLTO compilation). Must be located via disassembly or DWARF inspection in `vmlinux`.
+2. **Validation of Internal `task_struct` Offsets**: Corroborate whether `TASK_STRUCT_CRED_OFF` (`0x798`), `TASK_STRUCT_REAL_CRED_OFF` (`0x790`), and `pi_lock` (`0x884`) and `pi_blocked_on` (`0x8b0`) offsets are identical between ZG3 and EZE4 using the `.BTF` dump of `vmlinux`.
+3. **EZE4 P0 Fingerprint Page**: The ZG3 `p0_fingerprint.h` table cannot be used to resolve KASLR on EZE4; a specific table must be synthesized for the stock EZE4 `Image`.
 
 ---
 
-## 7. Próxima Fase Recomendada
+## 7. Recommended Next Phase
 
-**Fase 2: Extracción Estática de Tipos (BTF/DWARF) y Mapeo de Símbolos EZE4**
-1. **Auditoría de Tipos mediante BTF**: Ejecutar `bpftool btf dump` o inspección pahole sobre `/home/markpi.guest/.../out-eze4/vmlinux` para extraer los desplazamientos exactos de:
+**Phase 2: Static Type Extraction (BTF/DWARF) and EZE4 Symbol Mapping**
+1. **Type Audit via BTF**: Run `bpftool btf dump` or pahole inspection over `/home/markpi.guest/.../out-eze4/vmlinux` to extract exact offsets for:
    - `struct task_struct` (`cred`, `real_cred`, `pi_lock`, `pi_waiters`, `pi_blocked_on`).
    - `struct rt_mutex_waiter` (`pi_tree_entry`, `task`, `lock`, `prio`).
-   - `struct mm_struct` (tamaño de slab y offsets).
-   - `struct file_operations` y `struct work_struct`.
-2. **Localización de Gadgets y Símbolos No Exportados**: Identificar mediante análisis de desensamblado en `vmlinux` las direcciones exactas de `ashmem_misc_fops`, `configfs_bin_write_iter` y funciones de splicing.
-3. **Generación de la Tabla de Huellas P0 EZE4**: Crear un script estático que procese la `Image` stock de EZE4 y genere la cabecera `p0_fingerprint.h` correspondiente para el paso de 16 KB.
-4. **Comprobación de Orientación rbtree**: Evaluar las direcciones relativas de EZE4 para verificar si `PRODUCTION_STACK_PI_RIGHT_ONLY` debe ser `0` o `1`.
+   - `struct mm_struct` (slab size and offsets).
+   - `struct file_operations` and `struct work_struct`.
+2. **Gadget and Unexported Symbol Localization**: Identify exact addresses for `ashmem_misc_fops`, `configfs_bin_write_iter`, and splicing functions via disassembly analysis in `vmlinux`.
+3. **EZE4 P0 Fingerprint Table Generation**: Create a static script processing stock EZE4 `Image` to generate the corresponding `p0_fingerprint.h` header for the 16 KB step.
+4. **rbtree Orientation Verification**: Evaluate relative EZE4 addresses to verify whether `PRODUCTION_STACK_PI_RIGHT_ONLY` should be `0` or `1`.

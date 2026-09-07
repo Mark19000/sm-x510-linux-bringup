@@ -1,125 +1,90 @@
-# Estado del proyecto
+# Project Status
 
-Fecha de corte: 23 de agosto de 2026.
+Canonical cutoff date: September 6, 2026.
 
-## Terminado en el workspace
+This file governs the overall bring-up status. Specific closure for RMG/EZE4/J2 is governed in `docs/rmg-eze4/CANONICAL_STATUS.md`; completing J2 does not demonstrate recovery readiness, unlocking, or flashing capability.
 
-- objetivo físico confirmado: SM-X510 Wi-Fi, `BP4A.251205.006` /
-  `X510XXUCEZE4`, Android 16, One UI 8.5, binario U12, CSC `EUX` dentro de
-  multi-CSC `OXM` (`X510OXMCEZE4`);
-- fuentes downstream stock separadas para X510 (`X510XXU3BXDG`) y X516
-  (`X516BXXU7CYE1`), más mainline, descargadas de forma parcial;
-- inventario de DT base y overlays (X510 Wi-Fi: r00/r01/r04; referencia X516
-  5G: r00/r01/r02/r04);
-- matriz razonada de controladores;
-- extractor de contenedores DTBO y escáner de FDT incrustados;
-- recolector ADB de sólo lectura;
-- parche/fragmento Kconfig para early userspace;
-- VM Lima ARM64 reproducible (Ubuntu 26.04, ext4), scripts de toolchain, kernel
-  y BusyBox;
-- kernel downstream de referencia compilado completamente con Clang 21:
-  `Image`, BTF, módulos firmados e instalados y los tres overlays Wi-Fi;
-- nueve parches de compatibilidad/corrección documentados para el árbol vendor;
-- BusyBox 1.36.1 ARM64 estático con configuración mínima verificada;
-- initramfs reproducible en perfiles mínimo, UFS (28 módulos) y USB (45
-  módulos); el USB demuestra su dependencia real pero no cabe en `init_boot`,
-  mientras la raíz persistente se monta sólo en lectura;
-- constructor DTBO que conserva los rangos de revisión stock y prueba de
-  ida/vuelta por hashes;
-- documentación de build, bring-up y roadmap mainline;
-- ficha y cuaderno específicos de la unidad EZE4, con guardas de modelo/versión
-  en la extracción, el inventario ADB y la compilación.
-- firmware EUX/EZE4 descargado; ZIP validado por estructura, MD5 publicado
-  `255c0e65e2ec62b0ba723612c1ece5a4` y SHA-256 local;
-- extractor ZIP→AP→particiones en streaming para evitar duplicar 11+ GB;
-- `boot`, `init_boot`, `vendor_boot`, `dtbo` y `vbmeta` EZE4 extraídos y
-  analizados; cabeceras Android v4, tamaños, compresión y pies AVB registrados;
-- candidatos `boot`/`init_boot` sin firma reconstruidos y comprobados por
-  desempaquetado; AVB detecta correctamente que el hash Samsung ya no coincide;
-- pipeline Lima integral (`reference-all`), metadatos Kbuild deterministas,
-  hashes relativos y guardas contra artefactos obsoletos tras un fallo;
-- pipeline integral repetido de extremo a extremo con salida 0; la suite ampliada
-  alcanza 88 pruebas host-only, incluidas las guardas OSRC U11, comparación de
-  árboles, seguridad/adversariales, semántica DTS y herramientas de imágenes.
-- entrega OSRC Android 16/U11 confirmada internamente: base `X510XXU8DYJ4` más
-  suplemento `X510XXSBDZB4`, kernel 5.15.180, extraída íntegramente en ext4 sin
-  alterar U3 ni el stock EZE4;
-- comparación sistemática U3→U11→EZE4 generada: el overlay U11 no presenta
-  diferencias materiales observables respecto al r04 stock EZE4, aunque quedan
-  referencias externas sin resolver, y el DT base difiere materialmente en
-  `mfc/debug_mode` dentro de lo observable;
-- U11 compilado completamente con Clang 21 ARM64 y los nueve parches actuales:
-  Image, BTF/LTO, DTB, tres DTBO, 282 módulos construidos e instalados; pruebas
-  negativas confirman los fallos que reaparecen al retirar cada parche de
-  compatibilidad relevante;
-- pipeline U11 fijo sin comandos arbitrarios, con nueve hashes de parche,
-  metadatos deterministas y rechazo de rutas físicas en Image/módulos;
-- auditoría binaria de los DTB compilados U11→EZE4: cuatro diferencias
-  observables (EMS, MFC y SCSC) y 14 referencias sin resolver; ninguna autoriza
-  afirmar equivalencia completa;
-- auditoría de 282 módulos U11 frente a 281 stock: 280 comunes conservan orden,
-  las dependencias duras y los cierres UFS/USB están completos;
-- preflight U11 e initramfs separados del pipeline U3, siempre con puerta
-  física `NO-GO`.
+## Completed in the Workspace
 
-## Actualización canónica 2026-09-05 — EZE4 y Evidencia Física de Desbloqueo
+- Confirmed physical target: SM-X510 Wi-Fi, `BP4A.251205.006` / `X510XXUCEZE4`, Android 16, One UI 8.5, U12 binary, CSC `EUX` within multi-CSC `OXM` (`X510OXMCEZE4`);
+- Downstream stock sources separated for X510 (`X510XXU3BXDG`) and X516 (`X516BXXU7CYE1`), plus mainline, downloaded in sparse checkouts;
+- Base DT and overlay inventory (X510 Wi-Fi: r00/r01/r04; X516 5G reference: r00/r01/r02/r04);
+- Reasoned driver matrix;
+- DTBO container extractor and embedded FDT scanner;
+- Read-only ADB collector;
+- Early userspace Kconfig patch and configuration fragment;
+- Reproducible ARM64 Lima VM (Ubuntu 26.04, ext4), toolchain scripts, kernel, and BusyBox;
+- Downstream reference kernel fully compiled with Clang 21: `Image`, BTF, signed and installed modules, and all three Wi-Fi overlays;
+- Nine documented compatibility/correction patches for the vendor tree;
+- Static ARM64 BusyBox 1.36.1 with verified minimal configuration;
+- Reproducible initramfs in minimal, UFS (28 modules), and USB (45 modules) profiles; USB demonstrates genuine dependencies but exceeds `init_boot` capacity, while persistent root mounts read-only;
+- DTBO builder preserving stock revision ranges and verified via hash round-trip tests;
+- Build, bring-up, and mainline roadmap documentation;
+- Specific target sheet and test log for the EZE4 unit, with model/version guards across extraction, ADB inventory, and compilation;
+- EUX/EZE4 firmware downloaded; ZIP verified via archive structure, published MD5 `255c0e65e2ec62b0ba723612c1ece5a4`, and local SHA-256;
+- Streaming ZIP -> AP -> partition extractor to avoid duplicating 11+ GB on host;
+- Extracted and analyzed EZE4 `boot`, `init_boot`, `vendor_boot`, `dtbo`, and `vbmeta`; Android v4 headers, sizes, compression, and AVB footers recorded;
+- Unsigned `boot`/`init_boot` candidate images reconstructed and verified by unpacking; AVB correctly detects that Samsung hash no longer matches;
+- End-to-end Lima pipeline (`reference-all`), deterministic Kbuild metadata, relative hashes, and anti-stale-artifact guards on failure;
+- Full pipeline run end-to-end with exit code 0; extended test suite covers 88 host-only tests, including OSRC U11 guards, tree comparisons, safety/adversarial tests, DTS semantics, and image tool tests;
+- OSRC Android 16/U11 delivery confirmed internally: `X510XXU8DYJ4` base plus `X510XXSBDZB4` supplement, kernel 5.15.180, extracted cleanly onto ext4 without modifying U3 or stock EZE4;
+- Systematic U3 -> U11 -> EZE4 comparison generated: U11 overlay shows no observable material differences from stock EZE4 r04 (though unresolved external references remain), while base DT differs materially in `mfc/debug_mode` within observable nodes;
+- U11 compiled fully with Clang 21 ARM64 and the nine active patches: Image, BTF/LTO, DTB, three DTBOs, and 282 modules built and installed; negative tests confirm failures reappearing upon removing each relevant compatibility patch;
+- Fixed U11 pipeline without arbitrary commands, featuring nine patch hashes, deterministic metadata, and rejection of absolute host paths in Image/modules;
+- Binary audit of compiled U11 -> EZE4 DTBs: four observable differences (EMS, MFC, and SCSC) and 14 unresolved references; none justify claiming complete equivalence;
+- Audit of 282 U11 modules against 281 stock modules: 280 common modules retain relative order, hard dependencies and UFS/USB closures are satisfied;
+- U11 preflight and initramfs separated from U3 pipeline, strictly enforcing physical `NO-GO` gate.
 
-El bloque U11 inferior se conserva como historia, pero ya no describe el estado activo. Samsung OSRC EZE4 (`5.15.189`) es la base canónica del pipeline:
-- `kernelrelease` stock exacto: `5.15.189-android13-3-33478785`
-- `vermagic` stock exacto: `5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64`
-- Compatibilidad ABI: 100.00% (281/281 módulos propietarios stock verificados, 15,123/15,123 símbolos CRC exactos, 0 discrepancias).
-- Suite de pruebas de regresión: 98/98 pruebas aprobadas en host (incorporadas guardas anti-self-confirmation de identidad física 5.15.189-android13-3-33478785 y alias repro_compare).
-- Proyecto Root-My-Galaxy EZE4: Fase J2.1-R1 Non-Semantic Remediation COMPLETADA; stack de validación J2 congelado (71/71 pruebas passing); caps canónicas de ensayos inválidos ($\le 1/\text{boot}$, $\le 2\,\text{total}$); confounders canónicos ($C_1 = \text{unseparated P0 contamination}$, $C_2 = \text{Android freezer / suspension}$, $C_3 = \text{thermal throttling / core migration}$); J2 checkpoint hygiene: COMPLETE; overall repository working tree: DIRTY BY DESIGN; J3 en HOLD; L3 en NO-GO; exploit real no demostrado.
+## Canonical Update 2026-09-05 — EZE4 & Physical Unlock Evidence
 
-### Estado Físico y Evidencia de Diagnóstico (Actualizado por `IMG_2113.HEIC` y `IMG_2114.HEIC`)
+The historical U11 block below is retained as history, but no longer describes the active baseline. Samsung OSRC EZE4 (`5.15.189`) is the canonical pipeline baseline:
+- Exact stock `kernelrelease`: `5.15.189-android13-3-33478785`
+- Exact stock `vermagic`: `5.15.189-android13-3-33478785 SMP preempt mod_unload modversions aarch64`
+- ABI Compatibility: 100.00% (281/281 stock proprietary modules verified, 15,123/15,123 CRC symbols exact, 0 discrepancies).
+- Regression Test Suite: 98/98 tests passing on host (incorporating anti-self-confirmation physical identity guards for 5.15.189-android13-3-33478785 and repro_compare aliases).
+- Root-My-Galaxy EZE4 Project: Phase J2.1-R1 Non-Semantic Remediation COMPLETED; J2 validation stack frozen (71/71 tests passing); canonical invalid trial caps ($\le 1/\text{boot}$, $\le 2\,\text{total}$); canonical confounders ($C_1 = \text{unseparated P0 contamination}$, $C_2 = \text{Android freezer / suspension}$, $C_3 = \text{thermal throttling / core migration}$); J2 checkpoint hygiene: COMPLETE; overall repository working tree: DIRTY BY DESIGN; J3 on HOLD; L3 on NO-GO; real exploit not demonstrated.
 
-Se obtuvieron capturas fotográficas directas de la pantalla de advertencia previa (`IMG_2113.HEIC`) y de la pantalla estándar de Odin Mode (`IMG_2114.HEIC`, transcripción pública con identificadores únicos redactados en [`docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md`](file:///Users/markpi/tab-s9-fe-linux/docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md)):
-- **Pantalla de advertencia previa (Warning Screen)**: **CONFIRMED** (fotografiada físicamente en `IMG_2113.HEIC`).
-- **Ruta a Device Unlock Mode**: **CONFIRMED** (anunciada explícitamente en el microcódigo del cargador en la localización en chino: `长按音量增加键：设备解锁模式`, omitida en inglés).
-- **Pantalla normal de Odin Mode**: **CONFIRMED** (alcanzada mediante pulsación corta de Vol Up desde la pantalla de advertencia, fotografiada en `IMG_2114.HEIC`).
-- **CURRENT BINARY**: `Samsung Official` (**CONFIRMED** en UI de bootloader).
-- **KG STATE**: `Completed (00)` (**CONFIRMED** en UI de bootloader).
-- **Secure Download**: `Enabled` (**CONFIRMED** en UI de bootloader).
-- **Sales code / CID / AID**: `EUX//` (**CONFIRMED** en UI de bootloader).
-- **WARRANTY VOID**: `0 (0x0000)` (**CONFIRMED** en UI de bootloader).
-- **RP SWREV (Bootloader)**: `B:12` (**CONFIRMED** en UI de bootloader; confirma físicamente nivel de rollback 12).
-- **HW REV**: `4` (**CONFIRMED** en UI de bootloader; coincide con DTBO `r04`).
-- **DDR SIZE**: `8G` (**CONFIRMED** en UI de bootloader).
-- **BUILD VERSION**: `X510XXUCEZE4` (**CONFIRMED** en UI de bootloader).
-- **Campos no mostrados en Odin Mode**: `OEM LOCK`, `FRP LOCK`, `SYSTEM STATUS` (**`NOT DISPLAYED`**; no inferir estados desde la ausencia).
-- **Secuencia segura de reinicio/cancelación**: `Volume Down Key + Side key for more than 7 secs` (**CONFIRMED** en UI).
-- **Capacidad práctica de desbloqueo del propietario**: **STRONGLY_SUPPORTED** (anunciada en UI de SBOOT/LOKE en hardware Exynos EUX libre).
-- **Pantalla de Device Unlock Mode (2B)**: **NOT YET CAPTURED / NOT YET OBSERVED**.
-- **Desbloqueo exitoso completado**: **NOT YET TESTED / LOCKED** (el dispositivo físico continúa estrictamente `ro.boot.flash.locked=1`, `ro.boot.vbmeta.device_state=locked`, `ro.boot.verifiedbootstate=green`, `ro.boot.warranty_bit=0`).
-- **Estado de decisión del propietario**: **`READY_FOR_OWNER_UNLOCK_DECISION`** (se cuenta con evidencia física directa suficiente para evaluar borrado de fábrica y consecuencias en eFuse Knox).
-- **Estado para primer flasheo custom**: **`NOT_READY_FOR_FIRST_CUSTOM_FLASH`** (la recuperación está sólo parcialmente validada y AVB multi-partición no está probado).
-- **Recuperación**: **PARTIALLY VALIDATED** (acceso a Download Mode, diagnóstico visual y enumeración USB `04e8:685d` confirmados; herramientas host en macOS, handshake LOKE, lectura PIT y restauración completa pendientes).
-- **Significado de `[Reboot Device - D2]`**: estrictamente **UNKNOWN** (la hipótesis comunitaria de bloqueo de pantalla queda como conjetura no demostrada).
-- **Banderas AVB 2.0**: se distingue formalmente `flags=1` (`HASHTREE_DISABLED`) de `flags=2` (`VERIFICATION_DISABLED`).
-- **Documentos de Referencia Canónica**: [`docs/boot-chain/unlock-evidence-matrix.md`](file:///Users/markpi/tab-s9-fe-linux/docs/boot-chain/unlock-evidence-matrix.md), [`docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md`](file:///Users/markpi/tab-s9-fe-linux/docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md), [`docs/hardware/evidence/2026-09-05-download-warning-device-unlock-mode.md`](file:///Users/markpi/tab-s9-fe-linux/docs/hardware/evidence/2026-09-05-download-warning-device-unlock-mode.md).
+### Physical State and Diagnostic Evidence (Updated via `IMG_2113.HEIC` and `IMG_2114.HEIC`)
 
-## Pendiente de datos físicos (histórico U11; superseded)
+Direct photographic evidence was obtained of the pre-download Warning Screen (`IMG_2113.HEIC`) and standard Odin Mode screen (`IMG_2114.HEIC`, public transcript with device-unique identifiers redacted in `docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md`):
+- **Warning Screen**: **CONFIRMED** (physically photographed in `IMG_2113.HEIC`).
+- **Route to Device Unlock Mode**: **CONFIRMED** (explicitly advertised in bootloader microcode under Chinese localization: `长按音量增加键：设备解锁模式`, omitted in English).
+- **Standard Odin Mode Screen**: **CONFIRMED** (reached via short press of Vol Up from Warning Screen, photographed in `IMG_2114.HEIC`).
+- **CURRENT BINARY**: `Samsung Official` (**CONFIRMED** in bootloader UI).
+- **KG STATE**: `Completed (00)` (**CONFIRMED** in bootloader UI).
+- **Secure Download**: `Enabled` (**CONFIRMED** in bootloader UI).
+- **Sales code / CID / AID**: `EUX//` (**CONFIRMED** in bootloader UI).
+- **WARRANTY VOID**: `0 (0x0000)` (**CONFIRMED** in bootloader UI).
+- **RP SWREV (Bootloader)**: `B:12` (**CONFIRMED** in bootloader UI; physically confirms rollback index 12).
+- **HW REV**: `4` (**CONFIRMED** in bootloader UI; matches DTBO `r04`).
+- **DDR SIZE**: `8G` (**CONFIRMED** in bootloader UI).
+- **BUILD VERSION**: `X510XXUCEZE4` (**CONFIRMED** in bootloader UI).
+- **Fields Not Displayed in Odin Mode**: `OEM LOCK`, `FRP LOCK`, `SYSTEM STATUS` (**`NOT DISPLAYED`**; state must not be inferred from absence).
+- **Safe Reboot/Cancel Sequence**: `Volume Down Key + Side key for more than 7 secs` (**CONFIRMED** in UI).
+- **Practical Owner Unlock Capability**: **STRONGLY_SUPPORTED** (advertised in SBOOT/LOKE UI on carrier-free Exynos EUX hardware).
+- **Device Unlock Mode Screen (2B)**: **NOT YET CAPTURED / NOT YET OBSERVED**.
+- **Successful Unlock Completed**: **NOT YET TESTED / LOCKED** (physical device remains strictly `ro.boot.flash.locked=1`, `ro.boot.vbmeta.device_state=locked`, `ro.boot.verifiedbootstate=green`, `ro.boot.warranty_bit=0`).
+- **Owner Decision State**: **`NOT_READY_FOR_OWNER_UNLOCK_DECISION`**. Evidence supports the existence of an unlock path, but does not close recovery/PIT/restoration readiness; J2 does not alter this NO-GO.
+- **First Custom Flash State**: **`NOT_READY_FOR_FIRST_CUSTOM_FLASH`** (recovery is only partially validated and multi-partition AVB is untested).
+- **Recovery**: **PARTIALLY VALIDATED** (Download Mode access, visual diagnostics, and USB `04e8:685d` enumeration confirmed; macOS host tools, LOKE handshake, PIT read, and full restoration remain pending).
+- **Meaning of `[Reboot Device - D2]`**: strictly **UNKNOWN** (community hypothesis of lock screen presence remains unproven conjecture).
+- **AVB 2.0 Flags**: formal distinction between `flags=1` (`HASHTREE_DISABLED`) and `flags=2` (`VERIFICATION_DISABLED`).
+- **Physical Evidence Documents**: `docs/boot-chain/unlock-evidence-matrix.md`, `docs/hardware/evidence/2026-09-05-odin-mode-stock-baseline.md`, `docs/hardware/evidence/2026-09-05-download-warning-device-unlock-mode.md`. Their presence does not convert these unversioned documents into canonical evidence of the current commit.
 
-- recibir la respuesta a la solicitud oficial Samsung OSRC del código exacto
-  `SM-X510` / `X510XXUCEZE4`; U11 es la mejor referencia actual, no EZE4;
-- obtener DT en ejecución y mapa de particiones;
-- localizar una consola observable;
-- identificar la revisión física/overlay realmente elegida por el bootloader;
-- repetir/adaptar los parches sobre el código EZE4 cuando Samsung lo publique;
-- decidir y validar el procedimiento de desbloqueo, firma/AVB y rollback sin
-  arriesgar datos ni anti-rollback;
-- ejecutar M2-M5 en hardware y capturar logs.
+## Pending Physical Data (Historical U11; Superseded)
 
-## Bloqueo de seguridad vigente
+- Receive official Samsung OSRC response for exact `SM-X510` / `X510XXUCEZE4` source; U11 is best current reference, not EZE4;
+- Obtain live runtime DT and partition map;
+- Locate observable console;
+- Identify physical revision / overlay actually selected by bootloader;
+- Replicate / adapt patches onto EZE4 source once released by Samsung;
+- Decide and validate unlocking, signing/AVB, and rollback procedures without endangering data or anti-rollback state;
+- Execute M2-M5 on hardware and capture logs.
 
-`scripts/build-downstream.sh` compara la fuente conocida
-(`X510XXU3BXDG`) con el objetivo (`X510XXUCEZE4`) y se detiene. Se puede usar
-`ALLOW_REFERENCE_BUILD=1` únicamente para practicar/diagnosticar la compilación;
-no convierte el resultado en compatible ni autoriza su flasheo.
+## Active Safety Interlock
 
-## No afirmado
+`scripts/build-downstream.sh` compares the known reference source (`X510XXU3BXDG`) with target (`X510XXUCEZE4`) and halts. `ALLOW_REFERENCE_BUILD=1` may be used solely to practice/diagnose compilation; it does not make the output compatible or authorize flashing.
 
-No se afirma que mainline arranque, que el kernel de referencia sea compatible
-con EZE4, que los candidatos sin firma sean flasheables ni que pantalla, UFS,
-Wi-Fi o carga funcionen. Esas afirmaciones sólo se añadirán junto a un log de
-hardware y hashes reproducibles.
+## Explicit Non-Claims
+
+It is not claimed that mainline boots, that the reference kernel is compatible with EZE4, that unsigned candidates are flashable, or that display, UFS, Wi-Fi, or charging function. Such claims will only be made accompanied by hardware logs and reproducible hashes.

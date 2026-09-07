@@ -137,32 +137,32 @@ def compare(first: Path, second: Path) -> dict[str, object]:
 def markdown(result: dict[str, object]) -> str:
     verdict = "PASS" if result["reproducible"] else "FAIL"
     lines = [
-        "# Reproducibilidad del build U11 fijo",
+        "# Reproducibility of Fixed U11 Build",
         "",
-        f"- resultado: `{verdict}`",
-        f"- primer run: `{result['first_run']}` ({result['first_file_count']} ficheros)",
-        f"- segundo run: `{result['second_run']}` ({result['second_file_count']} ficheros)",
-        f"- escritura f\u00edsica: `{result['physical_write_gate']}`",
+        f"- result: `{verdict}`",
+        f"- first run: `{result['first_run']}` ({result['first_file_count']} files)",
+        f"- second run: `{result['second_run']}` ({result['second_file_count']} files)",
+        f"- physical write: `{result['physical_write_gate']}`",
         "",
     ]
     for key, title in (
-        ("missing_in_first", "Faltan en el primero"),
-        ("missing_in_second", "Faltan en el segundo"),
-        ("only_in_first", "S\u00f3lo en el primero"),
-        ("only_in_second", "S\u00f3lo en el segundo"),
-        ("differing", "Contenido distinto"),
-        ("unsafe_in_first", "Tipos no regulares en el primero"),
-        ("unsafe_in_second", "Tipos no regulares en el segundo"),
-        ("first_metadata_errors", "Identidad inv\u00e1lida en el primero"),
-        ("second_metadata_errors", "Identidad inv\u00e1lida en el segundo"),
+        ("missing_in_first", "Missing in first"),
+        ("missing_in_second", "Missing in second"),
+        ("only_in_first", "Only in first"),
+        ("only_in_second", "Only in second"),
+        ("differing", "Differing content"),
+        ("unsafe_in_first", "Non-regular types in first"),
+        ("unsafe_in_second", "Non-regular types in second"),
+        ("first_metadata_errors", "Invalid identity in first"),
+        ("second_metadata_errors", "Invalid identity in second"),
     ):
         values = result[key]
         if values:
             lines.extend((f"## {title}", "", *(f"- `{value}`" for value in values), ""))
     if result["reproducible"]:
         lines.extend((
-            "Todos los ficheros publicados, incluido el tar reproducible con los 282",
-            "m\u00f3dulos, son id\u00e9nticos byte a byte entre dos \u00e1rboles limpios.", "",
+            "All published files, including the reproducible tar with the 282",
+            "modules, are byte-for-byte identical between two clean trees.", "",
         ))
     return "\n".join(lines)
 

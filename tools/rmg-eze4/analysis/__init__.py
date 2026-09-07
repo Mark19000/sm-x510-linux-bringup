@@ -1,25 +1,20 @@
-"""Pure offline evidence analysis for the RMG EZE4 measurement design."""
+"""Canonical Phase J2 offline validation and campaign aggregation API.
 
-from .engine import (
-    ATTRIBUTABLE,
-    INVALID_MEASUREMENT,
-    INCONCLUSIVE,
-    INCOMPATIBLE,
-    COMPATIBLE,
-    analyze_observations,
-    assess_attribution,
-    enforce_evidence_level,
-    validate_observation,
+The historical Phase-I classifier remains available explicitly as
+``analysis.engine``; it is deliberately not re-exported here.
+"""
+
+from .aggregator import (
+    COMPATIBLE, INCOMPATIBLE, INCONCLUSIVE, INVALID_EXPERIMENT,
+    aggregate_campaign,
 )
+from .validator import validate_observation_record
 
 __all__ = [
-    "ATTRIBUTABLE",
-    "INVALID_MEASUREMENT",
     "INCONCLUSIVE",
     "INCOMPATIBLE",
     "COMPATIBLE",
-    "analyze_observations",
-    "assess_attribution",
-    "enforce_evidence_level",
-    "validate_observation",
+    "INVALID_EXPERIMENT",
+    "aggregate_campaign",
+    "validate_observation_record",
 ]

@@ -1,38 +1,34 @@
-# 8. Glosario y ejercicios
+# 8. Glossary and Exercises
 
-## Glosario corto
+## Concise Glossary
 
-- **ABI/KMI**: contrato binario entre kernel y módulos.
-- **ACPM**: microcontrolador/firmware Samsung que participa en energía y clocks.
-- **AVB**: Android Verified Boot, cadena de integridad de imágenes.
-- **binding DT**: contrato que define propiedades válidas para un dispositivo.
-- **BOM**: lista de componentes; dos tablets del mismo modelo pueden montar
-  proveedores de panel distintos.
-- **clock**: señal temporal que habilita y marca la frecuencia de un bloque.
-- **downstream**: árbol mantenido fuera de Linux upstream, aquí Samsung/Android.
-- **driver probe**: momento en que un driver intenta enlazarse con un dispositivo.
-- **earlycon**: consola disponible muy pronto, antes del driver serie completo.
-- **FDT/DTB**: representación binaria de Device Tree.
-- **IOMMU/SysMMU**: traduce direcciones DMA y aísla periféricos.
-- **initramfs**: filesystem `cpio` temporal cargado junto al kernel.
-- **phandle**: referencia entre nodos de Device Tree.
-- **power domain**: conjunto de hardware que se enciende/apaga coordinadamente.
-- **regulator**: fuente de tensión controlable.
-- **reset**: línea que coloca un bloque hardware en estado inicial.
-- **SoC**: sistema completo integrado en un chip.
-- **upstream/mainline**: kernel Linux mantenido por la comunidad principal.
+- **ABI/KMI**: Binary contract between kernel core and loadable modules.
+- **ACPM**: Proprietary Samsung microcontroller/firmware managing power domains and clocks.
+- **AVB**: Android Verified Boot, cryptographic image integrity chain.
+- **DT binding**: Specification defining valid properties for a device tree node.
+- **BOM**: Bill of Materials; two tablets of the same model designation may populate different display or touchscreen vendors.
+- **clock**: Timing reference signal that gates and clocks an IP block.
+- **downstream**: Kernel tree maintained outside upstream Linux, here Samsung / Android.
+- **driver probe**: Initialization phase where a driver attempts to bind to a matched device.
+- **earlycon**: Early console available before full serial subsystem initialization.
+- **FDT/DTB**: Flattened Device Tree binary format.
+- **IOMMU/SysMMU**: Manages DMA address translation and peripheral memory isolation.
+- **initramfs**: Ephemeral `cpio` root filesystem loaded into memory alongside the kernel.
+- **phandle**: Pointer/reference between Device Tree nodes.
+- **power domain**: Group of hardware blocks whose power rails are switched in coordination.
+- **regulator**: Controllable voltage/current supply rail.
+- **reset**: Hardware line that resets an IP block into its initial state.
+- **SoC**: System-on-Chip integrating cores, buses, and peripherals onto one die.
+- **upstream/mainline**: The canonical Linux kernel maintained by Linus Torvalds and the community.
 
-## Ejercicios guiados
+## Guided Exercises
 
-1. Busca UART0 en el DTS base. Anota dirección, IRQ, clocks, pinctrl y estado.
-2. En Wi-Fi compara r01 y r04 con `diff -u` (r02 sólo existe en la referencia
-   5G). Clasifica cada cambio como periférico, parámetro eléctrico o simple
-   renumeración de phandle.
-3. Elige `samsung,exynos-ufs`; encuentra su `of_match_table` downstream y
-   mainline. Dibuja qué datos privados consume cada implementación.
-4. Explica por qué `synopsys,dwc3` exacto no basta para que funcione el USB.
-5. Lista el `cpio` generado y sigue, línea por línea, qué hace `/init`.
-6. Descomprime el `/proc/config.gz` del dispositivo y compáralo con el defconfig:
+1. Locate UART0 in the base DTS. Note its register address, IRQ, parent clocks, pinctrl, and status.
+2. For the Wi-Fi variant, compare r01 and r04 with `diff -u` (r02 exists only in the 5G reference). Classify each delta as peripheral, electrical parameter, or phandle renumbering.
+3. Locate `samsung,exynos-ufs`; inspect its `of_match_table` in downstream and mainline. Diagram what private platform data each implementation consumes.
+4. Explain why an exact `synopsys,dwc3` compatible match is insufficient to enable operational USB.
+5. List the generated `cpio` contents and trace line-by-line what `/init` executes.
+6. Decompress the `/proc/config.gz` extracted from the physical device and compare it against the defconfig:
 
    ```sh
    gzip -dc reports/device-*/config.gz > /tmp/gts9fe-running.config
@@ -40,6 +36,4 @@
      /tmp/gts9fe-running.config | less
    ```
 
-7. Cuando tengas un log real, construye una hipótesis que explique **la primera
-   línea de error**, no las consecuencias posteriores, y diseña una prueba que
-   cambie una sola variable.
+7. When you capture a live hardware boot log, construct a hypothesis that explains **the first failure line**, not cascading secondary symptoms, and design an experiment changing only a single variable.

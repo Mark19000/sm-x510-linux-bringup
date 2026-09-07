@@ -1,39 +1,39 @@
-# Auditoría Comparativa Estructural: ZG3 vs EZE4 (BTF, DWARF e Image.stock)
+# Structural Comparative Audit: ZG3 vs EZE4 (BTF, DWARF, and Image.stock)
 
-- **Dispositivo**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
+- **Device**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
 - **SoC**: Samsung Exynos 1380 (`s5e8835`)
-- **Firmware Base Comparado**: `X510XXUCEZE4` (Kernel 5.15.189) vs `X510XXSEEZG3` (Kernel 5.15.189)
-- **Fuentes de Ground Truth**:
-  - EZE4 BTF (`vmlinux` unstripped sección `.BTF`, 6.0 MB)
-  - EZE4 DWARF (`vmlinux` unstripped secciones `.debug_*`, 400+ MB analizadas con `pahole` y `llvm-dwarfdump`)
-  - EZE4 `Image.stock` (binario de fábrica extraído de `boot.img`, SHA-256: `ca56baf4...`)
-- **Fecha de Auditoría**: 2026-09-06
+- **Compared Base Firmware**: `X510XXUCEZE4` (Kernel 5.15.189) vs `X510XXSEEZG3` (Kernel 5.15.189)
+- **Ground Truth Sources**:
+  - EZE4 BTF (unstripped `vmlinux` `.BTF` section, 6.0 MB)
+  - EZE4 DWARF (unstripped `vmlinux` `.debug_*` sections, 400+ MB analyzed with `pahole` and `llvm-dwarfdump`)
+  - EZE4 `Image.stock` (factory binary extracted from `boot.img`, SHA-256: `ca56baf4...`)
+- **Audit Date**: 2026-09-06
 
 ---
 
-## 1. Tabla Maestra de Comparación Estructural
+## 1. Master Structural Comparison Table
 
-| Estructura | Miembro / Campo | ZG3 Target Value | EZE4 BTF Value | EZE4 DWARF Value | Clasificación | Evidencia Directa en `Image.stock` | Resultado de Cruce |
+| Structure | Member / Field | ZG3 Target Value | EZE4 BTF Value | EZE4 DWARF Value | Classification | Direct Evidence in `Image.stock` | Cross-Reference Result |
 | :--- | :--- | :---: | :---: | :---: | :---: | :--- | :---: |
-| `task_struct` | `usage` | `0x38` (56) | `0x38` (56) | `0x38` (56) | **IDENTICAL** | *No observable en remove_waiter* | **BTF/DWARF MATCH** |
-| `task_struct` | `prio` | `0x7c` (124) | `0x7c` (124) | `0x7c` (124) | **IDENTICAL** | *No observable en remove_waiter* | **BTF/DWARF MATCH** |
-| `task_struct` | `normal_prio` | `0x84` (132) | `0x84` (132) | `0x84` (132) | **IDENTICAL** | *No observable en remove_waiter* | **BTF/DWARF MATCH** |
-| `task_struct` | `sched_task_group` | `0x400` (1024) | `0x400` (1024) | `0x400` (1024) | **IDENTICAL** | *No observable en remove_waiter* | **BTF/DWARF MATCH** |
-| `task_struct` | `real_cred` | `0x790` (1936) | `0x790` (1936) | `0x790` (1936) | **IDENTICAL** | *No observable en remove_waiter* | **BTF/DWARF MATCH** |
-| `task_struct` | `cred` | `0x798` (1944) | `0x798` (1944) | `0x798` (1944) | **IDENTICAL** | *No observable en remove_waiter* | **BTF/DWARF MATCH** |
+| `task_struct` | `usage` | `0x38` (56) | `0x38` (56) | `0x38` (56) | **IDENTICAL** | *Not observable in remove_waiter* | **BTF/DWARF MATCH** |
+| `task_struct` | `prio` | `0x7c` (124) | `0x7c` (124) | `0x7c` (124) | **IDENTICAL** | *Not observable in remove_waiter* | **BTF/DWARF MATCH** |
+| `task_struct` | `normal_prio` | `0x84` (132) | `0x84` (132) | `0x84` (132) | **IDENTICAL** | *Not observable in remove_waiter* | **BTF/DWARF MATCH** |
+| `task_struct` | `sched_task_group` | `0x400` (1024) | `0x400` (1024) | `0x400` (1024) | **IDENTICAL** | *Not observable in remove_waiter* | **BTF/DWARF MATCH** |
+| `task_struct` | `real_cred` | `0x790` (1936) | `0x790` (1936) | `0x790` (1936) | **IDENTICAL** | *Not observable in remove_waiter* | **BTF/DWARF MATCH** |
+| `task_struct` | `cred` | `0x798` (1944) | `0x798` (1944) | `0x798` (1944) | **IDENTICAL** | *Not observable in remove_waiter* | **BTF/DWARF MATCH** |
 | `task_struct` | `pi_lock` | `0x884` (2180) | `0x884` (2180) | `0x884` (2180) | **IDENTICAL** | `add x22, x20, #0x884` (`ffffffc0091506b8`) | **THREE-WAY MATCH** |
 | `task_struct` | `pi_waiters` (`rb_root`) | `0x898` (2200) | `0x898` (2200) | `0x898` (2200) | **IDENTICAL** | `add x1, x21, #0x898` (`ffffffc009150784`) | **THREE-WAY MATCH** |
 | `task_struct` | `pi_waiters` (`rb_leftmost`)| `0x8a0` (2208) | `0x8a0` (2208) | `0x8a0` (2208) | **IDENTICAL** | `ldr x8, [x21, #2208]` (`ffffffc009150734`) | **THREE-WAY MATCH** |
-| `task_struct` | `pi_top_task` | `0x8a8` (2216) | `0x8a8` (2216) | `0x8a8` (2216) | **IDENTICAL** | *Top task pointer en task_struct* | **BTF/DWARF MATCH** |
+| `task_struct` | `pi_top_task` | `0x8a8` (2216) | `0x8a8` (2216) | `0x8a8` (2216) | **IDENTICAL** | *Top task pointer in task_struct* | **BTF/DWARF MATCH** |
 | `task_struct` | `pi_blocked_on` | `0x8b0` (2224) | `0x8b0` (2224) | `0x8b0` (2224) | **IDENTICAL** | `str xzr, [x20, #2224]` (`ffffffc009150708`) | **THREE-WAY MATCH** |
 | `rt_mutex_waiter`| `tree_entry` | `0x00` (0) | `0x00` (0) | `0x00` (0) | **IDENTICAL** | `ldr x8, [x23]` (`ffffffc0091506d0`) | **THREE-WAY MATCH** |
 | `rt_mutex_waiter`| `pi_tree_entry` | `0x18` (24) | `0x18` (24) | `0x18` (24) | **IDENTICAL** | `ldr x8, [x23, #24]!` (`ffffffc009150728`)| **THREE-WAY MATCH** |
-| `rt_mutex_waiter`| `task` | `0x30` (48) | `0x30` (48) | `0x30` (48) | **IDENTICAL** | *Ignorado por remove_waiter vulnerable* | **BTF/DWARF MATCH** |
+| `rt_mutex_waiter`| `task` | `0x30` (48) | `0x30` (48) | `0x30` (48) | **IDENTICAL** | *Ignored by vulnerable remove_waiter* | **BTF/DWARF MATCH** |
 | `rt_mutex_waiter`| `lock` | `0x38` (56) | `0x38` (56) | `0x38` (56) | **IDENTICAL** | `ldr x8, [x24, #56]` (`ffffffc0091506a8`) | **THREE-WAY MATCH** |
-| `rt_mutex_waiter`| `wake_state` | `0x40` (64) | `0x40` (64) | `0x40` (64) | **IDENTICAL** | *wake_state en waiter* | **BTF/DWARF MATCH** |
-| `rt_mutex_waiter`| `prio` | `0x44` (68) | `0x44` (68) | `0x44` (68) | **IDENTICAL** | `ldr w10, [x0, #44]` (`ffffffc00915078c` donde `x0=waiter+0x18`)| **THREE-WAY MATCH** |
-| `rt_mutex_waiter`| `deadline` | `0x48` (72) | `0x48` (72) | `0x48` (72) | **IDENTICAL** | `ldr x12, [x0, #48]` (`ffffffc0091507b8` donde `x0=waiter+0x18`)| **THREE-WAY MATCH** |
-| `rt_mutex_waiter`| `ww_ctx` | `0x50` (80) | `0x50` (80) | `0x50` (80) | **IDENTICAL** | *ww_ctx en waiter* | **BTF/DWARF MATCH** |
+| `rt_mutex_waiter`| `wake_state` | `0x40` (64) | `0x40` (64) | `0x40` (64) | **IDENTICAL** | *wake_state in waiter* | **BTF/DWARF MATCH** |
+| `rt_mutex_waiter`| `prio` | `0x44` (68) | `0x44` (68) | `0x44` (68) | **IDENTICAL** | `ldr w10, [x0, #44]` (`ffffffc00915078c` where `x0=waiter+0x18`)| **THREE-WAY MATCH** |
+| `rt_mutex_waiter`| `deadline` | `0x48` (72) | `0x48` (72) | `0x48` (72) | **IDENTICAL** | `ldr x12, [x0, #48]` (`ffffffc0091507b8` where `x0=waiter+0x18`)| **THREE-WAY MATCH** |
+| `rt_mutex_waiter`| `ww_ctx` | `0x50` (80) | `0x50` (80) | `0x50` (80) | **IDENTICAL** | *ww_ctx in waiter* | **BTF/DWARF MATCH** |
 | `rt_mutex_base` | `wait_lock` | `0x00` (0) | `0x00` (0) | `0x00` (0) | **IDENTICAL** | `_raw_spin_lock_irq(lock)` | **BTF/DWARF MATCH** |
 | `rt_mutex_base` | `waiters` | `0x08` (8) | `0x08` (8) | `0x08` (8) | **IDENTICAL** | `add x1, x19, #0x8` (`ffffffc0091506f4`) | **THREE-WAY MATCH** |
 | `rt_mutex_base` | `owner` | `0x18` (24) | `0x18` (24) | `0x18` (24) | **IDENTICAL** | `add x8, x19, #0x18; ldar x8, [x8]` (`ffffffc0091506c0`) | **THREE-WAY MATCH** |
@@ -76,13 +76,13 @@
 
 ---
 
-## 2. Hallazgos Fundamentales de la Auditoría
+## 2. Fundamental Findings of the Audit
 
-1. **Invarianza Estructural (Parámetros Relevantes Idénticos)**:
-   - **53/53 parámetros estructurales relevantes para el target auditados son idénticos entre ZG3 target y EZE4.**
-   - No existe un solo desplazamiento estructural que haya variado entre el firmware de julio (ZG3) y el firmware local de mayo (EZE4).
-2. **Paridad con Image.stock (Three-Way Match)**:
-   - Todos los accesos a campos que pudieron observarse en el flujo desensamblado de `remove_waiter()` en `Image.stock` (`pi_lock`, `pi_blocked_on`, `pi_waiters.rb_root`, `pi_waiters.rb_leftmost`, `rt_mutex_base.waiters`, `rt_mutex_base.owner`, `rt_mutex_waiter.lock`, `rt_mutex_waiter.prio`, `rt_mutex_waiter.deadline`) demostraron coincidencia exacta y sin ambigüedad entre BTF, DWARF y el binario de fábrica.
-3. **Clarificación Formal de `MM_STRUCT_SZ 0x400`**:
-   - `sizeof(struct mm_struct)` en EZE4 es de **992 bytes** (`0x3e0`).
-   - `MM_STRUCT_SZ = 0x400` no es un miembro ni el tamaño exacto del struct, sino el **tamaño de allocation bucket** de SLUB (`kmalloc-1k` = 1024 bytes) en el cual se aloja la estructura. La macro ZG3 modela con precisión la geometría del slab derivada de BTF + SLUB.
+1. **Structural Invariance (Identical Relevant Parameters)**:
+   - **53/53 audited target-relevant structural parameters are identical between ZG3 target and EZE4.**
+   - Not a single structural offset varied between the July firmware (ZG3) and the local May firmware (EZE4).
+2. **Parity with Image.stock (Three-Way Match)**:
+   - All field accesses observable in the disassembled stream of `remove_waiter()` in `Image.stock` (`pi_lock`, `pi_blocked_on`, `pi_waiters.rb_root`, `pi_waiters.rb_leftmost`, `rt_mutex_base.waiters`, `rt_mutex_base.owner`, `rt_mutex_waiter.lock`, `rt_mutex_waiter.prio`, `rt_mutex_waiter.deadline`) demonstrated exact and unambiguous match between BTF, DWARF, and the factory binary.
+3. **Formal Clarification of `MM_STRUCT_SZ 0x400`**:
+   - `sizeof(struct mm_struct)` in EZE4 is **992 bytes** (`0x3e0`).
+   - `MM_STRUCT_SZ = 0x400` is neither a member nor the exact size of the struct, but rather the SLUB **allocation bucket size** (`kmalloc-1k` = 1024 bytes) in which the structure is allocated. The ZG3 macro accurately models the slab geometry derived from BTF + SLUB.

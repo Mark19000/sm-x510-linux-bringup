@@ -1,3 +1,8 @@
+# HISTORICAL / SUPERSEDED — DO NOT USE FOR CURRENT J2 DECISIONS
+
+These Phase-I synthetic results are retained for provenance only. The current
+oracle and adversarial suite runs through `make verify-j2`.
+
 # Synthetic Test Verification: Phase I Analysis Support for `DEFAULT_ATTEMPT_TIMEOUT_SEC`
 
 This document verifies that the Phase I offline analysis library (`tools/rmg-eze4/analysis/engine.py`) correctly represents every possible observation outcome, boundary condition, and failure mode for `DEFAULT_ATTEMPT_TIMEOUT_SEC`. All tests use **synthetic offline fixtures exclusively**; no hardware, ADB, or execution interfaces were accessed.

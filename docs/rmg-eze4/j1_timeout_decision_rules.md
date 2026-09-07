@@ -1,3 +1,8 @@
+# HISTORICAL / SUPERSEDED — DO NOT USE FOR CURRENT J2 DECISIONS
+
+Canonical J2 timeout decisions are defined by `phase_j2_e4_contract.md` and
+`phase_j2_decision_table.csv`.
+
 # Abstract Decision Rules: `DEFAULT_ATTEMPT_TIMEOUT_SEC`
 
 This document formalizes the abstract decision logic and classification criteria for evaluating the compatibility of `DEFAULT_ATTEMPT_TIMEOUT_SEC`. It defines the four canonical states—`COMPATIBLE`, `INCOMPATIBLE`, `INCONCLUSIVE`, and `INVALID_MEASUREMENT`—in terms of predicate calculus and deterministic pseudocode, operating strictly on normalized evidence records without prescribing a specific numeric timeout value or runtime execution steps.

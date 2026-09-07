@@ -1,19 +1,14 @@
-# 5. Construir y entender el initramfs
+# 5. Building and Understanding the Initramfs
 
-## Qué resuelve
+## Purpose
 
-El initramfs es un pequeño sistema de archivos que el kernel desempaqueta en
-RAM antes de acceder a Android o a una distribución. Linux ejecuta `/init` como
-PID 1. Así podemos intentar `kernel → /init → shell` sin escribir UFS, sin
-systemd y sin depender todavía de una raíz persistente.
+The initramfs is a small root filesystem that the kernel unpacks into RAM before accessing Android partitions or a regular Linux distribution. Linux executes `/init` as PID 1. This allows attempting `kernel -> /init -> shell` without writing to UFS, without systemd, and without depending on a persistent root filesystem.
 
-Nuestro `/init` monta `/proc`, `/sys`, `/dev` y `/run`, imprime diagnóstico,
-carga sólo los módulos declarados y termina en una shell. Una raíz indicada con
-`gts9fe.root=` se monta siempre en sólo lectura.
+Our `/init` script mounts `/proc`, `/sys`, `/dev`, and `/run`, prints diagnostic information, loads only explicitly declared modules, and drops to a rescue shell. Any root device specified via `gts9fe.root=` is strictly mounted read-only.
 
-## BusyBox ARM64 estático
+## Static ARM64 BusyBox
 
-Dentro de Linux/Lima:
+Inside Linux / Lima:
 
 ```sh
 ./scripts/build-busybox.sh
@@ -22,19 +17,13 @@ cat artifacts/busybox/SOURCE_COMMIT
 (cd artifacts/busybox && sha256sum -c SHA256SUMS)
 ```
 
-La receta fija BusyBox 1.36.1 al commit
-`1a64f6a20aaf6ea4dbba68bbfa8cc1ab7e5c57c4`, habilita sólo 27 applets y
-verifica cada opción. Esto evita dos fallos ya encontrados: `tc` no compila con
-cabeceras modernas porque su UAPI CBQ desapareció, y el `allnoconfig` de esta
-versión ignoraba silenciosamente booleanos del miniconfig.
+The recipe pins BusyBox 1.36.1 to commit `1a64f6a20aaf6ea4dbba68bbfa8cc1ab7e5c57c4`, enables only 27 essential applets, and validates each option. This avoids two previously encountered defects: `tc` fails compilation against modern headers due to removed UAPI CBQ definitions, and `allnoconfig` in this version silently ignored boolean flags in miniconfig fragments.
 
-La salida probada es AArch64, estática y mide 1 253 440 bytes. Un BusyBox
-dinámico fallaría por no tener cargador/bibliotecas; uno x86_64 daría
-`Exec format error`.
+The tested binary is AArch64, static, and measures 1,253,440 bytes. A dynamically linked BusyBox would fail due to missing dynamic linkers/libraries; an x86_64 binary would trigger `Exec format error`.
 
-## Perfiles de módulos U3 de referencia
+## Reference U3 Module Profiles
 
-El valor seguro por defecto es no copiar módulos:
+The safe default profile copies no kernel modules:
 
 ```sh
 DEVICE_VARIANT=wifi MODULES_MODE=none \
@@ -42,19 +31,17 @@ DEVICE_VARIANT=wifi MODULES_MODE=none \
   ./scripts/build-initramfs.sh
 ```
 
-Las rutas `artifacts/initramfs/wifi*` de este capítulo pertenecen al kernel U3.
-Los perfiles U11, sus tamaños y sus guardas están separados en el
-[capítulo 15](15-pipeline-u11-offline.md).
+Paths matching `artifacts/initramfs/wifi*` in this chapter belong to the U3 kernel. U11 profiles, sizing margins, and safety guards are documented separately in [chapter 15](15-pipeline-u11-offline.md).
 
-Perfiles disponibles:
+Available profiles:
 
-| Perfil | Contenido | Uso |
+| Profile | Contents | Purpose |
 |---|---|---|
-| `none` | sólo BusyBox y `/init` | primer intento y máxima probabilidad de caber |
-| `deps` | cierre de dependencias de la lista solicitada | llegar a un driver modular concreto |
-| `all` | todos los módulos instalados | diagnóstico offline; normalmente demasiado grande |
+| `none` | BusyBox and `/init` only | First boot attempt with maximum headroom to fit |
+| `deps` | Dependency closure of requested module list | Reach a specific modular driver |
+| `all` | All installed kernel modules | Offline diagnostics; typically exceeds partition size |
 
-Para preparar UFS downstream:
+To stage downstream UFS drivers:
 
 ```sh
 DEVICE_VARIANT=wifi MODULES_MODE=deps \
@@ -64,12 +51,9 @@ DEVICE_VARIANT=wifi MODULES_MODE=deps \
   ./scripts/build-initramfs.sh
 ```
 
-La lista pide `ufs-exynos-core`; `modprobe --show-depends` calcula el cierre
-real, copia 28 módulos del mismo `kernelrelease`, regenera `modules.dep` y deja
-la lista que `/init` cargará en `/etc/gts9fe-modules`. No copies `.ko` a mano:
-puedes olvidar dependencias o mezclar módulos de otro kernel.
+The configuration file requests `ufs-exynos-core`; `modprobe --show-depends` computes the genuine dependency closure, copies 28 modules matching the same `kernelrelease`, regenerates `modules.dep`, and populates the autoload list read by `/init` at `/etc/gts9fe-modules`. Do not copy `.ko` files manually: manual staging risks omitting dependencies or mixing modules built against different kernel trees.
 
-Para estudiar USB ACM existe una lista separada:
+For USB ACM diagnostics, a separate profile exists:
 
 ```sh
 DEVICE_VARIANT=wifi MODULES_MODE=deps \
@@ -79,35 +63,28 @@ DEVICE_VARIANT=wifi MODULES_MODE=deps \
   ./scripts/build-initramfs.sh
 ```
 
-El cierre de `phy-exynos-usbdrd-super` y `dwc3-exynos-usb` arrastra 45 módulos.
-Es una evidencia de dependencias, no un candidato: su LZ4 supera el ramdisk
-stock. La siguiente hipótesis es integrar sólo glue/PHY esenciales en `Image`,
-medir el crecimiento y volver a comprobar el límite de `boot`.
+The dependency closure for `phy-exynos-usbdrd-super` and `dwc3-exynos-usb` pulls in 45 modules. This serves as dependency evidence, not as a flashable candidate: its LZ4 payload exceeds the stock ramdisk budget. The subsequent hypothesis is to build essential glue/PHY drivers directly into `Image`, measure size growth, and re-evaluate `boot` partition capacity.
 
-## Salidas y reproducibilidad
+## Outputs and Reproducibility
 
-Cada perfil genera:
+Each profile generates:
 
-- `gts9fe-initramfs.cpio`, fácil de inspeccionar;
-- `gts9fe-initramfs.cpio.gz`, gzip sin timestamp;
-- `gts9fe-initramfs.cpio.lz4`, si `lz4` está instalado, en el formato legacy
-  usado por las imágenes stock;
+- `gts9fe-initramfs.cpio`, uncompressed and easily inspected;
+- `gts9fe-initramfs.cpio.gz`, timestamp-stripped gzip;
+- `gts9fe-initramfs.cpio.lz4`, if `lz4` is installed, formatted using legacy frame format matching stock images;
 - `SHA256SUMS`.
 
-El script ordena entradas y normaliza uid, gid y mtime. Dos ejecuciones con las
-mismas entradas ya dieron archivos idénticos byte por byte. Valores medidos:
+The build script sorts directory entries and normalizes uid, gid, and mtime. Two runs with identical inputs produced bit-for-bit identical archives. Measured payload sizes:
 
-| Perfil | CPIO | LZ4 legacy | Margen respecto al ramdisk stock (2 486 802 B) |
+| Profile | CPIO | Legacy LZ4 | Margin Relative to Stock Ramdisk (2,486,802 B) |
 |---|---:|---:|---:|
-| mínimo | 1 266 176 B | 690 117 B | 1 796 685 B |
-| UFS/deps | 6 589 952 B | 2 124 194 B | 362 608 B |
-| USB/deps | 10 065 920 B | 3 036 866 B | **excede 550 064 B** |
+| Minimal (`none`) | 1,266,176 B | 690,117 B | +1,796,685 B headroom |
+| UFS (`deps`) | 6,589,952 B | 2,124,194 B | +362,608 B headroom |
+| USB (`deps`) | 10,065,920 B | 3,036,866 B | **exceeds by 550,064 B** |
 
-El margen compara payload comprimido, no autoriza el flasheo. La imagen final
-tiene cabecera, alineación y AVB, y el perfil UFS queda demasiado ajustado para
-añadir herramientas alegremente.
+The headroom metric compares compressed payload bytes; it does not authorize flashing. The final partition image includes headers, alignment padding, and AVB footers, and the UFS profile leaves very tight headroom for extra userspace tools.
 
-Comprueba e inspecciona:
+Verify and inspect:
 
 ```sh
 (cd artifacts/initramfs/wifi && sha256sum -c SHA256SUMS)
@@ -116,41 +93,28 @@ cpio -it < artifacts/initramfs/wifi-ufs/gts9fe-initramfs.cpio | \
   grep 'lib/modules/.*\.ko$'
 ```
 
-## Parámetros entendidos por `/init`
+## Command-Line Parameters Understood by `/init`
 
-- sin opciones: shell sobre la consola abierta por el kernel;
-- `gts9fe.usb_debug=1`: intenta configurar un gadget USB ACM y abre una shell
-  en `/dev/ttyGS0`; requiere glue Exynos, PHY, DWC3 y ConfigFS funcionando;
-- `gts9fe.root=/dev/...`: monta la raíz en **sólo lectura** bajo `/newroot` y
-  permanece en rescate;
-- `gts9fe.switch_root=1`: permite el cambio sólo junto a una raíz montada y un
-  `/newroot/sbin/init` ejecutable. Se rechaza si también se pidió la shell USB.
+- No parameters: drops to a shell on the console opened by the kernel;
+- `gts9fe.usb_debug=1`: attempts to configure a USB ACM gadget and opens a shell on `/dev/ttyGS0`; requires Exynos glue, PHY, DWC3, and ConfigFS operational;
+- `gts9fe.root=/dev/...`: mounts the root device **strictly read-only** under `/newroot` and remains in rescue mode;
+- `gts9fe.switch_root=1`: permits switching root only when a root filesystem is mounted and `/newroot/sbin/init` is executable. Rejected if a USB debug shell was also requested.
 
-No uses `gts9fe.root` antes de M5 ni `gts9fe.switch_root=1` en la primera prueba
-de almacenamiento. Los nombres `/dev/sdX` pueden cambiar;
-primero registra los UUID y el mapa de particiones.
+Do not use `gts9fe.root` before milestone M5, nor `gts9fe.switch_root=1` during initial storage tests. `/dev/sdX` node assignments can shift across boots; first record partition UUIDs and partition tables.
 
-## Qué debe estar integrado (`=y`)
+## Requirements Built In-Tree (`=y`)
 
-Todo lo necesario antes de poder cargar módulos debe estar dentro de `Image`:
-soporte initrd, devtmpfs, una consola y la infraestructura básica de bloques.
-La configuración construida confirma `CONFIG_BLK_DEV_INITRD=y`,
-`CONFIG_DEVTMPFS=y`, `CONFIG_DEVTMPFS_MOUNT=y`, consola Samsung, DWC3 y gadget
-USB ConfigFS/ACM. El controlador UFS Exynos queda modular en este árbol y por
-eso existe el perfil `deps`.
+Everything required before loading modules must be built into `Image`: initrd support, devtmpfs, console drivers, and core block infrastructure. The compiled configuration confirms `CONFIG_BLK_DEV_INITRD=y`, `CONFIG_DEVTMPFS=y`, `CONFIG_DEVTMPFS_MOUNT=y`, Samsung serial console, DWC3, and ConfigFS/ACM USB gadget. The Exynos UFS driver is modular in this tree, which is why the `deps` profile exists.
 
-## Diagnóstico del primer arranque
+## First Boot Diagnostics
 
-M3 queda demostrado sólo si una consola física muestra algo como:
+Milestone M3 is demonstrated only if a physical console displays output resembling:
 
 ```text
-[gts9fe-init] iniciando early userspace
+[gts9fe-init] starting early userspace
 [gts9fe-init] kernel: Linux ... aarch64
 [gts9fe-init] cmdline: ...
-[gts9fe-init] shell de rescate...
+[gts9fe-init] rescue shell. Use dmesg, cat /proc/iomem and ls /sys.
 ```
 
-Si aparece `No working init found`, comprueba que `/init` sea 0755, empiece por
-`#!/bin/busybox sh` y que `/bin/busybox` sea AArch64 estático. Si falla
-`modprobe`, registra el módulo exacto, `uname -r`, `modules.dep` y el mensaje de
-símbolo/versión; no lo soluciones cargando un módulo de otra compilación.
+If `No working init found` appears, verify that `/init` is permissions `0755`, begins with `#!/bin/busybox sh`, and that `/bin/busybox` is a static AArch64 executable. If `modprobe` fails, record the exact module name, `uname -r`, `modules.dep`, and symbol/version error strings; do not attempt to resolve errors by loading modules compiled against a different kernel tree.

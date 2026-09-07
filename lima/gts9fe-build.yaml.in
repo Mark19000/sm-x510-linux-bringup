@@ -1,4 +1,4 @@
-# Plantilla probada en Apple Silicon. setup-lima.sh sustituye la ruta del repo.
+# Template tested on Apple Silicon. setup-lima.sh substitutes repository path.
 minimumLimaVersion: 2.0.0
 images:
   - location: "https://cloud-images.ubuntu.com/releases/resolute/release-20260720/ubuntu-26.04-server-cloudimg-arm64.img"

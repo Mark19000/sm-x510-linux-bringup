@@ -1,115 +1,115 @@
-# Auditoría Técnica del Algoritmo Oráculo P0 (KASLR Physical Slide Oracle)
+# Technical Audit of the P0 Oracle Algorithm (KASLR Physical Slide Oracle)
 
-- **Dispositivo**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
+- **Device**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
 - **SoC**: Samsung Exynos 1380 (`s5e8835`)
-- **Firmware Base Objetivo**: `X510XXUCEZE4` (Kernel Linux 5.15.189)
-- **Firmware de Referencia**: `X510XXSEEZG3` (Kernel Linux 5.15.189)
-- **Archivos de Código Auditados**:
+- **Target Base Firmware**: `X510XXUCEZE4` (Kernel Linux 5.15.189)
+- **Reference Firmware**: `X510XXSEEZG3` (Kernel Linux 5.15.189)
+- **Audited Code Files**:
   - `src/oracle.c`
   - `src/targets/gts9fewifi-X510XXSEEZG3/p0_fingerprint.h`
   - `src/targets/gts9fewifi-X510XXSEEZG3/target.h`
   - `tools/generate_p0_fingerprint.pl`
   - `src/slide_app.c`, `src/fops.c`, `src/pselect.c`, `src/fpsimd.c`
-- **Fecha**: 2026-09-06
+- **Date**: 2026-09-06
 
 ---
 
-## 1. Fundamento y Propósito de P0
+## 1. Fundamentals and Purpose of P0
 
-### ¿Qué es P0?
-En la arquitectura de memoria física de Samsung Exynos 1380, **P0** hace referencia a la base física de carga de la memoria DRAM del kernel (`P0_KERNEL_PHYS_LOAD = 0x80000000ULL`).
+### What is P0?
+In the Samsung Exynos 1380 physical memory architecture, **P0** refers to the kernel DRAM physical load base (`P0_KERNEL_PHYS_LOAD = 0x80000000ULL`).
 
-En el contexto de la suite *Root-My-Galaxy*, el **Oráculo P0** (*Physical Page 0 Oracle*) es un mecanismo de filtración de KASLR (*Kernel Address Space Layout Randomization*) que opera en el dominio de memoria física. A diferencia de las técnicas tradicionales de leak basadas en sockets de red (multicast), temporización de páginas de usuario o interfaces `/proc` y `sysfs` (fuertemente restringidas por SELinux en Android 13/14), el oráculo P0 utiliza la geometría de los buffers de tuberías de Linux (`struct user_pipe_buffer` de 40 bytes / `0x28`) y primitivas de sondeo físico para leer una página de memoria del kernel sin privilegios de root previos.
+In the context of the *Root-My-Galaxy* suite, the **P0 Oracle** (*Physical Page 0 Oracle*) is a KASLR (*Kernel Address Space Layout Randomization*) leak mechanism operating in the physical memory domain. Unlike traditional leak techniques based on network sockets (multicast), user-page timing, or `/proc` and `sysfs` interfaces (heavily restricted by SELinux on Android 13/14), the P0 oracle uses the geometry of Linux pipe buffers (40-byte / `0x28` `struct user_pipe_buffer`) and physical probe primitives to read a kernel memory page without prior root privileges.
 
-### ¿Qué intenta identificar?
-Su objetivo exclusivo es determinar con certeza matemática absoluta el desplazamiento de aleatorización **`slide`** de KASLR en la sesión actual de arranque:
-$$	ext{VA}(	ext{symbol}) = 	ext{KIMAGE\_TEXT\_BASE} + 	ext{offset} + 	ext{slide}$$
+### What does it attempt to identify?
+Its exclusive goal is to determine with absolute mathematical certainty the KASLR randomization offset **`slide`** in the current boot session:
+$$\text{VA}(\text{symbol}) = \text{KIMAGE\_TEXT\_BASE} + \text{offset} + \text{slide}$$
 
-En la arquitectura ARM64 de Samsung:
+In Samsung's ARM64 architecture:
 - `KIMAGE_TEXT_BASE = 0xffffffc008000000ULL`
 - `slide \in [0x000000, 0x1f0000]`
-Al obtener el `slide`, el exploit desaleatoriza en tiempo de ejecución todas las funciones de control (`commit_creds`, `prepare_kernel_cred`, gadgets de retorno).
+
+By obtaining the `slide`, the exploit runtime derandomizes all control functions (`commit_creds`, `prepare_kernel_cred`, return gadgets).
 
 ---
 
-## 2. Parámetros y Mecanismo del Oráculo Físico
+## 2. Parameters and Mechanism of the Physical Oracle
 
 ### Macro `PHYS_P0_ORACLE`
-Definida en `target.h` (`#define PHYS_P0_ORACLE 1`), instruye al compilador y al runtime a compilar y utilizar las funciones de `src/oracle.c` (`prepare_p0_pipe_oracle`, `verify_p0_pipe_oracle_gate`, `scan_p0_pipe_oracle`, `restore_p0_oracle_pages`). Si estuviera en 0, el exploit dependería de oráculos de red como multicast (`SLIDE_USE_MCAST`) o tracefs (`SLIDE_USE_TRACEFS`), ambos inoperantes o inestables en el entorno SELinux de Samsung One UI 6.
+Defined in `target.h` (`#define PHYS_P0_ORACLE 1`), instructs the compiler and runtime to compile and use functions in `src/oracle.c` (`prepare_p0_pipe_oracle`, `verify_p0_pipe_oracle_gate`, `scan_p0_pipe_oracle`, `restore_p0_oracle_pages`). If set to 0, the exploit would depend on network oracles like multicast (`SLIDE_USE_MCAST`) or tracefs (`SLIDE_USE_TRACEFS`), both inoperative or unstable in Samsung One UI 6 SELinux environment.
 
-### Uso de `P0_ORACLE_PROBE_OFFSET`
-Definido para Tab S9 FE como:
-$$	ext{P0\_ORACLE\_PROBE\_OFFSET} = 	ext{0x1f0000ULL} \quad (2	ext{ MB})$$
+### Use of `P0_ORACLE_PROBE_OFFSET`
+Defined for Tab S9 FE as:
+$$\text{P0\_ORACLE\_PROBE\_OFFSET} = \text{0x1f0000ULL} \quad (2\text{ MB})$$
 
-El exploit configura una página física fija de sondeo ubicada a exactamente $2	ext{ MB}$ de la base física de DRAM:
-$$P_{probe} = P_{base} + 	ext{P0\_ORACLE\_PROBE\_OFFSET} = 	ext{0x80000000} + 	ext{0x1f0000} = 	ext{0x801f0000}$$
+The exploit configures a fixed physical probe page located at exactly $2\text{ MB}$ from the DRAM physical base:
+$$P_{\text{probe}} = P_{\text{base}} + \text{P0\_ORACLE\_PROBE\_OFFSET} = \text{0x80000000} + \text{0x1f0000} = \text{0x801f0000}$$
 
-Cuando el bootloader carga el kernel con un KASLR slide aleatorio $	ext{slide}$, el inicio del kernel se posiciona en:
-$$P_{load} = P_{base} + 	ext{slide}$$
+When the bootloader loads the kernel with a random KASLR slide $\text{slide}$, the kernel start is positioned at:
+$$P_{\text{load}} = P_{\text{base}} + \text{slide}$$
 
-Por lo tanto, la posición relativa dentro del archivo binario `Image` que queda expuesta bajo la dirección física de sondeo $P_{probe}$ es:
-$$P_{load} + 	ext{Image\_offset} = P_{probe}$$
-$$(P_{base} + 	ext{slide}) + 	ext{Image\_offset} = P_{base} + 	ext{P0\_ORACLE\_PROBE\_OFFSET}$$
-$$\mathbf{	ext{Image\_offset} = 	ext{P0\_ORACLE\_PROBE\_OFFSET} - 	ext{slide}}$$
+Therefore, the relative position within the `Image` binary exposed under the physical probe address $P_{\text{probe}}$ is:
+$$P_{\text{load}} + \text{Image\_offset} = P_{\text{probe}}$$
+$$(P_{\text{base}} + \text{slide}) + \text{Image\_offset} = P_{\text{base}} + \text{P0\_ORACLE\_PROBE\_OFFSET}$$
+$$\mathbf{\text{Image\_offset} = \text{P0\_ORACLE\_PROBE\_OFFSET} - \text{slide}}$$
 
-Esta fórmula es la piedra angular del oráculo: **a medida que el slide del kernel crece, la ventana observada en la página física retrocede en el archivo Image**.
+This formula is the cornerstone of the oracle: **as kernel slide grows, the window observed at the physical page shifts backwards in the Image file**.
 
 ---
 
-## 3. Discrepancia 32 vs 125 Candidatos y `SLIDE_KASLR_STEP`
+## 3. Discrepancy: 32 vs 125 Candidates and `SLIDE_KASLR_STEP`
 
-### ¿Cómo interviene `SLIDE_KASLR_STEP`?
-El paso de KASLR (`SLIDE_KASLR_STEP`) define la granularidad de alineación mínima permitida por el kernel al aleatorizar su dirección de carga.
-- En la mayoría de teléfonos insignia (Galaxy S24/S23, SoC Qualcomm o Exynos 2400), el paso es de **64 KB** (`0x10000`).
-- En la familia Samsung Galaxy Tab S9 FE y teléfonos de gama media con Exynos 1380 (`s5e8835`), el kernel utiliza un paso de **16 KB** (`0x4000`):
-  $$	ext{SLIDE\_KASLR\_STEP} = 	ext{0x4000ULL} \quad (16	ext{ KB})$$
+### How does `SLIDE_KASLR_STEP` come into play?
+The KASLR step (`SLIDE_KASLR_STEP`) defines the minimum alignment granularity allowed by the kernel when randomizing its load address.
+- On most flagship phones (Galaxy S24/S23, Qualcomm or Exynos 2400 SoC), the step is **64 KB** (`0x10000`).
+- On the Samsung Galaxy Tab S9 FE family and mid-range phones with Exynos 1380 (`s5e8835`), the kernel uses a **16 KB** step (`0x4000`):
+  $$\text{SLIDE\_KASLR\_STEP} = \text{0x4000ULL} \quad (16\text{ KB})$$
 
-### ¿Por qué existen 32 candidatos en unos y 125 en otros?
-El espacio de búsqueda del oráculo abarca una ventana total de $2	ext{ MB}$ (`0x1f0000`).
-1. **Dispositivos de 64 KB (`0x10000`)**:
-   $$	ext{Candidatos} =
-rac{	ext{0x1f0000}}{	ext{0x10000}} + 1 = 31 + 1 = \mathbf{32 	ext{ entradas}}$$
+### Why are there 32 candidates in some and 125 in others?
+The oracle search space spans a total window of $2\text{ MB}$ (`0x1f0000`).
+1. **64 KB devices (`0x10000`)**:
+   $$\text{Candidates} = \frac{\text{0x1f0000}}{\text{0x10000}} + 1 = 31 + 1 = \mathbf{32\text{ entries}}$$
    (Slides: `0x000000`, `0x010000`, `0x020000`, ..., `0x1f0000`).
 2. **Tab S9 FE / Exynos 1380 (`0x4000`)**:
-   $$	ext{Candidatos} =
-rac{	ext{0x1f0000}}{	ext{0x4000}} + 1 = 124 + 1 = \mathbf{125 	ext{ entradas}}$$
+   $$\text{Candidates} = \frac{\text{0x1f0000}}{\text{0x4000}} + 1 = 124 + 1 = \mathbf{125\text{ entries}}$$
    (Slides: `0x000000`, `0x004000`, `0x008000`, ..., `0x1f0000`).
 
-La mención histórica de "32 candidatos" se deriva del diseño original para terminales de 64 KB, pero la implementación real para `gts9fewifi` requiere de forma mandatoria **125 candidatos** para cubrir la malla de 16 KB.
+The historical mention of "32 candidates" derives from the original design for 64 KB devices, but the actual implementation for `gts9fewifi` mandatorily requires **125 candidates** to cover the 16 KB grid.
 
 ---
 
-## 4. Estructura de la Huella Dactilar (Fingerprint)
+## 4. Fingerprint Structure
 
-### Los 8 Offsets Intrapágina
-Dentro de una página física estándar de 4 KB (4096 bytes / `0x1000`), se toman muestras en 8 desplazamientos uniformemente espaciados por 512 bytes (`0x200`):
-$$\{ 	ext{0x000}, 	ext{0x200}, 	ext{0x400}, 	ext{0x600}, 	ext{0x800}, 	ext{0xa00}, 	ext{0xc00}, 	ext{0xe00} \}$$
+### The 8 Intra-page Offsets
+Within a standard 4 KB physical page (4096 bytes / `0x1000`), samples are taken at 8 offsets uniformly spaced by 512 bytes (`0x200`):
+$$\{ \text{0x000}, \text{0x200}, \text{0x400}, \text{0x600}, \text{0x800}, \text{0xa00}, \text{0xc00}, \text{0xe00} \}$$
 
-Esta dispersión intrapágina garantiza que la huella muestree:
-- El inicio del bloque (`0x000`)
-- Puntos intermedios cada medio kilobyte
-- El final del bloque (`0xe00` a `0xe07`)
-Evitando que páginas con cabeceras idénticas o áreas de padding de ceros provoquen falsos emparejamientos.
+This intra-page dispersion ensures that the fingerprint samples:
+- Block start (`0x000`)
+- Intermediate points every half kilobyte
+- Block end (`0xe00` to `0xe07`)
 
-### Representación de Cada Palabra (`word`)
-Cada palabra almacenada en `words[8]` es un entero de 64 bits sin signo (`uint64_t`, 8 bytes) en formato little-endian ARM64:
+Preventing pages with identical headers or zero-padding areas from causing false matches.
+
+### Representation of Each Word (`word`)
+Each word stored in `words[8]` is an unsigned 64-bit integer (`uint64_t`, 8 bytes) in ARM64 little-endian format:
 ```c
 struct p0_fingerprint {
   uintptr_t slide;
   uint64_t words[8];
 };
 ```
-Cada palabra extrae directamente los 8 bytes binarios de la imagen estática:
-$$	ext{words}[i] = 	ext{Image}[(	ext{P0\_ORACLE\_PROBE\_OFFSET} - 	ext{slide}) + 	ext{offset}_i]$$
+Each word directly extracts the 8 binary bytes from the static image:
+$$\text{words}[i] = \text{Image}[(\text{P0\_ORACLE\_PROBE\_OFFSET} - \text{slide}) + \text{offset}_i]$$
 
-Dado que el código `.text` y las tablas `.rodata` del kernel son inmutables durante la ejecución, estos 64 bytes totales forman una firma criptográficamente robusta de la página física proyectada.
+Since kernel `.text` code and `.rodata` tables are immutable during execution, these 64 total bytes form a cryptographically robust signature of the projected physical page.
 
 ---
 
-## 5. Algoritmo de Puntuación, Confianza y Colisiones
+## 5. Scoring Algorithm, Confidence, and Collisions
 
-### Cálculo del Score (`p0_fingerprint_score`)
-En `src/oracle.c:197-208`, la comparación se evalúa palabra por palabra:
+### Score Calculation (`p0_fingerprint_score`)
+In `src/oracle.c:197-208`, the comparison is evaluated word by word:
 ```c
 static int p0_fingerprint_score(
     const unsigned char *page, const struct p0_fingerprint *fingerprint) {
@@ -124,32 +124,32 @@ static int p0_fingerprint_score(
   return score;
 }
 ```
-El puntaje final de una comparación es un entero discreto en el rango $[0, 8]$.
+The final score of a comparison is a discrete integer in the range $[0, 8]$.
 
-### Criterio `P0_FINGERPRINT_MIN_BEST = 5`
-- Establece que el mejor candidato debe tener al menos **5 de 8 palabras idénticas** ($62.5\%$ de coincidencia mínima).
-- Si la página leída del pipe estuviera vacía, contuviera basura de memoria de usuario o estuviera corrupta, el puntaje típico es $\le 1$. Al imponer $	ext{score} \ge 5$, se descarta automáticamente cualquier lectura fallida antes de cometer una dirección errónea.
+### Criterion `P0_FINGERPRINT_MIN_BEST = 5`
+- Establishes that the best candidate must have at least **5 out of 8 identical words** ($62.5\%$ minimum match).
+- If the page read from the pipe were empty, contained user-memory garbage, or were corrupted, the typical score is $\le 1$. Enforcing $\text{score} \ge 5$ automatically discards any failed read before committing an erroneous address.
 
-### Criterio `P0_FINGERPRINT_MIN_MARGIN = 3`
-- Establece la separación requerida entre el candidato ganador y su competidor más cercano:
-  $$	ext{best\_score} - 	ext{second\_score} \ge 3$$
-- Si el mejor candidato obtiene 6 puntos y el segundo obtiene 4 puntos ($	ext{margen} = 2 < 3$), la muestra se considera ambigua y se **rechaza**.
-- Esto protege contra colisiones accidentales producidas por patrones repetitivos de código en el kernel (por ejemplo, secuencias consecutivas de NOPs o funciones stub).
+### Criterion `P0_FINGERPRINT_MIN_MARGIN = 3`
+- Establishes the required separation between the winning candidate and its nearest competitor:
+  $$\text{best\_score} - \text{second\_score} \ge 3$$
+- If the best candidate scores 6 points and the second scores 4 points ($\text{margin} = 2 < 3$), the sample is considered ambiguous and is **rejected**.
+- This protects against accidental collisions produced by repetitive code patterns in the kernel (for example, consecutive NOP sequences or stub functions).
 
-### Gestión de Colisiones
-En `src/oracle.c:278-292`:
-1. Si no se modifica exactamente 1 página (`changed_pages != 1`), retorna `-1`.
-2. Si hay empate ($	ext{best\_score} \le 	ext{second\_score}$), retorna `-1`.
-3. Si no se supera el umbral o el margen, el oráculo emite:
+### Collision Handling
+In `src/oracle.c:278-292`:
+1. If not exactly 1 page is modified (`changed_pages != 1`), returns `-1`.
+2. If there is a tie ($\text{best\_score} \le \text{second\_score}$), returns `-1`.
+3. If threshold or margin is not exceeded, the oracle emits:
    `p0 fingerprint rejected low-confidence best=%d second=%d min_best=%d margin=%d`
-   y retorna `(uintptr_t)-1`.
-4. El proceso llamador (`slide_app.c`) detecta el valor `-1` y reintenta el oráculo con un nuevo intento limpio, **evitando provocar un kernel panic**.
+   and returns `(uintptr_t)-1`.
+4. The caller process (`slide_app.c`) detects the `-1` value and retries the oracle with a fresh, clean attempt, **avoiding triggering a kernel panic**.
 
 ---
 
-## 6. Conclusión de la Auditoría del Algoritmo P0
+## 6. Conclusion of the P0 Algorithm Audit
 
-El algoritmo P0 es un discriminador probabilístico altamente optimizado, determinista y matemáticamente formalizado:
-- Total de candidatos en EZE4: **125 entradas** (paso `0x4000` en ventana `0x1f0000`).
-- Muestreo: **8 palabras de 64 bits** (64 bytes/página en offsets `0x200`).
-- Validación: **Score $\ge 5$** con **Margen $\ge 3$**.
+The P0 algorithm is a highly optimized, deterministic, and mathematically formalized probabilistic discriminator:
+- Total candidates in EZE4: **125 entries** (step `0x4000` across window `0x1f0000`).
+- Sampling: **8 64-bit words** (64 bytes/page at offsets `0x200`).
+- Validation: **Score $\ge 5$** with **Margin $\ge 3$**.

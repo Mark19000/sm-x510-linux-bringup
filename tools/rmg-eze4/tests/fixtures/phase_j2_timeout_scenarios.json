@@ -18024,7 +18024,7 @@
         "classification": {
           "trial_terminal_class": "SUPERVISOR_OVERALL_TIMEOUT",
           "trial_validity": "INVALID",
-          "trial_evidence_vote": "INCOMPATIBLE_VOTE"
+          "trial_evidence_vote": "NO_VOTE"
         }
       }
     ]

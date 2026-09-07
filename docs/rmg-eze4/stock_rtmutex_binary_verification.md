@@ -1,53 +1,53 @@
-# Verificación Binaria de Ground Truth: `remove_waiter` en Image Stock EZE4
+# Ground Truth Binary Verification: `remove_waiter` in Stock EZE4 Image
 
-- **Dispositivo**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
+- **Device**: Samsung Galaxy Tab S9 FE Wi-Fi (`SM-X510` / `gts9fewifi`)
 - **SoC**: Samsung Exynos 1380 (`s5e8835`)
-- **Firmware Stock Auditado**: `X510XXUCEZE4` (Build oficial de fábrica)
-- **Artefacto Binario Analizado**: `artifacts/stock/images/Image.stock` (extraído directamente de `artifacts/stock/images/boot.img` @ offset 4096, longitud: 39,356,928 bytes, SHA-256: `ca56baf428a3f334d90f5d366f02e6cb36cf70fec23a2055b4f80c29cbe6ede9`)
-- **Guía de Referencia**: `vmlinux` unstripped y `System.map` del árbol OSRC EZE4.
-- **Fecha de Auditoría**: 2026-09-06
-- **Veredicto Definitivo**: **`STOCK_PATCH_ABSENT`**
+- **Audited Stock Firmware**: `X510XXUCEZE4` (Official factory build)
+- **Analyzed Binary Artifact**: `artifacts/stock/images/Image.stock` (extracted directly from `artifacts/stock/images/boot.img` @ offset 4096, length: 39,356,928 bytes, SHA-256: `ca56baf428a3f334d90f5d366f02e6cb36cf70fec23a2055b4f80c29cbe6ede9`)
+- **Reference Guide**: Unstripped `vmlinux` and `System.map` from EZE4 OSRC tree.
+- **Audit Date**: 2026-09-06
+- **Definitive Verdict**: **`STOCK_PATCH_ABSENT`**
 
 ---
 
-## 1. Veredicto Ejecutivo
+## 1. Executive Verdict
 
 ```
 ================================================================================
-VEREDICTO GROUND TRUTH: STOCK_PATCH_ABSENT
-Estado de Seguridad: Vulnerable en el binario oficial de producción
-Certeza Técnica: ABSOLUTA (100% demostrado por desensamblado directo de Image.stock)
-Evidencia: La función remove_waiter() en el kernel de fábrica lee "current"
-           desde SP_EL0, adquiere current->pi_lock (+0x884) y anula
-           current->pi_blocked_on (+0x8b0), sin comprobar ni desvincular
-           el puntero "waiter->task".
+GROUND TRUTH VERDICT: STOCK_PATCH_ABSENT
+Security Status: Vulnerable in official production binary
+Technical Certainty: ABSOLUTE (100% proven by direct disassembly of Image.stock)
+Evidence: The remove_waiter() function in factory kernel reads "current"
+           from SP_EL0, acquires current->pi_lock (+0x884), and zeroes
+           current->pi_blocked_on (+0x8b0), without checking or unlinking
+           the "waiter->task" pointer.
 ================================================================================
 ```
 
 ---
 
-## 2. Metodología de Localización Binaria
+## 2. Binary Localization Methodology
 
-Para no depender ciegamente de los símbolos de una compilación personalizada, se utilizó una estrategia de búsqueda basada en firmas de control y semántica de microarquitectura:
+To avoid relying blindly on custom build symbols, a search strategy based on control signatures and microarchitectural semantics was used:
 
-1. **Guía Preliminar (Árbol OSRC / vmlinux)**:
-   - En el `vmlinux` reconstruido con Clang 21, la función `remove_waiter` se ubica en `0xffffffc0091125f0` (offset `0x11125f0` del archivo Image).
-   - Secuencia característica: acceso al registro del sistema `SP_EL0` (`mrs Xt, sp_el0`), adición del desplazamiento `0x884` (`pi_lock`) y almacenamiento a cero en el desplazamiento `0x8b0` (decimal 2224, `pi_blocked_on`).
-2. **Búsqueda en `Image.stock`**:
-   - Mediante escaneo del flujo binario completo de 39.3 MB, se localizó la firma semántica `mrs Xt, sp_el0` + `add Xd, Xt, #0x884` en el offset de archivo:
-     $$\text{Offset en Image.stock} = \text{0x1150680}$$
-     $$\text{Dirección virtual (ajuste VMA 0xffffffc008000000)} = \text{0xffffffc009150680}$$
-   - Se procedió a desensamblar el rango completo de la función (`0xffffffc009150680` a `0xffffffc0091508ac`) mediante GNU objdump para aarch64.
+1. **Preliminary Guide (OSRC Tree / vmlinux)**:
+   - In `vmlinux` rebuilt with Clang 21, `remove_waiter` is located at `0xffffffc0091125f0` (offset `0x11125f0` in Image file).
+   - Characteristic sequence: access to system register `SP_EL0` (`mrs Xt, sp_el0`), addition of offset `0x884` (`pi_lock`), and zero-store at offset `0x8b0` (decimal 2224, `pi_blocked_on`).
+2. **Search in `Image.stock`**:
+   - Scanning the complete 39.3 MB binary stream located the semantic signature `mrs Xt, sp_el0` + `add Xd, Xt, #0x884` at file offset:
+     $$\text{Offset in Image.stock} = \text{0x1150680}$$
+     $$\text{Virtual address (VMA adjustment 0xffffffc008000000)} = \text{0xffffffc009150680}$$
+   - Proceeded to disassemble the full function range (`0xffffffc009150680` to `0xffffffc0091508ac`) using GNU objdump for aarch64.
 
 ---
 
-## 3. Desensamblado Directo del Binario Stock (`Image.stock`)
+## 3. Direct Disassembly of Stock Binary (`Image.stock`)
 
-A continuación se transcribe la sección crítica de `remove_waiter()` extraída del binario de fábrica de Samsung:
+The critical section of `remove_waiter()` extracted from the factory Samsung binary is transcribed below:
 
 ```asm
 ; ============================================================================
-; Función remove_waiter() en Image.stock (0xffffffc009150680 - 0xffffffc0091508ac)
+; Function remove_waiter() in Image.stock (0xffffffc009150680 - 0xffffffc0091508ac)
 ; x0 = struct rt_mutex_base *lock
 ; x1 = struct rt_mutex_waiter *waiter
 ; ============================================================================
@@ -66,16 +66,16 @@ ffffffc0091506a8:  ldr    x8, [x24, #56]          ; x8 = top_waiter->lock
 ffffffc0091506ac:  cmp    x8, x19
 ffffffc0091506b0:  b.ne   0xffffffc0091508b8      ; lockdep_assert_held failure / bug
 
-; --- INICIO DE SECCIÓN CRÍTICA DE SINCRONIZACIÓN ---
-ffffffc0091506b4:  mrs    x20, sp_el0             ; x20 = current (hilo llamador en CPU) !!
+; --- START OF SYNCHRONIZATION CRITICAL SECTION ---
+ffffffc0091506b4:  mrs    x20, sp_el0             ; x20 = current (calling thread on CPU) !!
 ffffffc0091506b8:  add    x22, x20, #0x884        ; x22 = &current->pi_lock (offset 0x884) !!
 ffffffc0091506bc:  mov    x0, x22
 ffffffc0091506c0:  add    x8, x19, #0x18          ; x8 = &lock->wait_lock
 ffffffc0091506c4:  ldar   x8, [x8]
-ffffffc0091506c8:  and    x21, x8, #0xfffffffffffffffe ; x21 = owner (sin bit 0)
+ffffffc0091506c8:  and    x21, x8, #0xfffffffffffffffe ; x21 = owner (without bit 0)
 ffffffc0091506cc:  bl     0xffffffc009153b8c      ; _raw_spin_lock(&current->pi_lock)
 
-; --- DESENCOLADO DEL WAITER ---
+; --- DEQUEUEING WAITER ---
 ffffffc0091506d0:  ldr    x8, [x23]
 ffffffc0091506d4:  cmp    x8, x23
 ffffffc0091506d8:  b.eq   0xffffffc009150704
@@ -90,54 +90,54 @@ ffffffc0091506f8:  mov    x0, x23                 ; waiter
 ffffffc0091506fc:  bl     0xffffffc00882ed2c      ; rb_erase(waiter, &lock->waiters)
 ffffffc009150700:  str    x23, [x23]
 
-; --- ANULACIÓN DE PI_BLOCKED_ON Y LIBERACIÓN DEL CERROJO ---
+; --- ZEROING PI_BLOCKED_ON AND RELEASING LOCK ---
 ffffffc009150704:  mov    x0, x22                 ; x0 = &current->pi_lock
 ffffffc009150708:  str    xzr, [x20, #2224]       ; current->pi_blocked_on = NULL (2224 == 0x8b0) !!
 ffffffc00915070c:  bl     0xffffffc009153e44      ; _raw_spin_unlock(&current->pi_lock)
 
-; --- COMPROBACIÓN DE OWNER Y TOP WAITER ---
+; --- CHECKING OWNER AND TOP WAITER ---
 ffffffc009150710:  cbz    x21, 0xffffffc009150898 ; if (!owner) return
 ffffffc009150714:  cmp    x24, x23                ; if (top_waiter != waiter)
 ffffffc009150718:  b.ne   0xffffffc009150898      ;     return
 ...
-ffffffc0091508ac:  ret                            ; Fin de remove_waiter()
+ffffffc0091508ac:  ret                            ; End of remove_waiter()
 ```
 
 ---
 
-## 4. Confrontación Triple: Binario Stock vs OSRC vs Upstream
+## 4. Triple Confrontation: Stock Binary vs OSRC vs Upstream
 
-| Componente Analizado | Binario Stock EZE4 (`Image.stock`) | Código Fuente OSRC EZE4 | Corrección Upstream (CVE-2026-43499) |
+| Analyzed Component | Stock EZE4 Binary (`Image.stock`) | OSRC EZE4 Source Code | Upstream Fix (CVE-2026-43499) |
 | :--- | :--- | :--- | :--- |
-| **Identificación del Task** | `mrs x20, sp_el0` (obtiene `current`) | `&current->pi_lock` | `waiter_task = waiter->task;` |
-| **Guardia contra Task Nulo** | **Ninguna** (asume que `current` siempre existe) | **Ninguna** | `if (!waiter_task) return;` |
-| **Cerrojo Adquirido** | `_raw_spin_lock(current + 0x884)` | `raw_spin_lock(&current->pi_lock);` | `scoped_guard(raw_spinlock, &waiter_task->pi_lock)` |
-| **Puntero de Bloqueo Limpiado** | `str xzr, [current, #0x8b0]` | `current->pi_blocked_on = NULL;` | `waiter_task->pi_blocked_on = NULL;` |
-| **Operación en `rt_mutex_start_proxy_lock`** | Cuando un hilo invoca proxy-lock en nombre de otro hilo y falla, **desincroniza el hilo invocador** y deja el `pi_blocked_on` del hilo víctima **intacto como puntero colgante**. | Idéntico defecto a nivel de lógica C. | Limpia correctamente el `pi_blocked_on` del `waiter_task` real. |
+| **Task Identification** | `mrs x20, sp_el0` (gets `current`) | `&current->pi_lock` | `waiter_task = waiter->task;` |
+| **Null Task Guard** | **None** (assumes `current` always exists) | **None** | `if (!waiter_task) return;` |
+| **Lock Acquired** | `_raw_spin_lock(current + 0x884)` | `raw_spin_lock(&current->pi_lock);` | `scoped_guard(raw_spinlock, &waiter_task->pi_lock)` |
+| **Blocked Pointer Cleared** | `str xzr, [current, #0x8b0]` | `current->pi_blocked_on = NULL;` | `waiter_task->pi_blocked_on = NULL;` |
+| **Operation in `rt_mutex_start_proxy_lock`** | When a thread invokes proxy-lock on behalf of another thread and fails, it **desynchronizes the calling thread** and leaves the victim thread's `pi_blocked_on` **intact as a dangling pointer**. | Identical flaw at C logic level. | Correctly clears `pi_blocked_on` of the actual `waiter_task`. |
 
 ---
 
-## 5. Análisis de Estructuras y Desplazamientos Extraídos de `Image.stock`
+## 5. Analysis of Structures and Offsets Extracted from `Image.stock`
 
-El desensamblado directo del binario de fábrica de Samsung arrojó los offsets reales de compilación para el kernel EZE4, confirmando la paridad con el target ZG3:
+Direct disassembly of the factory Samsung binary yielded real compilation offsets for the EZE4 kernel, confirming parity with the ZG3 target:
 
 1. **`TASK_STRUCT_PI_LOCK_OFF`**: `0x884` (decimal 2180).
-   - Evidencia: `add x22, x20, #0x884` en `0xffffffc0091506b8`.
+   - Evidence: `add x22, x20, #0x884` at `0xffffffc0091506b8`.
 2. **`TASK_STRUCT_PI_BLOCKED_ON_OFF`**: `0x8b0` (decimal 2224).
-   - Evidencia: `str xzr, [x20, #2224]` en `0xffffffc009150708`.
+   - Evidence: `str xzr, [x20, #2224]` at `0xffffffc009150708`.
 3. **`TASK_STRUCT_PI_WAITERS_OFF`**: `0x898` (decimal 2200).
-   - Evidencia: `add x1, x21, #0x898` en `0xffffffc009150784`.
+   - Evidence: `add x1, x21, #0x898` at `0xffffffc009150784`.
 4. **`TASK_STRUCT_PI_TOP_TASK_OFF`**: `0x8a8` (decimal 2208 + 8).
-   - Evidencia: `ldr x8, [x21, #2208]` en `0xffffffc009150734` y `0xffffffc009150748`.
+   - Evidence: `ldr x8, [x21, #2208]` at `0xffffffc009150734` and `0xffffffc009150748`.
 
-Todos estos valores son **exactamente idénticos** a las definiciones de macros encontradas en `target.h` de ZG3 (`FAKE_TASK_PI_LOCK_OFF 0x884`, `FAKE_TASK_PI_BLOCKED_ON_OFF 0x8b0`, `FAKE_TASK_PI_WAITERS_OFF 0x898`).
+All these values are **exactly identical** to macro definitions found in ZG3 `target.h` (`FAKE_TASK_PI_LOCK_OFF 0x884`, `FAKE_TASK_PI_BLOCKED_ON_OFF 0x8b0`, `FAKE_TASK_PI_WAITERS_OFF 0x898`).
 
 ---
 
-## 6. Conclusión de Ground Truth
+## 6. Ground Truth Conclusion
 
-Queda demostrado matemática y binariamente que el firmware comercial **`X510XXUCEZE4` instalado de fábrica en la Samsung Galaxy Tab S9 FE Wi-Fi**:
-1. Contiene la implementación vulnerable de `remove_waiter()` en la dirección virtual `0xffffffc009150680`.
-2. **No contiene** el parche oficial upstream ni ningún backport propietario de Samsung para mitigar CVE-2026-43499.
-3. El estado de la vulnerabilidad en el firmware físico clasifica definitivamente como:
+It is mathematically and binarily proven that the commercial firmware **`X510XXUCEZE4` installed from factory on the Samsung Galaxy Tab S9 FE Wi-Fi**:
+1. Contains the vulnerable implementation of `remove_waiter()` at virtual address `0xffffffc009150680`.
+2. **Does not contain** the official upstream patch or any proprietary Samsung backport mitigating CVE-2026-43499.
+3. Vulnerability status in the physical firmware definitively classifies as:
    $$\mathbf{STOCK\_PATCH\_ABSENT}$$

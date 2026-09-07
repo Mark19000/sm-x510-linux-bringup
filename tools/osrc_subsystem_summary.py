@@ -66,12 +66,12 @@ def build_summary(data: dict) -> dict:
 
 def markdown(summary: dict) -> str:
     lines = [
-        "# Resumen de cambios U3 → U11 por subsistema",
+        "# U3 → U11 Changes Summary by Subsystem",
         "",
-        "Los números cuentan rutas cuyo contenido/presencia cambia. No prueban por sí",
-        "solos compatibilidad de hardware; deben leerse junto al diff semántico DTS.",
+        "The numbers count paths whose content/presence changes. They do not prove",
+        "hardware compatibility on their own; they must be read alongside the DTS semantic diff.",
         "",
-        "| subsistema | cambiados | sólo U3 | sólo U11 | ejemplos |",
+        "| subsystem | changed | U3 only | U11 only | examples |",
         "|---|---:|---:|---:|---|",
     ]
     for name, entry in summary["subsystems"].items():

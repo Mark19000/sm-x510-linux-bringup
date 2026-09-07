@@ -10,7 +10,8 @@ Evidence-driven downstream Linux bring-up for Samsung Galaxy Tab S9 FE Wi-Fi (`S
 - Exact stock vermagic.
 - ABI: 281/281 stock modules compatible; 15,123/15,123 MODVERSIONS CRCs exact.
 - DTBO r00/r01/r04 byte-identical to stock.
-- Pipeline: 98/98 tests; functional deterministic reproducibility.
+- Verification: global and J2-specific gates are documented separately; use
+  `make verify-j2` for the current J2 closure barrier.
 
 ## Boot-chain status
 
@@ -39,6 +40,9 @@ No repository command authorizes hardware writes. Historical U11 plans/reports a
 
 ## Canonical documents
 
+- `PROJECT_STATUS.md` — global bring-up state and physical gates.
+- `docs/rmg-eze4/CANONICAL_STATUS.md` — RMG/EZE4/J2 scope only.
+- `docs/rmg-eze4/J2_FINAL_STATUS.md` — concise J2 closure result.
 - `reports/2026-09-05-pre-unlock-closure.md`
 - `reports/2026-09-05-pre-unlock-errata-audit.md`
 - `docs/boot-chain/eze4-avb-trust-graph.md`
