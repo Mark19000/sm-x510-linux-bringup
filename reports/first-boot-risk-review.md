@@ -9,7 +9,7 @@ Mode: independent risk review. Repository read-only. No scripts, code, or images
 
 The project has a strong documentary foundation and a coherent physical gate at **NO-GO**, but the recent phase introduced three important risks:
 
-1. **Operational contradiction between documents**: `docs/hardware-observation-plan.md` still recommends preparing `earlycon`, `ramoops`, and paths oriented toward first flashing with a more advanced tone than the current verdict of `PROJECT_STATUS.md`, `docs/12-preflight-primera-prueba.md`, and the ABI audit. Without explicitly marking it as an old document, it could be followed in error.
+1. **Operational contradiction between documents**: `docs/hardware-observation-plan.md` still recommends preparing `earlycon`, `ramoops`, and paths oriented toward first flashing with a more advanced tone than the current verdict of `PROJECT_STATUS.md`, `docs/12-first-test-preflight.md`, and the ABI audit. Without explicitly marking it as an old document, it could be followed in error.
 
 2. **The current plan contains an invalid `earlycon` syntax**: it proposes `earlycon=samsung,0x13800000`, but the auditable driver registers the name `exynos4210` for compatible `samsung,exynos4210-uart`. Furthermore, UART0 is `disabled`, uses USI v2 mode, and depends on prior bootloader configuration and unproven physical pins. Therefore, absence of UART cannot be interpreted as proof that the kernel failed to boot.
 
@@ -43,7 +43,7 @@ Primary evidence:
 
 - `docs/hardware-observation-plan.md`
 - `reports/2026-08-23-u11-eze4-binary-abi-audit.md`
-- `docs/12-preflight-primera-prueba.md`
+- `docs/12-first-test-preflight.md`
 - `reports/2026-08-24-crash-logging-audit-u11.md`
 - `docs/first-boot-experiment-plan.md`
 

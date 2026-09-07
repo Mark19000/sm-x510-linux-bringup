@@ -240,7 +240,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     audit.add(
         "identity_separation",
         "PASS" if identity_ok else "FAIL",
-        "source U11/B11 y objetivo EZE4/U12 están registrados como identidades distintas",
+        "U11/B11 source and EZE4/U12 target are registered as distinct identities",
         str(identity_path.relative_to(root)),
     )
 
@@ -262,7 +262,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     audit.add(
         "osrc_hashes",
         "FAIL" if package_failures else "PASS",
-        "hashes OSRC base, overlay y Kernel.tar.gz " + ("no coinciden: " + ", ".join(package_failures) if package_failures else "coinciden"),
+        "OSRC base, overlay, and Kernel.tar.gz hashes " + ("do not match: " + ", ".join(package_failures) if package_failures else "match"),
     )
 
     build = resolve(root, identity["U11_BUILD_ARTIFACTS"])
@@ -271,7 +271,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     audit.add(
         "build_hashes",
         "FAIL" if failures else "PASS",
-        f"{len(checked)} artefactos de build verificados" + (f"; {', '.join(failures)}" if failures else ""),
+        f"{len(checked)} build artifacts verified" + (f"; {', '.join(failures)}" if failures else ""),
         str(manifest.relative_to(root)) if manifest.exists() else None,
     )
 
@@ -286,7 +286,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
         build_info.get("installed_modules") == "282",
     ))
     audit.add("build_identity", "PASS" if build_identity_ok else "FAIL",
-              "BUILD_INFO enlaza source, kernel y 282 módulos" if build_identity_ok else "BUILD_INFO no coincide con la identidad U11")
+              "BUILD_INFO links source, kernel, and 282 modules" if build_identity_ok else "BUILD_INFO does not match U11 identity")
 
     config_path = build / "kernel.config"
     config = parse_kernel_config(config_path) if config_path.is_file() else {}
@@ -294,7 +294,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     audit.add(
         "early_userspace_config",
         "FAIL" if missing_config else "PASS",
-        "config preparado para initramfs y consola temprana" if not missing_config else "faltan: " + ", ".join(missing_config),
+        "config prepared for initramfs and early console" if not missing_config else "missing: " + ", ".join(missing_config),
         str(config_path.relative_to(root)) if config_path.exists() else None,
     )
 
@@ -311,8 +311,8 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     audit.add(
         "installed_modules",
         "PASS" if modules_ok else "FAIL",
-        f"release={release_dirs[0].name if len(release_dirs) == 1 else 'ambiguous'}, módulos={len(installed_modules)}, "
-        f"regulares verificados contra tar={tar_count}, symlinks={len(symlinks)}"
+        f"release={release_dirs[0].name if len(release_dirs) == 1 else 'ambiguous'}, modules={len(installed_modules)}, "
+        f"regular files verified against tar={tar_count}, symlinks={len(symlinks)}"
         + (f"; {', '.join(tar_failures)}" if tar_failures else ""),
     )
 
@@ -334,7 +334,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
             vendor_names.extend(module_names_from_vendor_list(path))
     missing_named = [name for name in early_names + vendor_names if name not in available_names]
     audit.add("vendor_module_lists", "PASS" if not missing_named and len(early_names) == 7 else "FAIL",
-              f"7 módulos early + {len(vendor_names)} módulos de producto presentes" if not missing_named else "faltan: " + ", ".join(missing_named))
+              f"7 early modules + {len(vendor_names)} product modules present" if not missing_named else "missing: " + ", ".join(missing_named))
 
     module_audit_path = root / "reports/generated/u11-modules/modules-audit.json"
     module_audit = json.loads(module_audit_path.read_text(encoding="utf-8"))
@@ -353,8 +353,8 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     audit.add(
         "module_vendor_boot_audit",
         "PASS" if module_audit_ok else "FAIL",
-        ("metadatos, dependencias, orden stock y cierres UFS/USB verificados"
-         if module_audit_ok else "checks de módulos ausentes/fallidos: " + ", ".join(missing_module_checks)),
+        ("metadata, dependencies, stock order, and UFS/USB closures verified"
+         if module_audit_ok else "missing/failed module checks: " + ", ".join(missing_module_checks)),
         str(module_audit_path.relative_to(root)),
     )
 
@@ -379,8 +379,8 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     ))
     audit.add(
         "initramfs_source_provenance", "PASS" if init_provenance_ok else "FAIL",
-        ("initramfs enlazado por hash al manifiesto, tar y árbol de módulos U11"
-         if init_provenance_ok else "metadata initramfs incompleta o no coincide con el build U11"),
+        ("initramfs linked by hash to U11 manifest, tar, and modules tree"
+         if init_provenance_ok else "incomplete initramfs metadata or mismatch with U11 build"),
         str(init_metadata_path.relative_to(root)) if init_metadata_path.exists() else None,
     )
     profiles: dict[str, object] = {}
@@ -399,9 +399,9 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
             status = "PASS"
         else:
             status = "WARN"
-        detail = f"{len(module_files)} módulos, LZ4={fit['bytes']} B, margen={fit['margin']} B"
+        detail = f"{len(module_files)} modules, LZ4={fit['bytes']} B, margin={fit['margin']} B"
         if profile == "usb" and not fit["fits"]:
-            detail += "; perfil diagnóstico sobredimensionado, no empaquetable"
+            detail += "; oversized diagnostic profile, unpackable"
         audit.add(f"initramfs_{profile}", status, detail,
                   str(profile_manifest.relative_to(root)) if profile_manifest.exists() else None)
         profiles[profile] = {"module_count": len(module_files), "checksums": len(profile_checked), **fit}
@@ -416,7 +416,7 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
         "dt_observed_distance",
         "WARN" if overlay_observed and base_observed else "FAIL",
         f"r04 material={semantic_r04.get('material_difference_count')}, unresolved={len(semantic_r04.get('unresolved', []))}; "
-        f"DTB base compilado material={semantic_base.get('material_difference_count')}, unresolved={len(semantic_base.get('unresolved', []))}. No demuestra equivalencia.",
+        f"compiled base DTB material={semantic_base.get('material_difference_count')}, unresolved={len(semantic_base.get('unresolved', []))}. Does not prove equivalence.",
         str(compiled_base_path.relative_to(root)),
     )
 
@@ -425,8 +425,8 @@ def run_audit(root: Path, identity_path: Path) -> dict[str, object]:
     reproducible = repro_report_valid(repro_report)
     audit.add(
         "kernel_binary_reproducibility", "PASS" if reproducible else "WARN",
-        ("dos runs limpios del perfil fijo son idénticos byte a byte"
-         if reproducible else "falta comparación válida de dos runs limpios del perfil fijo"),
+        ("two clean runs of fixed profile are byte-for-byte identical"
+         if reproducible else "missing valid comparison of two clean runs of fixed profile"),
         str(repro_path.relative_to(root)) if repro_path.exists() else None,
     )
     audit.add("exact_eze4_source", "WARN", "OSRC X510XXUCEZE4 request is pending; U11 is not U12/EZE4")

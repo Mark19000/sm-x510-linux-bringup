@@ -12,7 +12,7 @@ equivalence claim.
   `.../samsung/gts9fewifi/gts9fewifi_eur_open_w00_r04.dts`, from the tree
   `X510XXU3BXDG` (commit `9a752a83347461b3785711760ba925fcabea3071`),
   identified as U3/Android 14 in
-  [`docs/00-seguridad-y-modelos.md`](../../../docs/00-seguridad-y-modelos.md).
+  [`docs/00-safety-and-models.md`](../../../docs/00-safety-and-models.md).
 - EZE4 base input: `artifacts/stock/dt/vendor_boot/fdt-00-offset-0113f040.dts`,
   extracted from `vendor_boot.img`; the manifest preserves the same FDT and
   `artifacts/stock/firmware-metadata.txt` identifies the AP as

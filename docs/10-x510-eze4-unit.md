@@ -72,7 +72,7 @@ The port requires two distinct deliverables:
 
 Firmware supplies real binary images; OSRC supplies source code that can be compiled and audited. One does not replace the other. As of this logbook entry, the former is secured, while the latter is actively tracked and requested.
 
-Public searches on August 23, 2026 did not yield an exact EZE4 entry. The owner submitted an official inquiry for SM-X510 / X510XXUCEZE4 / Android 16, which Samsung confirmed was escalated to the responsible department. The project integrates incoming source code only upon receiving and archiving complete materials with timestamp, filename, and SHA-256.
+Public searches on August 23, 2026 did not yield an exact EZE4 entry. The owner submitted an official inquiry for SM-X510 / X510XXUCEZE4 / Android 16, which Samsung confirmed was escalated to the responsible department. If no response is received within 24 hours, the request will be resent from the same account. The project integrates incoming source code only upon receiving and archiving complete materials with timestamp, filename, and SHA-256.
 
 Suggested text for "Request for source codes":
 

@@ -150,7 +150,7 @@ First attempt (minimal profile)
 ## 7. Fixed Rules for This Phase
 
 - Single variable changed between trials.
-Trial sheet mandatory prior to touching hardware (see `docs/12-preflight-primera-prueba.md`).
+Trial sheet mandatory prior to touching hardware (see `docs/12-first-test-preflight.md`).
 - Timeout and abort conditions written prior to trial.
 - No simultaneous modification of kernel + DTBO + vbmeta + rootfs.
 - The verdict remains **NO-GO for flashing**; this phase only prepares instrumentation.

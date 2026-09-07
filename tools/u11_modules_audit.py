@@ -149,8 +149,8 @@ def run(root: Path) -> dict[str, object]:
     )
     stock_evidence_ok = stock_evidence_ok and stock_checked == 6 and not stock_hash_failures
     add(checks, "stock_provenance", "PASS" if stock_evidence_ok else "FAIL",
-        ("vendor_boot EZE4 v4: fragmentos generic + dlkm, 281 módulos; 6 ficheros verificados"
-         if stock_evidence_ok else "provenance stock incompleta o alterada: " + ", ".join(stock_hash_failures)))
+        ("vendor_boot EZE4 v4: generic + dlkm fragments, 281 modules; 6 verified files"
+         if stock_evidence_ok else "altered or incomplete stock provenance: " + ", ".join(stock_hash_failures)))
 
     modules = sorted(installed.rglob("*.ko"))
     module_ids = {module_id(path.name) for path in modules}
@@ -167,8 +167,8 @@ def run(root: Path) -> dict[str, object]:
             vermagic_values.add(vermagic)
     metadata_ok = len(modules) == 282 and not bad_vermagic and not unsigned and len(vermagic_values) == 1
     add(checks, "u11_module_metadata", "PASS" if metadata_ok else "FAIL",
-        f"282/282 módulos con vermagic 5.15.180 y firma añadida" if metadata_ok else
-        f"módulos={len(modules)}, vermagic inválido={len(bad_vermagic)}, sin firma={len(unsigned)}")
+        f"282/282 modules with vermagic 5.15.180 and appended signature" if metadata_ok else
+        f"modules={len(modules)}, invalid vermagic={len(bad_vermagic)}, unsigned={len(unsigned)}")
 
     dependencies = parse_modules_dep(installed / "modules.dep")
     softdeps = parse_softdeps(installed / "modules.softdep")
@@ -176,16 +176,16 @@ def run(root: Path) -> dict[str, object]:
     missing_soft = sorted({dependency for values in softdeps.values() for dependency in values if dependency not in module_ids})
     dep_ok = len(dependencies) == 282 and not missing_global
     add(checks, "u11_hard_dependency_graph", "PASS" if dep_ok else "FAIL",
-        "282 entradas modules.dep; todas las dependencias duras están presentes" if dep_ok else
-        f"dependencias duras ausentes: {', '.join(missing_global)}")
+        "282 modules.dep entries; all hard dependencies are present" if dep_ok else
+        f"missing hard dependencies: {', '.join(missing_global)}")
     stock_softdeps = parse_softdeps(stock / "modules.softdep")
     stock_module_ids = {module_id(line.split(maxsplit=1)[1]) for line in lines(stock / "MODULES_SHA256SUMS")}
     stock_missing_soft = sorted({dependency for values in stock_softdeps.values() for dependency in values
                                  if dependency not in stock_module_ids})
     mirrored_stale_softdeps = missing_soft == stock_missing_soft
     add(checks, "softdep_stale_names", "WARN" if missing_soft else "PASS",
-        (f"referencias no resolubles {missing_soft}; coinciden con vendor_boot EZE4={mirrored_stale_softdeps}"
-         if missing_soft else "todas las referencias softdep se resuelven"))
+        (f"unresolvable references {missing_soft}; matches EZE4 vendor_boot={mirrored_stale_softdeps}"
+         if missing_soft else "all softdep references resolve"))
 
     prefix = lines(build / "vendor_boot_module_order_s5e8835.cfg")
     build_order = [module_filename(item) for item in lines(build / "modules.order")]

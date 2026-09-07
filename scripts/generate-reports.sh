@@ -44,6 +44,7 @@ python3 "$ROOT/tools/compatible_report.py" \
             echo "$revision: install diffstat for detailed summary"
     done
     echo '```'
-} > "$OUT/revisiones.md"
+} > "$OUT/revisions.md"
+cp -f "$OUT/revisions.md" "$OUT/revisiones.md"
 
 echo "Reports generated in $OUT"

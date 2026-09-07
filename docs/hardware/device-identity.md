@@ -22,7 +22,7 @@ Audit date: 2026-08-24. Mode: read-only over local artifacts and existing docume
 | AP/PDA version | `X510XXUCEZE4` | `configs/target-sm-x510.env`; `artifacts/stock/firmware-metadata.txt` |
 | CSC / multi-CSC | `EUX` / `OXM` (`X510OXMCEZE4`) | `configs/target-sm-x510.env`; documented SAOMC string |
 | Bootloader binary revision | `U12` | Field `TARGET_BOOTLOADER_REVISION=12` and project documentation |
-| Preserved firmware | Full ZIP with SHA-256 `45a45087...01d375` | `configs/target-sm-x510.env`; `docs/10-unidad-x510-eze4.md` |
+| Preserved firmware | Full ZIP with SHA-256 `45a45087...01d375` | `configs/target-sm-x510.env`; `docs/10-x510-eze4-unit.md` |
 | AP entry | `AP_..._MQB109790656_REV00_user_low_ship...tar.md5` | `artifacts/stock/firmware-metadata.txt` |
 
 ### EZE4 Overlays Table

@@ -1,6 +1,6 @@
 # 3. Driver Matrix: Android/Downstream vs Linux Mainline
 
-> In this checkout `docs/03-comparacion-drivers.md` does not exist; the canonical document is this `docs/03-matriz-de-drivers.md`. The comprehensive matrix and reproducible searches reside in [`reports/generated/wifi/driver-matrix.md`](../reports/generated/wifi/driver-matrix.md).
+> In this checkout `docs/03-comparacion-drivers.md` does not exist; the canonical document is this `docs/03-driver-matrix.md`. The comprehensive matrix and reproducible searches reside in [`reports/generated/wifi/driver-matrix.md`](../reports/generated/wifi/driver-matrix.md).
 
 ## Identity and Methodology
 
@@ -51,7 +51,7 @@ The initial boot image must prioritize console output and diagnostics. UART0 is 
 
 ## Explicit M2/M3 Blockers
 
-M2 represents the first kernel message, and M3 is `/init` as PID 1 (`README.md:83-94`). Infrastructure blockers are the correct base EZE4 DT, PSCI/GIC/timer, CMU/clocks, pinctrl/GPIO, minimal PMU/ACPM, and an observable channel (validated UART, pre-tested USB, or pstore). M3 adds stable IRQ/SMP and a valid initramfs with `/init`; it does not require UFS, display, touch, GPU, Wi-Fi, audio, or battery charging. The recommended initial test uses a module-free initramfs and leaves these peripherals uninitialized (`docs/12-preflight-primera-prueba.md:94-111`).
+M2 represents the first kernel message, and M3 is `/init` as PID 1 (`README.md:83-94`). Infrastructure blockers are the correct base EZE4 DT, PSCI/GIC/timer, CMU/clocks, pinctrl/GPIO, minimal PMU/ACPM, and an observable channel (validated UART, pre-tested USB, or pstore). M3 adds stable IRQ/SMP and a valid initramfs with `/init`; it does not require UFS, display, touch, GPU, Wi-Fi, audio, or battery charging. The recommended initial test uses a module-free initramfs and leaves these peripherals uninitialized (`docs/12-first-test-preflight.md:94-111`).
 
 UFS (M5), full USB, DPU/panel, touchscreen/Wacom, GPU, SCSC Wi-Fi/BT, ABOX, SM5714/SM5440, cameras/NPU, sensors, and CPIF can wait for M5/M6/M7. The detailed matrix lists the dependencies to resolve at each phase.
 

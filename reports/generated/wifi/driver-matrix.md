@@ -16,7 +16,7 @@ the unit nor that a shared `compatible` is electrically interchangeable.
 The Samsung code is U3 and serves as a reference, not as exact EZE4 source
 (`sources/README.md:7-10`). The stock DT contains overlays for hw-rev 0, 1--3, and
 4--32; without the effective hw-rev, r00, r01, or r04 cannot be chosen
-(`docs/02-analisis-device-tree.md:29-48`). Therefore, panels and touch
+(`docs/02-device-tree-analysis.md:29-48`). Therefore, panels and touch
 controllers remain as candidates.
 
 Only cases where the string appears in the mainline `of_device_id`/binding were
@@ -55,8 +55,8 @@ variant functions.
 | **Wi-Fi / BT SCSC**: `samsung,scsc_wifibt`, `exynos,wifibt_if`, QoS | `drivers/misc/samsung/scsc/`, `platform_mif_s5e8835.c`, and `drivers/net/wireless/scsc` | No SCSC in present mainline files and Git tree also lacks `drivers/net/wireless/scsc` | Driver, firmware, reserved memory, IRQ, PMU/QoS, and protocol are proprietary; not a reasonable block for first boot. `a96t396_wifi` is another I2C node from overlay, not proof of WLAN. **P5** | Stock DT `:234,8442-8458`, overlay 01 `:2868-2869`; downstream `.../platform_mif_s5e8835.c:53-54`; `rg -n -F 'samsung,scsc_wifibt' sources/mainline-kernel` = 0; `git ls-tree ... drivers/net/wireless/scsc` empty |
 | **Audio**: `samsung,abox`, `samsung,abox-core`, `cirrus,cs35l45` | ABOX/machine `sound/soc/samsung/exynos/{abox,exynos8835_sound.c}` and downstream codec | Exact CS35L45 codec (I2C/SPI and binding); no ABOX or Exynos8835 machine in present files | Isolated codec does not produce audio: missing DSP/firmware, ABOX, machine, clocks, and routes. **P5** | Stock DT `:5846`; overlay 01 `:5287,5388`; downstream `.../abox_core.c:564`, `.../exynos8835_sound.c:1697`; mainline `sound/soc/codecs/cs35l45-i2c.c:50`, `cs35l45-spi.c:52`; `rg -n -F 'samsung,abox' sources/mainline-kernel` = 0 |
 | **PMIC, Charging, and USB-PD**: `samsung,sm5714-charger`, `siliconmitus,sm5714mfd`, `siliconmitus,sm5440`, `samsung,sec-battery` | MFD/charger/fuel-gauge/Type-C SM5714, SM5440, and `sec-battery`; S2MPU15/16 PMIC | No drivers/compatibles for SM5714, SM5440, S2MPU15/16, or `sec-battery` in present mainline files; only other generic Silicon Mitus | High risk: do not enable charging or alter limits/regulators without schematics and measurements; depends on I2C, GPIO, IRQ, and ACPM. **P5** | Overlay 01 `:264-277,2608-2609`; downstream `drivers/mfd/sm/sm5714/sm5714_core.c:448`, `drivers/usb/typec/sm/sm5714/sm5714_typec.c:4490`, `drivers/battery/common/sec_direct_charger.c:1171`; queries `rg -n -F sm5714`, `sm5440`, and `sec-battery` on mainline: 0 |
-| **Cameras / NPU / Samsung Multimedia**: `samsung,exynos-is`, `samsung,exynos-npu` and private sensors | `drivers/media/platform/exynos/camera`, `drivers/vision`/Samsung stack | Snapshot lacks `drivers/media/platform/exynos` (empty `git ls-tree`) and equivalent S5E8835/NPU stack; older Exynos camera bindings exist | Do not block console/UFS/USB on these blocks; require IOMMU, clocks, firmware, reserved memory, and identified sensors. **P6** | Base DT `docs/02-analisis-device-tree.md:60-62`; compatibles in `reports/generated/wifi/compatibles.md`; `git -C sources/mainline-kernel ls-tree -r --name-only HEAD -- drivers/media/platform/exynos`; `git -C sources/mainline-kernel ls-tree -r --name-only HEAD -- drivers/vision` |
-| **Modem/CPIF** (X516 reference only, not Wi-Fi target) | CPIF/GNSS code in 5G reference `sources/device-kernel` | Not applicable to `TARGET_VARIANT=wifi`; do not enable CP nodes by SoC similarity | Keep disabled and out of X510 Wi-Fi bring-up; do not infer hardware from X516 matrix. **P6/N/A** | `configs/target-sm-x510.env:3-4`; `sources/README.md:9`; `docs/02-analisis-device-tree.md:82-84` |
+| **Cameras / NPU / Samsung Multimedia**: `samsung,exynos-is`, `samsung,exynos-npu` and private sensors | `drivers/media/platform/exynos/camera`, `drivers/vision`/Samsung stack | Snapshot lacks `drivers/media/platform/exynos` (empty `git ls-tree`) and equivalent S5E8835/NPU stack; older Exynos camera bindings exist | Do not block console/UFS/USB on these blocks; require IOMMU, clocks, firmware, reserved memory, and identified sensors. **P6** | Base DT `docs/02-device-tree-analysis.md:60-62`; compatibles in `reports/generated/wifi/compatibles.md`; `git -C sources/mainline-kernel ls-tree -r --name-only HEAD -- drivers/media/platform/exynos`; `git -C sources/mainline-kernel ls-tree -r --name-only HEAD -- drivers/vision` |
+| **Modem/CPIF** (X516 reference only, not Wi-Fi target) | CPIF/GNSS code in 5G reference `sources/device-kernel` | Not applicable to `TARGET_VARIANT=wifi`; do not enable CP nodes by SoC similarity | Keep disabled and out of X510 Wi-Fi bring-up; do not infer hardware from X516 matrix. **P6/N/A** | `configs/target-sm-x510.env:3-4`; `sources/README.md:9`; `docs/02-device-tree-analysis.md:82-84` |
 
 ## Bring-up Order Derived from Comparison
 
@@ -90,7 +90,7 @@ driver/DT blockers are solely:
 - **M3:** All of the above, plus stable IRQ/SMP and an initramfs with valid
   `devtmpfs`, format, and `/init`. UFS, display, touch, GPU, Wi-Fi, audio, and
   charging are not required: preflight recommends `MODULES_MODE=none` and rootfs
-  in initramfs for this test (`docs/12-preflight-primera-prueba.md:94-111`).
+  in initramfs for this test (`docs/12-first-test-preflight.md:94-111`).
 - **Shared infrastructure blockers:** S5E8835 CMU, pinctrl/GPIO, PMU/ACPM, and,
   only if the chosen channel requires it, basic UART/USB. SysMMU, UFS, DPU,
   DSIM, display PHY, GPU, and Android peripherals must not enter M2/M3 under
@@ -105,7 +105,7 @@ early crash.
 
 This list orders technical work; it does not authorize a physical test.
 The gates for exact EZE4 source, hw-rev, AVB, restoration, and observability
-remain those of preflight (`docs/12-preflight-primera-prueba.md`) and can
+remain those of preflight (`docs/12-first-test-preflight.md`) and can
 maintain the NO-GO verdict even if M2/M3 are solved in the laboratory.
 
 ## Limitations and Reproducible Checks

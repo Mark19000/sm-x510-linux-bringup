@@ -119,4 +119,4 @@ the nine Wi-Fi patches applied, and compilation performed with Clang 21 ARM64.
 The full build produced kernel 5.15.180, `Image`, base DTB, DTBOs r00/r01/r04,
 and 282 modules, exiting with status 0. Hashes, logs, and per-patch negative
 tests are in `artifacts/u11/x510xxsbdzb4-u11-clang21-20260823`; analysis is
-explained in `docs/14-resultados-u11-u3-eze4.md`.
+explained in `docs/14-u11-u3-eze4-results.md`.

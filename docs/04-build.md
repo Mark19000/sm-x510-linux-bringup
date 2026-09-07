@@ -7,7 +7,7 @@ Two distinct assertions must be maintained:
 1. **The U3 tree compiles**: validates build scripts, patches, configuration fragments, Device Tree compilation, and kernel modules.
 2. **The resulting binary is usable on EZE4**: not yet demonstrated, because Samsung has not released the exact U12 / Android 16 source tree and AVB invalidates any modified byte.
 
-The completed reference build uses commit `9a752a83347461b3785711760ba925fcabea3071` from `X510XXU3BXDG`. It produces an `Image` of 38,361,600 bytes, 282 kernel modules, and the r00, r01, and r04 Wi-Fi overlays. The record of real compiler and build issues is in [11-registro-build-referencia.md](11-registro-build-referencia.md). For the Android 16 U11 pipeline, use the isolated recipe in [chapter 15](15-pipeline-u11-offline.md), not `make build`.
+The completed reference build uses commit `9a752a83347461b3785711760ba925fcabea3071` from `X510XXU3BXDG`. It produces an `Image` of 38,361,600 bytes, 282 kernel modules, and the r00, r01, and r04 Wi-Fi overlays. The record of real compiler and build issues is in [11-reference-build-log.md](11-reference-build-log.md). For the Android 16 U11 pipeline, use the isolated recipe in [chapter 15](15-pipeline-u11-offline.md), not `make build`.
 
 ## Reproducible Environment on Apple Silicon
 
